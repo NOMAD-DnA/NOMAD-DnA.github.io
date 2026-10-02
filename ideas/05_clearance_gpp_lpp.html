@@ -36,10 +36,10 @@ dialog{width:min(1120px,96vw);max-height:94vh;overflow:auto;padding:22px;border:
 <div class="corner-head"><div><h2 id="cornerTitle">ㄱ자 경로가 있어도, 모서리에서 꺾으면 늦을 수 있습니다</h2><p>같은 차체·조향 한계. 차이는 <b>조향을 시작할 위치와 미리 확보한 공간</b>입니다.</p></div><button id="cornerClose" autofocus>닫기</button></div>
 <div class="corner-pair">
 <section class="corner-card"><h3 class="corner-red">기존 예시 · 늦은 조향 검사</h3><p>모서리 가까이 직진한 후 90° 방향 전환을 시도</p><canvas id="lateCanvas" aria-label="늦게 조향하면 예측 궤적이 장애물에 걸리는 장면"></canvas><div class="corner-outcome" id="lateOutcome"></div></section>
-<section class="corner-card"><h3 class="corner-green">5안 · 여유공간 확보·사전 조향</h3><p>장애물에서 더 떨어진 위치부터 완만하게 방향 전환</p><canvas id="earlyCanvas" aria-label="미리 조향하면 같은 회전반경으로 통과하는 장면"></canvas><div class="corner-outcome" id="earlyOutcome"></div></section>
+<section class="corner-card"><h3 class="corner-green">5안 · 여유공간 확보·사전 조향</h3><p>장애물에서 더 떨어진 위치부터 미리 방향 전환</p><canvas id="earlyCanvas" aria-label="미리 조향하면 같은 회전반경으로 통과하는 장면"></canvas><div class="corner-outcome" id="earlyOutcome"></div></section>
 </div>
 <div class="corner-bottom"><span id="cornerParameters"></span><button id="cornerReplay">예측 궤적 다시 보기</button></div>
-<p class="corner-caution">장애물 앞에서의 90° 방향 전환만 분리한 설명용 예시입니다. 점선 ㄱ자 선은 참조 경로이며 실제 A* 결과가 아닙니다. 최대 조향의 예측 원호와 차체 외접원+공통 여유를 검사합니다. 실제 차체를 장애물에 충돌시키지 않고, 위험이 예측되면 정지합니다. 일반적인 GPP·LPP가 반드시 실패한다는 주장이나 전체 목적지 도착 검증이 아닙니다.</p>
+<p class="corner-caution">장애물 위치를 이미 아는 별도 기하 예시입니다(관측·GPP 재계획 아님). 장애물 앞에서의 90° 방향 전환만 분리했으며, 점선 ㄱ자 선은 참조 경로이고 실제 A* 결과가 아닙니다. 최대 조향의 예측 원호와 차체 외접원+공통 여유를 검사합니다. 실제 차체를 장애물에 충돌시키지 않고, 위험이 예측되면 정지합니다. 일반적인 GPP·LPP가 반드시 실패한다는 주장이나 전체 목적지 도착 검증이 아닙니다.</p>
 </dialog>
 <script id="simulation-engine">
 'use strict';
