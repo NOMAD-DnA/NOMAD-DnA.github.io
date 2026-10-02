@@ -12,6 +12,7 @@
 @media(max-width:800px){main{padding:18px 14px}header{display:block}nav{margin-top:7px}h1{font-size:23px}.comparison,.reading{grid-template-columns:1fr}.controls .info{width:100%;margin:0}.flow{font-size:12px;gap:8px}.metrics strong{font-size:17px}.panel h2{font-size:18px}.map{aspect-ratio:28/18}}
 @media print{.controls,nav,details,.log{display:none}body{background:white}main{padding:8px}.comparison,.reading{grid-template-columns:1fr 1fr}.map{aspect-ratio:28/18}}
 .map-badges{position:absolute;top:9px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;font-size:12px}.map-badges span{padding:4px 8px;background:#ffffffee;border:1px solid #d8e0e6;border-radius:4px;font-weight:650}.map-badges [data-phase="detect"],.map-badges [data-phase="map"],.map-badges [data-phase="plan"]{background:#fff0e4;border-color:#dba47d;color:#a84c25}.flow{flex-wrap:wrap}.state{font-size:13px}.legend{font-size:10px}
+.scene-caption{position:absolute;left:12px;right:12px;top:45px;padding:7px 10px;background:#fffffff2;border-left:4px solid var(--blue);border-radius:3px;pointer-events:none;box-shadow:0 2px 9px #20374712}.scene-caption strong{font-size:15px;display:block;line-height:1.3}.scene-caption span{font-size:11px;color:var(--muted);display:block;margin-top:2px;line-height:1.3}.scene-caption[data-tone="stop"]{background:#fff1eaf7;border-color:#c45930;color:#a04424}.scene-caption[data-tone="clear"]{background:#eef9f5f7;border-color:var(--new);color:var(--new)}.map{min-height:300px}.legend{max-width:calc(100% - 24px);font-size:10px}.panel-head p{font-size:12px}
 </style>
 </head>
 <body>
@@ -22,13 +23,13 @@
 <div class="comparison">
 <section class="panel base" aria-labelledby="baselineHeading">
   <div class="panel-head"><h2 id="baselineHeading">기존 예시 · 거리 중심 GPP</h2><p>벽을 끼고 진입 → 가려진 코너 너머에서 급회전 필요</p></div>
-  <div class="map"><canvas id="baseCanvas" aria-label="벽을 따라 진입해 가려진 헤어핀을 관측하는 거리 중심 경로"></canvas><div class="map-badges"><span id="basePhase">관측·주행</span><span id="baseObserved">관측 0%</span></div><div class="legend"><span>회색 미관측</span><span>갈색 벽</span><span>실선 GPP / 점선 미관측 가정</span></div></div>
+  <div class="map"><canvas id="baseCanvas" aria-label="벽을 따라 진입해 가려진 헤어핀을 관측하는 거리 중심 경로"></canvas><div class="map-badges"><span id="basePhase">관측·주행</span><span id="baseObserved">관측 0%</span></div><div class="scene-caption" id="baseCaption"><strong>① 벽 가까이 진입</strong><span>벽 뒤 통로는 아직 보이지 않음</span></div><div class="legend"><span>파란 차 실제 위치</span><span>붉은 점선·차체 회전 예측</span><span>회색 미관측</span></div></div>
   <div class="status"><span class="state" id="baseState">관측하며 전진</span><span class="clock" id="baseTime">0.0 s</span></div>
   <div class="metrics"><div><span>주행거리</span><strong id="baseDistance">—</strong></div><div><span>안전한 전진 후보</span><strong id="baseGap">—</strong></div><div><span>차량 방향 변화</span><strong id="baseSteer">0°</strong></div><div><span>정지·재계획</span><strong id="baseStops">0회</strong></div></div>
 </section>
 <section class="panel proposed" aria-labelledby="proposedHeading">
   <div class="panel-head"><h2 id="proposedHeading">5안 · 여유거리 비용 GPP</h2><p>벽과 간격 유지 → 넓게 돌아 반대 방향으로 이동</p></div>
-  <div class="map"><canvas id="newCanvas" aria-label="벽과 회전 여유를 유지해 헤어핀을 넓게 도는 경로"></canvas><div class="map-badges"><span id="newPhase">관측·주행</span><span id="newObserved">관측 0%</span></div><div class="legend"><span>회색 미관측</span><span>갈색 벽</span><span>옅은 초록 여유거리 비용</span></div></div>
+  <div class="map"><canvas id="newCanvas" aria-label="벽과 회전 여유를 유지해 헤어핀을 넓게 도는 경로"></canvas><div class="map-badges"><span id="newPhase">관측·주행</span><span id="newObserved">관측 0%</span></div><div class="scene-caption" id="newCaption"><strong>① 벽과 간격을 두고 진입</strong><span>미리 관측한 벽을 기준으로 회전 여유 확보</span></div><div class="legend"><span>파란 차 실제 위치</span><span>초록 선 선택된 회전 예측</span><span>회색 미관측</span></div></div>
   <div class="status"><span class="state" id="newState">관측하며 전진</span><span class="clock" id="newTime">0.0 s</span></div>
   <div class="metrics"><div><span>주행거리</span><strong id="newDistance">—</strong></div><div><span>안전한 전진 후보</span><strong id="newGap">—</strong></div><div><span>차량 방향 변화</span><strong id="newSteer">0°</strong></div><div><span>정지·재계획</span><strong id="newStops">0회</strong></div></div>
 </section>
@@ -42,7 +43,8 @@
 <p><strong>헤어핀 GPP:</strong> 긴 가림벽의 끝을 돌아 반대 방향으로 이어지는 길을 구성했습니다. 양쪽 모두 0.25 m·4방향 A*를 사용합니다. 기존은 거리 비용, 5안은 <code>구간 거리 × (1 + 10 exp(−여유거리 / 1.0))</code> 비용입니다. 여유거리는 관측된 벽과 이미 아는 시험구역 경계까지의 거리로 계산합니다. 미관측 구간은 GPP에서 통과 가능으로 가정하며 점선으로 표시합니다. 정지 위치나 성공 궤적을 지정하지 않습니다.</p>
 <p><strong>공통 LPP:</strong> 차체 1.2×0.8 m, 휠베이스 0.9 m, 최대 조향 ±30°, 최소 회전반경 1.56 m. 속도 1.2·0.75·0.35 m/s와 조향 21개를 조합한 63개 후보를 3초 예측하며, GPP 목표점을 2 m 앞에서 선택합니다. 관측된 자유공간 안에서 안전한 후보만 실행합니다. 후보가 없으면 정지하며 후진·복귀는 하지 않습니다.</p>
 <p><strong>주행 중 정지 원인:</strong> 기존 차량은 실제 벽 끝을 지난 후 약116° 방향을 바꾼 위치에서 멈춥니다. 관측된 보조벽과 현재 자세 때문에 63개 전진 후보가 모두 안전 조건을 위반합니다. 차체 외접원+0.16 m 안전여유와 보수적인 격자 거리보정(0.25√2 m)을 적용했습니다. 물리적 조향각만으로 모든 회피가 불가능하다는 증명은 아닙니다. 연속 조향 변경·다른 LPP·후진을 쓰면 결과가 달라질 수 있습니다.</p>
-<p><strong>차량 방향·점선 원호:</strong> 표시 각도는 출발 방향(0°)에 대한 차량 방향 변화입니다. 180°면 반대 방향입니다. 멈춘 위치의 원호는 남은 방향 전환을 최대 조향으로 시도할 때의 예측이며, × 이후는 안전 조건 위반입니다. 실제 차체를 충돌시키거나 원호로 강제 주행시키지 않습니다.</p>
+<p><strong>차량 방향·회전 예측:</strong> 표시 각도는 출발 방향(0°)에 대한 차량 방향 변화입니다. 180°면 반대 방향입니다. 정지 화면의 붉은 점선·반투명 차량은 실제 계산된 탈락 LPP 후보 하나를 예로 보여줍니다. 얇은 회색 원호는 남은 방향 전환을 최대 조향으로 시도하는 보조 예측입니다. 둘 다 실제 이동이 아니며, 차량을 충돌시키거나 예측 원호로 강제 주행시키지 않습니다.</p>
+<p><strong>확대·강조 표시:</strong> 코너 진입부터 같은 화면 축척으로 양쪽을 확대하고 관측·정지 구간을 느리게 재생합니다. 주행 계산·정지 시점은 변경하지 않습니다. 붉은 반투명 차량은 실행하지 않은 회전 예측입니다. 붉은 원은 차체 외접원·안전여유·격자 보정을 합친 장애물 안전 검사 범위를 나타내며, 붉게 칠한 관측 벽은 그 범위와 겹치는 곳입니다. 실제 차량 충돌을 의미하지 않습니다.</p>
 <p><strong>정보·평가 한계:</strong> GPP·LPP는 관측 지도만 읽고 실제 환경은 센서 관측 생성과 사후 충돌 확인에만 사용합니다. 코너 표시 지점은 관측 여부를 화면에 설명하기 위한 표식일 뿐 경로계산 입력이 아닙니다. 한쪽이 미완주했으므로 소요시간·거리의 성능 우열을 비교하지 않습니다. 정확한 위치·이상적 인식·즉시 정지를 가정하며 실제 VIO·영상 피드백·제동거리·야지 동역학은 구현하지 않았습니다. ROS/Gazebo나 실차 검증이 아닌, 이 조건에서의 계산 기반 개념 시연입니다.</p>
 <p><strong>설계 참고:</strong> <a href="https://docs.nav2.org/jazzy/configuration_and_development/tuning_guide/" target="_blank" rel="noopener">Nav2 공식 튜닝 가이드</a> / <a href="https://github.com/ros-navigation/navigation2/blob/main/nav2_regulated_pure_pursuit_controller/README.md" target="_blank" rel="noopener">Nav2 RPP 공식 설명</a>. 해당 패키지를 실행한 것이 아니며 독창성이나 일반적인 성능 우위를 입증하지 않습니다.</p>
 </div></details>
@@ -127,28 +129,66 @@ window.AvoidanceDemo = (() => {
 const E=window.AvoidanceDemo,$=id=>document.getElementById(id),colors=['#b85c34','#147d74'];
 const runs=[E.simulate(false),E.simulate(true)],canvases=[$('baseCanvas'),$('newCanvas')];
 const duration=Math.max(...runs.map(r=>r.time));let elapsed=0,playing=false,last=0,logged=new Set(),showResult=false;
+const stopTime=runs[0].frames.find(f=>f.phase==='stop').time;
+const focusStart=Math.min(...runs.map(r=>r.frames.find(f=>f.x>=18).time))-1.8;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+function playbackRate(){return elapsed>=stopTime-1.8&&elapsed<stopTime+1.8?.45:elapsed>=runs[0].cornerTime-.6&&elapsed<runs[0].cornerTime+1.8?.8:3;}
 function log(time,text,key){if(logged.has(key))return;logged.add(key);const li=document.createElement('li'),t=document.createElement('time'),p=document.createElement('span');t.textContent=time.toFixed(1)+'s';p.textContent=text;li.append(t,p);$('eventLog').append(li);$('eventLog').scrollTop=$('eventLog').scrollHeight;}
 function frameAt(run,t){return run.frames[Math.min(run.frames.length-1,Math.floor(t/E.C.dt))];}
 function line(ctx,points,color,width=2,dash=[]){if(points.length<2)return;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.setLineDash([]);}
-function draw(index){const canvas=canvases[index],rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(rect.width*ratio));canvas.height=Math.max(1,Math.round(rect.height*ratio));const ctx=canvas.getContext('2d'),w=rect.width,h=rect.height;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#f2f5ef';ctx.fillRect(0,0,w,h);const scale=Math.min((w-32)/E.C.w,(h-26)/E.C.h),ox=(w-scale*E.C.w)/2,oy=(h-scale*E.C.h)/2;ctx.translate(ox,oy);ctx.scale(scale,scale);
+function vehicle(ctx,p,ghost=false){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.yaw);ctx.fillStyle=ghost?'#c4483260':'#294c65';ctx.strokeStyle=ghost?'#bc432e':'#152e40';ctx.lineWidth=.06;ctx.fillRect(-.6,-.4,1.2,.8);ctx.strokeRect(-.6,-.4,1.2,.8);ctx.fillStyle=ghost?'#c4483250':'#1c2c38';for(const x of [-.45,.2])for(const y of [-.50,.34])ctx.fillRect(x,y,.30,.16);ctx.fillStyle=ghost?'#ffddcd':'#b4d9e5';ctx.fillRect(.10,-.30,.23,.60);ctx.fillStyle=ghost?'#bc432e':'#fff';ctx.beginPath();ctx.moveTo(.82,0);ctx.lineTo(.5,-.18);ctx.lineTo(.5,.18);ctx.closePath();ctx.fill();ctx.restore();}
+function tag(ctx,p,text,scale,color='#315e7e',dx=15,dy=-17){ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);ctx.font='650 12px system-ui';const tw=ctx.measureText(text).width;ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(dx,dy);ctx.stroke();const tx=dx<0?dx-tw-10:dx;ctx.fillStyle='#fffffff4';ctx.fillRect(tx-4,dy-16,tw+12,22);ctx.fillStyle=color;ctx.fillText(text,tx+2,dy);ctx.restore();}
+function conflict(ctx,f,scale){
+  // A real, discarded LPP sample. The ghost and safety area are predictions, never executed motion.
+  const sample=f.samples.filter(s=>!s.safe&&s.reason==='obstacle'&&s.v===.35).sort((a,b)=>b.points.length-a.points.length)[0];
+  if(!sample)return;
+  const q=sample.points.at(-1),gridQ={x:Math.round(q.x/E.C.grid)*E.C.grid,y:Math.round(q.y/E.C.grid)*E.C.grid};
+  const safetyRadius=E.C.hard+.04+E.C.grid*Math.SQRT2;
+  line(ctx,[f,...sample.points],'#c44832',.15,[.19,.12]);
+  ctx.fillStyle='#dd593223';ctx.strokeStyle='#c44832';ctx.lineWidth=.07;ctx.setLineDash([.13,.09]);ctx.beginPath();ctx.arc(gridQ.x,gridQ.y,safetyRadius,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.setLineDash([]);
+  let contact=null,best=Infinity;
+  for(let y=0;y<E.ny;y++)for(let x=0;x<E.nx;x++)if(f.map.cells[y*E.nx+x]===2){const p={x:x*E.C.grid,y:y*E.C.grid},d=Math.hypot(p.x-gridQ.x,p.y-gridQ.y);if(d<safetyRadius){ctx.fillStyle='#e74c35';ctx.fillRect(p.x-.125,p.y-.125,.25,.25);if(d<best){best=d;contact=p;}}}
+  vehicle(ctx,q,true);
+  tag(ctx,q,'회전 예측 · 실행 안 함',scale,'#a1442b',-23,-23);
+  if(contact){line(ctx,[gridQ,contact],'#b6402c',.07,[.12,.09]);ctx.fillStyle='#e84b3535';ctx.beginPath();ctx.arc(contact.x,contact.y,.43+.05*Math.sin(elapsed*9),0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.strokeStyle='#ba3e2b';ctx.lineWidth=.10;ctx.beginPath();ctx.arc(contact.x,contact.y,.23,0,Math.PI*2);ctx.fill();ctx.stroke();tag(ctx,contact,'예측 안전범위가 벽에 닿음',scale,'#a1442b',36,-16);}
+}
+function draw(index){const canvas=canvases[index],rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(rect.width*ratio));canvas.height=Math.max(1,Math.round(rect.height*ratio));const ctx=canvas.getContext('2d'),w=rect.width,h=rect.height;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#e8eef1';ctx.fillRect(0,0,w,h);
+  // Both panels use the same camera. Zoom changes presentation only, not sensor data or simulation.
+  const focus=ease((elapsed-focusStart)/6),scale=Math.min((w-24)/E.C.w,(h-108)/E.C.h)*(1+1.35*focus),cx=14+(20.6-14)*focus,cy=9+.5*focus,ox=w/2-scale*cx,oy=88+(h-116)/2-scale*cy;
+  ctx.save();ctx.beginPath();ctx.rect(0,87,w,h-113);ctx.clip();ctx.translate(ox,oy);ctx.scale(scale,scale);
   const f=frameAt(runs[index],elapsed),shown=runs[index].frames.filter(p=>p.time<=elapsed);
   // Only observation memory is drawn. No ground-truth obstacle geometry is exposed.
   ctx.fillStyle='#cbd3d9';ctx.fillRect(0,0,E.C.w,E.C.h);
   for(let y=0;y<E.ny;y++)for(let x=0;x<E.nx;x++){const k=y*E.nx+x,v=f.map.cells[k];if(!v)continue;ctx.fillStyle=v===2?'#a46547':'#f2f5ed';ctx.fillRect(x*E.C.grid-E.C.grid/2,y*E.C.grid-E.C.grid/2,E.C.grid+.005,E.C.grid+.005);if(index===1&&v===1){const gap=E.mapClearance(x*E.C.grid,y*E.C.grid,f.map.ds)-E.C.radius;if(gap>.16&&gap<3.2){ctx.fillStyle=`rgba(20,125,116,${.20*Math.exp(-gap/1.0)})`;ctx.fillRect(x*E.C.grid-.125,y*E.C.grid-.125,.25,.25);}}}
   ctx.save();ctx.strokeStyle='#93a3af55';ctx.lineWidth=.035;for(let x=0;x<=E.C.w;x++){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,E.C.h);ctx.stroke();}for(let y=0;y<=E.C.h;y++){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(E.C.w,y);ctx.stroke();}ctx.restore();
   for(let k=1;k<f.path.length;k++){const p=f.path[k],q=f.path[k-1],known=f.map.cells[Math.round(p.y/E.C.grid)*E.nx+Math.round(p.x/E.C.grid)]!==0;line(ctx,[q,p],known?colors[index]:'#7c8c98',known?.14:.075,known?[]:[.16,.18]);}
-  line(ctx,shown,'#283f53',.10,[.12,.18]);
+  line(ctx,shown,'#283f53',.13);
   ctx.save();ctx.strokeStyle='#3f6f9180';ctx.lineWidth=.05;ctx.setLineDash([.17,.17]);ctx.beginPath();ctx.arc(f.x,f.y,E.C.sensorRange,0,Math.PI*2);ctx.stroke();ctx.restore();
-  if(playing||elapsed>0){for(const sample of f.samples)line(ctx,[f,...sample.points],sample.safe?'#9ab1ba70':'#b96a5450',.035);if(f.selected)line(ctx,[f,...f.selected.points],colors[index],.085);}
+  if(playing||elapsed>0){for(const sample of f.samples)line(ctx,[f,...sample.points],sample.safe?'#9ab1ba60':'#b96a5440',.035);if(f.selected){line(ctx,[f,...f.selected.points],colors[index],.12);if(index===1&&f.cornerSeen&&f.phase==='drive'){ctx.strokeStyle='#147d7470';ctx.lineWidth=.06;ctx.setLineDash([.12,.10]);for(const p of f.selected.points.filter((_,k)=>k%9===0)){ctx.beginPath();ctx.arc(p.x,p.y,E.C.hard,0,Math.PI*2);ctx.stroke();}ctx.setLineDash([]);}}}
   for(const [point,label] of [[E.start,'S'],[E.goal,'G']]){ctx.fillStyle='#315e7e';ctx.beginPath();ctx.arc(point.x,point.y,.24,0,Math.PI*2);ctx.fill();ctx.font=`600 ${14/scale}px system-ui`;ctx.fillStyle='#243342';ctx.fillText(label,point.x-.15,point.y-.6);}
-  ctx.save();ctx.font=`600 ${12/scale}px system-ui`;ctx.fillStyle=f.cornerSeen?'#147d74':'#526675';ctx.fillText(f.cornerSeen?'목표 측 통로 확인 · 반대 방향으로':'벽 뒤 목표 측 통로는 미관측',E.scene.cornerExit.x-3.7,E.scene.cornerExit.y+2.5);ctx.restore();
-  ctx.save();ctx.translate(f.x,f.y);ctx.rotate(f.yaw);ctx.fillStyle='#294c65';ctx.fillRect(-.6,-.4,1.2,.8);ctx.fillStyle='#1c2c38';ctx.fillRect(-.45,-.50,.30,.16);ctx.fillRect(.2,-.50,.30,.16);ctx.fillRect(-.45,.34,.30,.16);ctx.fillRect(.2,.34,.30,.16);ctx.fillStyle='#b4d9e5';ctx.fillRect(.10,-.30,.23,.60);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(.82,0);ctx.lineTo(.5,-.18);ctx.lineTo(.5,.18);ctx.closePath();ctx.fill();ctx.restore();
+  if(f.cornerSeen){const visible=[E.scene.cornerExit,...f.path.filter(p=>p.x<19&&p.y>10)].slice(0,12);ctx.fillStyle='#147d7416';ctx.beginPath();ctx.arc(E.scene.cornerExit.x,E.scene.cornerExit.y,.65,0,Math.PI*2);ctx.fill();if(f.phase==='stop')tag(ctx,visible[0],'목적지 방향 ←',scale,'#315e7e',-8,-17);}
   if(['detect','map','plan','stop'].includes(f.phase)){ctx.save();ctx.strokeStyle='#c45930';ctx.lineWidth=.16;ctx.beginPath();ctx.arc(f.x,f.y,1.15,0,Math.PI*2);ctx.stroke();ctx.restore();}
   if(f.phase==='stop'){
-    // Predicted max-steering arcs are a live overlay at the actual stopped pose, not a second scenario.
-    for(const probe of E.turnPrediction(f,f.map)){const k=probe.firstUnsafe<0?probe.points.length-1:probe.firstUnsafe;line(ctx,[f,...probe.points.slice(0,k+1)],'#5d7b8b',.10,[.12,.12]);if(probe.firstUnsafe>=0){const q=probe.points[k];line(ctx,probe.points.slice(k),'#bf5438',.12,[.14,.14]);ctx.strokeStyle='#bf5438';ctx.lineWidth=.10;ctx.beginPath();ctx.moveTo(q.x-.22,q.y-.22);ctx.lineTo(q.x+.22,q.y+.22);ctx.moveTo(q.x-.22,q.y+.22);ctx.lineTo(q.x+.22,q.y-.22);ctx.stroke();}}
-    ctx.save();ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#fff2e9';ctx.fillRect(12,43,w-24,42);ctx.fillStyle='#a54b2c';ctx.font='600 14px system-ui';ctx.fillText('회전 후보 '+f.safeCandidates+' / '+f.totalCandidates+'개 → 안전정지',22,69);ctx.restore();
-  }
+    for(const probe of E.turnPrediction(f,f.map))line(ctx,[f,...probe.points],'#5d7b8b65',.045,[.12,.12]);
+    conflict(ctx,f,scale);
+  }else if(index===0&&f.cornerSeen&&f.selected&&elapsed>stopTime-1.8){line(ctx,[f,...f.selected.points],'#c07b20',.14,[.16,.09]);tag(ctx,f.selected.points.at(-1),'더 돌 공간이 좁아짐',scale,'#a06b16',-30,-20);}
+  vehicle(ctx,f);
+  if(f.phase==='stop')tag(ctx,f,'현재 차량 · 정지',scale,'#294c65',25,-28);
+  else if(index===1&&f.cornerSeen&&f.phase==='drive')tag(ctx,f,'회전 여유 유지',scale,'#147d74',-25,-23);
+  ctx.restore();
+  if(f.phase==='stop'){
+    ctx.fillStyle='#a9472b';ctx.font='750 14px system-ui';ctx.fillText('전진 후보 0 / 63 → 회전 진행 불가',15,h-34);
+  }else if(f.cornerSeen){ctx.fillStyle=index?'#147d74':'#9b6b28';ctx.font='650 12px system-ui';ctx.fillText(index?'넓은 진입 궤적 → 반대 방향으로 이어서 이동':'통로는 보였지만 → 목적지 쪽으로 더 돌아야 함',15,h-34);}
+  if(focus>.8){ctx.fillStyle='#5e6e7b';ctx.font='600 10px system-ui';ctx.textAlign='right';ctx.fillText('코너 확대 · 양쪽 동일 축척',w-14,h-34);ctx.textAlign='left';}
+}
+function caption(index,f){const element=$(index?'newCaption':'baseCaption');let title,sub,tone='';
+  if(f.phase==='stop'){title='③ 더 돌면 안전여유 위반 → 정지';sub='길이 없는 것이 아니라, 현재 자세의 전진 후보가 모두 제외됨';tone='stop';}
+  else if(f.phase==='done'){title='③ 확보한 공간에서 방향 전환 · 도착';sub='같은 조향 한계로 반대 방향의 목적지에 도달';tone='clear';}
+  else if(f.cornerSeen){title=index?'② 통로 확인 → 넓게 방향 전환':'② 통로 확인 → 지금보다 더 꺾어야 함';sub=index?'미리 알고 우회한 것이 아니라, 벽과의 여유를 유지한 결과':'벽을 따라 들어온 현재 자세에서 회전 공간을 확인';tone=index?'clear':'';}
+  else if(['detect','map','plan'].includes(f.phase)){title='벽 너머 새 장애물 관측 · 잠시 정지';sub='관측 지도 갱신 → 같은 목적지로 경로 다시 계산';}
+  else{title=index?'① 벽과 간격을 두고 진입':'① 벽 가까이 진입';sub='벽 뒤 목표 측 통로는 아직 보이지 않음';}
+  element.firstElementChild.textContent=title;element.lastElementChild.textContent=sub;element.dataset.tone=tone;
 }
 function update(){
   const visibleEvents=[];
@@ -161,6 +201,7 @@ function update(){
     $(prefix+'Observed').textContent='관측 '+((f.map.free+f.map.occupied)/(E.nx*E.ny)*100).toFixed(0)+'%';
     $(prefix+'Phase').textContent=f.phase==='drive'?(f.cornerSeen?'U턴형 방향 전환':'벽 따라 진입'):{detect:'새 장애물 감지 / 정지',map:'지도·비용 갱신',plan:'GPP 재계획',done:'도착',stop:'급회전 공간 부족'}[f.phase];
     $(prefix+'Phase').dataset.phase=f.phase;
+    caption(i,f);
     for(const [j,e] of runs[i].events.entries())if(e.time<=elapsed)visibleEvents.push({...e,key:i+'-'+j,label:i?'5안':'기존'});draw(i);
   }
   visibleEvents.sort((a,b)=>a.time-b.time).forEach(e=>log(e.time,e.label+' · '+e.text,e.key));
@@ -168,12 +209,12 @@ function update(){
   else if(elapsed>0){
     const phases=runs.map(r=>frameAt(r,elapsed).phase);
     const observedCorner=runs.some(r=>frameAt(r,elapsed).cornerSeen);
-    $('current').innerHTML=phases.includes('stop')?'<b>코너 진입 후 급회전 문제</b> 벽을 따라 들어온 자세에서 전진 회전 후보가 막혔습니다. 점선 U자 원호는 그 위치의 회전 예측이며 실제 이동이 아닙니다.':phases.includes('detect')?'<b>새 구간 관측</b> 진행하면서 새 장애물 정보를 얻었습니다. 벽 뒤 회색 영역은 여전히 미관측입니다.':phases.includes('map')?'<b>관측 지도 갱신</b> 실제 관측한 벽과 통로만 반영합니다. 미래 통로를 미리 알고 계획하지 않습니다.':phases.includes('plan')?'<b>GPP 재계획</b> 방금 확인한 벽과 목적지 좌표를 사용합니다. 점선은 여전히 확인되지 않은 통과 가정입니다.':observedCorner?'<b>가려진 코너 너머 확인</b> 목적지 방향으로 가려면 약 180° 방향을 바꿔야 합니다. 현재 자세와 확보한 회전 공간에 따라 추종 가능한 궤적이 달라집니다.':'<b>벽을 따라 진입</b> 벽 뒤 통로는 아직 보이지 않습니다. 기존은 가까운 경로를, 5안은 관측한 벽과 간격을 둔 경로를 선택합니다.';
-    $('progressText').textContent='가상 시간 '+elapsed.toFixed(1)+' / '+duration.toFixed(1)+' s · 3배 재생';
+    $('current').innerHTML=phases.includes('stop')?'<b>왜 멈췄나?</b> 목적지 쪽으로 더 돌아야 하지만, 현재 자세에서 예측한 전진 후보가 모두 안전여유를 위반했습니다. 붉은 차량·원은 실행하지 않은 예측이며 실제 충돌이 아닙니다.':phases.includes('detect')?'<b>새 구간 관측</b> 진행하면서 새 장애물 정보를 얻었습니다. 벽 뒤 회색 영역은 여전히 미관측입니다.':phases.includes('map')?'<b>관측 지도 갱신</b> 실제 관측한 벽과 통로만 반영합니다. 미래 통로를 미리 알고 계획하지 않습니다.':phases.includes('plan')?'<b>GPP 재계획</b> 방금 확인한 벽과 목적지 좌표를 사용합니다. 점선은 여전히 확인되지 않은 통과 가정입니다.':observedCorner?'<b>가려진 코너 너머 확인</b> 목적지 방향으로 가려면 약 180° 방향을 바꿔야 합니다. 현재 자세와 확보한 회전 공간에 따라 추종 가능한 궤적이 달라집니다.':'<b>벽을 따라 진입</b> 벽 뒤 통로는 아직 보이지 않습니다. 기존은 가까운 경로를, 5안은 관측한 벽과 간격을 둔 경로를 선택합니다.';
+    $('progressText').textContent='가상 시간 '+elapsed.toFixed(1)+' / '+duration.toFixed(1)+' s · '+(playbackRate()<1?'원인 장면 느리게':'3배 재생');
   }
 }
 function reset(){elapsed=0;playing=false;last=0;showResult=false;logged.clear();$('eventLog').replaceChildren();$('play').textContent='주행 비교 시작';$('progressText').textContent='부분 관측 지도 · 계산 기반 개념 시연';$('current').innerHTML='<b>시작 상태</b> 목적지 좌표와 보이는 벽만 압니다. 벽 뒤 통로는 미관측이며, 점선은 확정 경로가 아닌 가정 경로입니다.';update();}
-function tick(now){if(playing){if(last)elapsed=Math.min(duration,elapsed+(now-last)/1000*3);update();if(elapsed>=duration){playing=false;$('play').textContent='다시 비교';}}last=now;requestAnimationFrame(tick);}
+function tick(now){if(playing){if(last)elapsed=Math.min(duration,elapsed+Math.min(.12,(now-last)/1000)*playbackRate());update();if(elapsed>=duration){playing=false;$('play').textContent='다시 비교';}}last=now;requestAnimationFrame(tick);}
 $('play').addEventListener('click',()=>{if(elapsed>=duration)reset();playing=!playing;last=0;$('play').textContent=playing?'일시정지':'계속 재생';update();});$('detect').addEventListener('click',()=>{reset();elapsed=Math.min(...runs.map(r=>r.cornerTime).filter(t=>t!==null))+.36;$('play').textContent='계속 재생';update();});$('finish').addEventListener('click',()=>{playing=false;elapsed=duration;showResult=true;$('play').textContent='다시 비교';update();});$('reset').addEventListener('click',reset);new ResizeObserver(()=>update()).observe(document.querySelector('.comparison'));reset();requestAnimationFrame(tick);
 })();
 </script>
