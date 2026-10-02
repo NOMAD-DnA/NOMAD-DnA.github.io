@@ -1,0 +1,200 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>경사별 예상거리 유도 · 기하 검토 예시</title><style>:root{color-scheme:light;--bg-primary:#f7f8fa;--bg-secondary:#fff;--bg-tertiary:#edf1f5;--text-primary:#21303f;--text-secondary:#607080;--text-muted:#748292;--border:#d8e0e7;--border-color:#d8e0e7;--accent:#3174aa;--accent-primary:#3174aa;--color-blue-500:#3174aa}*{box-sizing:border-box}body{margin:0;padding:20px;color:var(--text-primary);background:var(--bg-primary);font:16px/1.6 system-ui,-apple-system,'Segoe UI','Malgun Gothic',sans-serif}h2{font-size:24px;line-height:1.4}button,input,select{font:inherit}button,.btn{border:1px solid var(--border);border-radius:6px;padding:7px 13px;background:white;color:var(--text-primary);cursor:pointer}.btn-primary{background:var(--accent);color:white}.form-select,.form-input{padding:7px;border:1px solid var(--border);border-radius:5px;background:white;color:var(--text-primary)}.form-label{font-size:14px}body>div{max-width:1300px;margin:auto}</style></head><body><div id="slope-path-unfolding">
+  <style>
+    #slope-path-unfolding { width:100%; color:var(--foreground); --font-size-base:16px; }
+    #slope-path-unfolding * { box-sizing:border-box; }
+    #slope-path-unfolding .head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+    #slope-path-unfolding h2 { margin:0; }
+    #slope-path-unfolding .sub { margin:4px 0 0; color:var(--muted-foreground); }
+    #slope-path-unfolding .controls { display:flex; gap:18px; flex-wrap:wrap; align-items:end; }
+    #slope-path-unfolding .control { min-width:190px; }
+    #slope-path-unfolding .label-row { display:flex; justify-content:space-between; gap:10px; margin-bottom:4px; }
+    #slope-path-unfolding .stage-buttons { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 12px; }
+    #slope-path-unfolding .viz { width:100%; display:block; }
+    #slope-path-unfolding .panel-title { font-size:18px; font-weight:500; fill:var(--foreground); }
+    #slope-path-unfolding .axis-label, #slope-path-unfolding .note { font-size:14px; fill:var(--muted-foreground); }
+    #slope-path-unfolding .value-label { font-size:15px; fill:var(--foreground); font-weight:500; paint-order:stroke; stroke:var(--background); stroke-width:5px; stroke-linejoin:round; }
+    #slope-path-unfolding .terrain { fill:color-mix(in srgb, var(--viz-series-3) 18%, transparent); stroke:color-mix(in srgb, var(--foreground) 28%, transparent); stroke-width:1.2; }
+    #slope-path-unfolding .contour { fill:none; stroke:color-mix(in srgb, var(--foreground) 24%, transparent); stroke-width:1.2; }
+    #slope-path-unfolding .route-shadow { fill:none; stroke:color-mix(in srgb, var(--foreground) 18%, transparent); stroke-width:14; stroke-linecap:round; stroke-linejoin:round; }
+    #slope-path-unfolding .route { fill:none; stroke:var(--viz-series-1); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; }
+    #slope-path-unfolding .seg-a { stroke:var(--viz-series-1); }
+    #slope-path-unfolding .seg-b { stroke:var(--viz-series-2); }
+    #slope-path-unfolding .seg-c { stroke:var(--viz-series-4); }
+    #slope-path-unfolding .seg-d { stroke:var(--viz-series-5); }
+    #slope-path-unfolding .segment { fill:none; stroke-width:7; stroke-linecap:round; }
+    #slope-path-unfolding .guide { fill:none; stroke:var(--border); stroke-width:1.5; stroke-dasharray:6 6; }
+    #slope-path-unfolding .gradient-arrow { stroke:var(--viz-series-2); stroke-width:3; }
+    #slope-path-unfolding .contour-arrow { stroke:var(--muted-foreground); stroke-width:3; }
+    #slope-path-unfolding .point { fill:var(--background); stroke:var(--viz-series-1); stroke-width:3; }
+    #slope-path-unfolding .profile-fill { fill:color-mix(in srgb, var(--viz-series-1) 12%, transparent); }
+    #slope-path-unfolding .projection { stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 7; opacity:0; transition:opacity .25s ease; }
+    #slope-path-unfolding .profile-group { opacity:.12; transition:opacity .3s ease; }
+    #slope-path-unfolding .segment-labels { opacity:0; transition:opacity .25s ease; }
+    #slope-path-unfolding[data-stage="2"] .segment-labels,
+    #slope-path-unfolding[data-stage="3"] .segment-labels,
+    #slope-path-unfolding[data-stage="4"] .segment-labels { opacity:1; }
+    #slope-path-unfolding[data-stage="3"] .profile-group,
+    #slope-path-unfolding[data-stage="4"] .profile-group { opacity:1; }
+    #slope-path-unfolding[data-stage="3"] .projection,
+    #slope-path-unfolding[data-stage="4"] .projection { opacity:1; }
+    #slope-path-unfolding .result-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
+    #slope-path-unfolding .metric { padding:10px 2px; }
+    #slope-path-unfolding .metric strong { display:block; font-size:1.25em; font-weight:500; margin-top:2px; }
+    #slope-path-unfolding .warning { color:var(--destructive); }
+    @media (max-width:700px) {
+      #slope-path-unfolding .result-row { grid-template-columns:1fr; }
+      #slope-path-unfolding .control { min-width:150px; flex:1; }
+    }
+  </style>
+
+  <div class="head">
+    <div>
+      <h2>3차원 경로를 2차원 경사 단면으로 펼치기</h2>
+      <p class="sub">곡선 경로를 경사 구간별로 분리해 실제 예상거리와 통과시간의 입력값으로 변환합니다.</p>
+    </div>
+    <div class="controls viz-controls">
+      <label class="control">
+        <span class="label-row"><span class="form-label">최대 경사각 α</span><strong id="alpha-readout" class="tabular-nums">20°</strong></span>
+        <input id="alpha-range" class="form-range" type="range" min="5" max="30" step="1" value="20">
+      </label>
+      <label class="control">
+        <span class="label-row"><span class="form-label">경사 방향과 진행 방향 차이 φ</span><strong id="phi-readout" class="tabular-nums">35°</strong></span>
+        <input id="phi-range" class="form-range" type="range" min="0" max="89" step="1" value="35">
+      </label>
+    </div>
+  </div>
+
+  <div class="stage-buttons" aria-label="변환 단계">
+    <button class="btn btn-primary" type="button" data-step="1">1. 3D 경로</button>
+    <button class="btn" type="button" data-step="2">2. 경사 구간 분할</button>
+    <button class="btn" type="button" data-step="3">3. 2D로 펼치기</button>
+    <button class="btn" type="button" data-step="4">4. 예상거리 계산</button>
+  </div>
+
+  <svg class="viz" viewBox="0 0 1000 530" role="img" aria-labelledby="unfold-title unfold-desc">
+    <title id="unfold-title">3차원 곡선 경로의 2차원 경사 단면 변환</title>
+    <desc id="unfold-desc">왼쪽의 굽은 지형 경로를 구간별로 나누고 오른쪽에서 거리와 고도로 표현된 경사 단면으로 펼치는 과정입니다.</desc>
+    <defs>
+      <marker id="arrow-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--viz-series-2)"/></marker>
+      <marker id="arrow-neutral" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--muted-foreground)"/></marker>
+    </defs>
+
+    <text class="panel-title" x="22" y="30">① 3차원 지형의 후보 경로</text>
+    <text class="panel-title" x="525" y="30">② 진행 방향을 따라 펼친 2차원 단면</text>
+    <line x1="500" y1="18" x2="500" y2="500" stroke="var(--border)"/>
+
+    <g aria-hidden="true">
+      <path class="terrain" d="M30 345 Q105 205 195 260 T340 188 T474 245 L474 470 L30 470Z"/>
+      <path class="contour" d="M43 390 Q130 300 205 345 T355 292 T465 320"/>
+      <path class="contour" d="M47 340 Q118 250 206 295 T350 245 T466 270"/>
+      <path class="contour" d="M61 285 Q132 205 218 250 T362 198 T461 218"/>
+      <path class="route-shadow" d="M67 410 C110 365 112 294 174 274 C234 254 247 345 310 314 C367 286 365 207 448 184"/>
+      <path class="route" d="M67 410 C110 365 112 294 174 274 C234 254 247 345 310 314 C367 286 365 207 448 184"/>
+      <circle class="point" cx="67" cy="410" r="7"/><circle class="point" cx="448" cy="184" r="7"/>
+      <text class="value-label" x="48" y="440">현재 위치</text><text class="value-label" x="405" y="164">목표</text>
+
+      <g class="segment-labels">
+        <path class="segment seg-a" d="M67 410 C110 365 112 294 174 274"/>
+        <path class="segment seg-b" d="M174 274 C234 254 247 345 310 314"/>
+        <path class="segment seg-c" d="M310 314 C367 286 365 207 448 184"/>
+        <text class="value-label" x="88" y="314">구간 A</text><text class="value-label" x="220" y="342">구간 B</text><text class="value-label" x="363" y="247">구간 C</text>
+      </g>
+
+      <line class="gradient-arrow" x1="302" y1="286" x2="356" y2="222" marker-end="url(#arrow-a)"/>
+      <line class="contour-arrow" x1="278" y1="264" x2="346" y2="322" marker-end="url(#arrow-neutral)"/>
+      <path id="heading-arrow" class="gradient-arrow" d="M302 286 L360 257" marker-end="url(#arrow-a)"/>
+      <text class="note" x="350" y="213">최대 경사 방향</text>
+      <text class="note" x="244" y="344">동일 고도선</text>
+      <text class="value-label" id="beta-map-label" x="350" y="282">유효 경사 β</text>
+    </g>
+
+    <g class="projection" aria-hidden="true">
+      <line x1="170" y1="275" x2="552" y2="370"/><line x1="310" y1="314" x2="700" y2="342"/><line x1="448" y1="184" x2="944" y2="220"/>
+    </g>
+
+    <g class="profile-group">
+      <line x1="540" y1="450" x2="965" y2="450" stroke="var(--foreground)" stroke-width="1.5"/>
+      <line x1="540" y1="450" x2="540" y2="90" stroke="var(--foreground)" stroke-width="1.5"/>
+      <text class="axis-label" x="830" y="480">누적 수평거리 d<tspan baseline-shift="sub">xy</tspan> (m)</text>
+      <text class="axis-label" transform="translate(515 205) rotate(-90)">고도 z (m)</text>
+      <path class="profile-fill" d="M552 420 L650 315 L744 345 L944 220 L944 450 L552 450Z"/>
+      <path class="segment seg-a" d="M552 420 L650 315"/>
+      <path class="segment seg-b" d="M650 315 L744 345"/>
+      <path class="segment seg-c" d="M744 345 L944 220"/>
+      <line class="guide" x1="552" y1="420" x2="552" y2="450"/><line class="guide" x1="650" y1="315" x2="650" y2="450"/><line class="guide" x1="744" y1="345" x2="744" y2="450"/><line class="guide" x1="944" y1="220" x2="944" y2="450"/>
+      <text class="value-label" x="585" y="348">A</text><text class="value-label" x="690" y="350">B</text><text class="value-label" x="838" y="272">C</text>
+      <path id="angle-arc" d="M552 420 A50 50 0 0 1 585 382" fill="none" stroke="var(--viz-series-2)" stroke-width="3"/>
+      <text id="beta-profile-label" class="value-label" x="590" y="405">β = 16.4°</text>
+      <text class="note" x="550" y="82">곡선의 순서는 유지하고, 구간 길이와 고도 변화만 한 축에 누적</text>
+    </g>
+  </svg>
+
+  <div class="result-row" aria-live="polite">
+    <div class="metric"><span class="text-muted">진행 방향의 유효 경사</span><strong id="beta-value" class="tabular-nums">16.4°</strong></div>
+    <div class="metric"><span class="text-muted">고도차 5 m 도달 예상거리</span><strong id="distance-value" class="tabular-nums">18.0 m</strong></div>
+    <div class="metric"><span class="text-muted">기하학적 판정</span><strong id="feasibility-value">계산 가능</strong></div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('slope-path-unfolding');
+      const alpha = root.querySelector('#alpha-range');
+      const phi = root.querySelector('#phi-range');
+      const alphaReadout = root.querySelector('#alpha-readout');
+      const phiReadout = root.querySelector('#phi-readout');
+      const betaValue = root.querySelector('#beta-value');
+      const distanceValue = root.querySelector('#distance-value');
+      const feasibility = root.querySelector('#feasibility-value');
+      const betaMapLabel = root.querySelector('#beta-map-label');
+      const betaProfileLabel = root.querySelector('#beta-profile-label');
+      const headingArrow = root.querySelector('#heading-arrow');
+      const buttons = [...root.querySelectorAll('[data-step]')];
+
+      function update() {
+        const a = Number(alpha.value);
+        const p = Number(phi.value);
+        const ar = a * Math.PI / 180;
+        const pr = p * Math.PI / 180;
+        const beta = Math.atan(Math.tan(ar) * Math.cos(pr)) * 180 / Math.PI;
+        const dz = 5;
+        const directionalGrade = Math.tan(ar) * Math.cos(pr);
+        const horizontal = directionalGrade > 0.0001 ? dz / directionalGrade : Infinity;
+        const distance = Number.isFinite(horizontal) ? Math.hypot(horizontal, dz) : Infinity;
+        alphaReadout.textContent = `${a}°`;
+        phiReadout.textContent = `${p}°`;
+        betaValue.textContent = `${beta.toFixed(1)}°`;
+        betaMapLabel.textContent = `유효 경사 β=${beta.toFixed(1)}°`;
+        betaProfileLabel.textContent = `β = ${beta.toFixed(1)}°`;
+        const angle = (-27 + p * .8) * Math.PI / 180;
+        const x2 = 302 + Math.cos(angle) * 66;
+        const y2 = 286 + Math.sin(angle) * 66;
+        headingArrow.setAttribute('d', `M302 286 L${x2.toFixed(1)} ${y2.toFixed(1)}`);
+        if (p >= 86 || distance > 100) {
+          distanceValue.textContent = distance > 999 ? '∞에 접근' : `${distance.toFixed(1)} m`;
+          feasibility.textContent = '등고선 방향 · 후보 제외';
+          feasibility.classList.add('warning');
+        } else {
+          distanceValue.textContent = `${distance.toFixed(1)} m`;
+          feasibility.textContent = p >= 78 ? '거리 급증 구간' : '계산 가능';
+          feasibility.classList.toggle('warning', p >= 78);
+        }
+      }
+
+      function setStage(step) {
+        root.dataset.stage = String(step);
+        buttons.forEach((button) => {
+          const active = Number(button.dataset.step) === step;
+          button.classList.toggle('btn-primary', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+      }
+
+      alpha.addEventListener('input', update);
+      phi.addEventListener('input', update);
+      buttons.forEach((button) => button.addEventListener('click', () => setStage(Number(button.dataset.step))));
+      root.dataset.stage = '1';
+      update();
+    })();
+  </script>
+</div>
+</body></html>

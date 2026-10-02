@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="미관측 환경에서 지도를 만들고, 막다른 길에서 센서를 180도 회전하여 후진 복귀하는 UGV 시뮬레이션"><title>FRONTIER LAB · 관측에서 복귀까지</title>
+<script>
+/* Keep launch guidance readable even when the simulation cannot start. */
+(function () {
+  var root = document.documentElement;
+  root.setAttribute('data-simulation-status', 'loading');
+  function fail() {
+    root.setAttribute('data-simulation-status', 'error');
+    var notice = document.getElementById('startupStatus');
+    if (notice) {
+      notice.hidden = false;
+      notice.setAttribute('role', 'alert');
+      notice.textContent = '시뮬레이션을 실행하지 못했습니다. 첨부파일을 기기에 저장한 뒤 Chrome, Edge 또는 Safari에서 열어 주세요. 메일·메신저의 첨부 미리보기에서는 버튼이 작동하지 않을 수 있습니다. 브라우저에서 다시 열어도 같은 문제가 생기면 브라우저 이름과 이 화면을 전달해 주세요.';
+    }
+  }
+  window.UGVStandalone = {
+    fail: fail,
+    ready: function () {
+      if (root.getAttribute('data-simulation-status') === 'error') return;
+      root.setAttribute('data-simulation-status', 'ready');
+      var notice = document.getElementById('startupStatus');
+      if (notice) notice.hidden = true;
+    }
+  };
+  window.addEventListener('error', fail);
+  window.addEventListener('unhandledrejection', fail);
+  window.addEventListener('load', function () {
+    if (root.getAttribute('data-simulation-status') === 'error') fail();
+  });
+}());
+</script>
+<style>
+:root{color-scheme:dark;--bg:#0a1019;--panel:#131d2b;--line:#29364a;--muted:#99aabd;--text:#edf4fb;--mint:#65e0bf;--blue:#6f9fff;--orange:#ffb768;--pink:#ed879c}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,'Segoe UI',sans-serif}button,select,input{font:inherit}button,select{border:1px solid var(--line);background:#1d2a3d;color:var(--text);border-radius:8px;padding:10px 13px}button{cursor:pointer;transition:background .15s}button:hover{background:#293d53}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--mint);outline-offset:3px}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--mint);color:#092b28;font-weight:750;border-color:var(--mint)}.primary:hover{background:#88eed2}header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 28px 20px;max-width:1680px;margin:auto}.eyebrow{color:var(--mint);letter-spacing:.2em;font-size:12px;font-weight:750}h1{font-size:27px;line-height:1.3;margin:7px 0}header p{margin:5px 0 0;color:var(--muted);font-size:14px}.tag{font-size:12px;border:1px solid var(--line);padding:7px 12px;border-radius:30px;color:var(--muted);white-space:nowrap}main{display:grid;grid-template-columns:270px minmax(0,1fr);gap:18px;padding:0 28px 28px;max-width:1680px;margin:auto}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}.controls{padding:20px;align-self:start}.controls h2{font-size:17px;margin:0 0 14px}.controls>button{width:100%;margin-bottom:9px}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.control{margin:18px 0}.control label{display:block;font-size:14px;color:var(--muted);margin-bottom:7px}.control select{width:100%}input[type=range]{width:100%;accent-color:var(--mint)}input[type=checkbox]{accent-color:var(--mint);width:16px;height:16px}.check{font-size:14px;display:flex;align-items:center;gap:9px;margin:11px 0}.small{font-size:13px;color:var(--muted)}.divider{border-top:1px solid var(--line);margin:20px 0}.fact{display:flex;justify-content:space-between;font-size:14px;margin:8px 0}.fact span{color:var(--muted)}.content{min-width:0}.phases{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px}.phase{font-size:13px;color:var(--muted);padding:10px 7px;border:1px solid var(--line);background:var(--panel);border-radius:7px;white-space:nowrap;text-align:center}.phase.active{border-color:var(--mint);background:#15382f;color:var(--mint)}.phase.past{color:#c8d8e6}.scene{position:relative;overflow:hidden;background:radial-gradient(ellipse at 55% 40%,#1a3040,#101925 70%)}.scene-head{position:absolute;top:16px;left:17px;right:17px;display:flex;justify-content:space-between;align-items:start;z-index:1;pointer-events:none}.badge{display:inline-block;border:1px solid #3f5770;border-radius:7px;padding:7px 11px;background:#0b1524dd;font-size:14px}.scene-head .small{margin-top:7px}.scene-head button{pointer-events:auto;font-size:13px;padding:7px 11px}#world{display:block;width:100%;height:490px;touch-action:none}.legend{display:flex;flex-wrap:wrap;gap:13px;padding:11px 17px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.legend span{display:flex;align-items:center;gap:6px}.dot{width:9px;height:9px;display:inline-block;border-radius:2px}.statusline{padding:13px 17px;border-top:1px solid var(--line);display:flex;gap:14px;align-items:center;font-size:14px}.statusline strong{color:var(--mint);white-space:nowrap}.statusline span{color:#b9c8d7}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:12px 0}.metric{padding:13px 15px}.metric span{color:var(--muted);font-size:13px;display:block}.metric strong{display:block;font:600 22px/1.5 ui-monospace,monospace;margin-top:5px}.metric em{font:normal 12px system-ui;color:var(--muted);margin-left:3px}.section-title{font-size:16px;margin:0 0 11px}.maps{padding:16px}.mapgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mapcard{background:#0c1520;border:1px solid var(--line);border-radius:8px;overflow:hidden}.mapcard header{display:block;padding:12px 12px 4px;font-size:14px;font-weight:650}.mapcard p{font-size:12px;color:var(--muted);margin:0 12px 8px}.mapcard canvas{width:100%;height:210px;display:block}.lower{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.lower>.panel{padding:17px}.sensor-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.sensor-top strong{color:var(--orange);font:600 22px ui-monospace,monospace}#sensorView{height:130px;width:100%;display:block;background:#09111a;border-radius:6px}.sensorlegend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:7px}#events{height:204px;overflow:auto;scrollbar-color:#3c5369 transparent}.event{display:grid;grid-template-columns:48px 1fr;gap:9px;padding:8px 0;border-bottom:1px solid #263247}.event time{font:12px ui-monospace,monospace;color:var(--muted);padding-top:4px}.event b{display:block;font-size:13px}.event p{margin:2px 0;font-size:12px;color:var(--muted)}details{margin-top:13px;padding:16px 18px}summary{cursor:pointer;font-size:14px;font-weight:650}details p,details li{color:#bccbda;font-size:14px}details ol{padding-left:23px}details code{color:var(--mint)}.callout{border-left:2px solid var(--orange);padding-left:11px;margin-top:17px;color:#c8d7e6;font-size:13px}footer{font-size:12px;color:var(--muted);padding-top:16px}.toast{color:var(--orange)}@media(min-width:1450px){#world{height:560px}.mapcard canvas{height:250px}}@media(max-width:1100px){main{grid-template-columns:235px minmax(0,1fr);padding:0 18px 20px;gap:12px}header{padding:20px 18px}.controls{padding:16px}.phases{grid-template-columns:repeat(3,1fr)}.metrics{grid-template-columns:repeat(3,1fr)}.mapgrid{grid-template-columns:1fr}.mapcard canvas{height:220px}.lower{grid-template-columns:1fr}}@media(max-width:720px){header{display:block}h1{font-size:24px}.tag{display:none}main{display:flex;flex-direction:column}.controls{width:100%}.controls .settings{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.control{margin:10px 0}.controls .compact-hide{display:none}#world{height:400px}.metrics{grid-template-columns:repeat(2,1fr)}.mapgrid{grid-template-columns:1fr}.statusline{align-items:start;flex-direction:column;gap:5px}.phase{font-size:12px}.lower{grid-template-columns:1fr}.scene-head{left:12px;right:12px}.scene-head .small{max-width:200px}}
+.setup{padding:0;border:0;margin:16px 0 0}.setup summary{color:var(--muted);font-size:14px;margin-bottom:8px}.setup[open] summary{margin-bottom:13px}@media(max-width:720px){.controls>p{margin-bottom:8px}.setup{margin-top:8px}}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 0 11px}.mode{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:10px 13px;min-width:0}.mode b{display:block;font-size:14px}.mode small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.mode.active{border-color:var(--mint);background:#15372f}.mode.active b{color:var(--mint)}.mode[data-mode="Replanning mode"].active{border-color:var(--blue);background:#1a2d47}.mode[data-mode="Replanning mode"].active b{color:var(--blue)}.mode[data-mode="Recovery mode"].active{border-color:var(--orange);background:#3c2b25}.mode[data-mode="Recovery mode"].active b{color:var(--orange)}@media(max-width:720px){.modes{gap:5px}.mode{padding:8px 6px}.mode b{font-size:12px}.mode small{font-size:11px}}
+.launch-notice{max-width:1624px;margin:16px auto 0;padding:14px 18px;border:1px solid #75613c;border-radius:8px;background:#2b251a;color:#f2dfb8;font-size:14px}.launch-notice[hidden]{display:none}.open-help{max-width:1624px;margin:0 auto 16px;color:var(--muted);padding:10px 18px}.open-help p{margin-bottom:0}#world{touch-action:pan-y}html[data-simulation-status="error"] #start,html[data-simulation-status="error"] #pause{opacity:.45;pointer-events:none}@media(max-width:720px){.launch-notice,.open-help{margin-left:18px;margin-right:18px}button,select{min-height:44px}#world{height:350px;height:min(400px,60vh);min-height:270px}.scene-head button{min-height:44px}.controls,.content{min-width:0}}@media(max-width:380px){.controls .settings{grid-template-columns:1fr}.scene-head .small{max-width:170px}.mode b{font-size:11px}}
+</style></head><body>
+<div id="startupStatus" class="launch-notice" role="status">시뮬레이션을 준비하고 있습니다. 이 안내가 계속 보이거나 버튼이 작동하지 않으면 첨부파일을 기기에 저장한 뒤 Chrome, Edge 또는 Safari에서 열어 주세요. 메일·메신저의 첨부 미리보기에서는 실행이 제한될 수 있습니다.</div>
+<noscript><div class="launch-notice">현재 화면에서는 JavaScript 실행이 허용되지 않습니다. 첨부파일을 기기에 저장하고 외부 브라우저에서 열어 주세요. 브라우저의 JavaScript 실행도 허용되어 있어야 합니다.</div></noscript>
+<details class="open-help"><summary>파일을 여는 방법</summary><p>이 HTML 파일 하나만 저장하면 인터넷 연결 없이 사용할 수 있습니다. PC에서는 저장한 파일을 Chrome 또는 Edge로 열어 주세요. 휴대전화에서는 다운로드한 파일의 공유·연결 앱 메뉴에서 외부 브라우저를 선택하세요. 해당 메뉴가 없으면 PC 브라우저에서 열어 주세요. 메일·메신저 안의 미리보기는 시뮬레이션 실행을 제한할 수 있습니다.</p></details>
+<header><div><div class="eyebrow">FRONTIER LAB / UNKNOWN ENVIRONMENT</div><h1>관측하며 전진하고, 막히면 돌아오다.</h1><p>누적 지도 · D* Lite 재계획 · 센서 180° 회전 · 후진 복귀</p></div><span class="tag">UGV / 2D KINEMATIC SIMULATION</span></header>
+<main><aside class="panel controls"><h2>시연 제어</h2><button id="start" class="primary">▶ 전체 시연 시작</button><div class="row"><button id="pause" disabled>일시정지</button><button id="reset">초기화</button></div><p class="small">막다른 길에서 정지하고 센서를 뒤로 돌린 뒤, 갈림길로 복귀합니다.</p>
+<details class="setup" open><summary>센서·지도 설정</summary><div class="settings"><div class="control"><label for="scenario">시험 조건</label><select id="scenario"><option value="normal">정상 복귀 → 목표 도착</option><option value="blocked">후방 장애물 → 안전 정지</option></select></div><div class="control"><label for="rate">재생 속도</label><select id="rate"><option value="1">1배</option><option value="3" selected>3배</option><option value="6">6배</option><option value="12">12배</option></select></div><div class="control"><label for="range">센서 거리 <output id="rangeLabel">20 m</output></label><input id="range" type="range" min="8" max="14" step="1" value="10"></div><div class="control"><label for="unknown">미관측 구간 비용</label><select id="unknown"><option value="1.12">낙관적 · 1.12배</option><option value="1.5">균형 · 1.5배</option><option value="2">보수적 · 2배</option></select></div></div>
+<p class="small">시험 조건·센서·비용을 바꾸면 초기화됩니다. 비용에 따라 조기에 우회할 수 있습니다.</p><div class="divider"></div><label class="check"><input type="checkbox" id="truth">실제 환경 보기 <span class="small">관찰자용</span></label><label class="check"><input type="checkbox" id="frontier" checked>Frontier 표시</label><label class="check"><input type="checkbox" id="showPath" checked>Global path 표시</label><div class="compact-hide"><div class="divider"></div><h2>실험 조건</h2><div class="fact"><span>시작점</span><b>S (0, 0)</b></div><div class="fact"><span>목표점</span><b>G (100, 100)</b></div><div class="fact"><span>격자 해상도</span><b>2 m</b></div><div class="fact"><span>LiDAR / 카메라</span><b>140° / 80°</b></div><div class="fact"><span>센서 회전 시간</span><b>3 s</b></div><div class="fact"><span>차량 반경</span><b>1.3 m</b></div><div class="callout">센서가 회전해도 차량 본체 방향은 바뀌지 않습니다. 후방 확인을 통과해야 후진을 시작합니다.</div></div></details></aside>
+<section class="content"><div class="modes" aria-label="현재 주행 모드"><div class="mode active" data-mode="Normal mode"><b>Normal mode</b><small>목표 경로 주행</small></div><div class="mode" data-mode="Replanning mode"><b>Replanning mode</b><small>D* Lite 경로 갱신</small></div><div class="mode" data-mode="Recovery mode"><b>Recovery mode</b><small>정지 · 회전 · 후진 복귀</small></div></div><div class="phases" aria-label="주행 단계"><div class="phase" data-phase="0">01 목표 주행</div><div class="phase" data-phase="1">02 정지</div><div class="phase" data-phase="2">03 센서 회전</div><div class="phase" data-phase="3">04 후방 확인</div><div class="phase" data-phase="4">05 후진 복귀</div><div class="phase" data-phase="5">06 재계획·도착</div></div>
+<div class="panel scene"><div class="scene-head"><div><span class="badge" id="state">출발 준비</span><div class="small" id="position">S(0, 0) → G(100, 100)</div></div><button id="view">평면 시점</button></div><canvas id="world" role="img" aria-label="UGV, 미관측 영역, 센서 시야, 누적 지도와 계획 경로의 실시간 시뮬레이션"></canvas><div class="legend"><span><i class="dot" style="background:#e9eef3"></i>미관측</span><span><i class="dot" style="background:#397969"></i>관측된 자유 공간</span><span><i class="dot" style="background:#a0b0c3"></i>장애물</span><span><i class="dot" style="background:#6f9fff"></i>잠정 Global path</span><span><i class="dot" style="background:#65e0bf"></i>주행 이력</span><span><i class="dot" style="background:#ffb768"></i>Frontier / 후진</span></div><div class="statusline"><strong id="action">관측 지도 준비 완료</strong><span id="description">시연 시작을 누르면 미관측 구간을 포함한 잠정 경로를 따라갑니다.</span></div></div>
+<div class="metrics"><div class="panel metric"><span>차량 속도 · 음수는 후진</span><strong id="speed">0.00<em>m/s</em></strong></div><div class="panel metric"><span>센서 회전각 · 본체 기준</span><strong id="yaw">0<em>°</em></strong></div><div class="panel metric"><span>가상 주행 시간</span><strong id="time">0.0<em>s</em></strong></div><div class="panel metric"><span>D* Lite 경로 갱신</span><strong id="replans">1<em>회</em></strong></div><div class="panel metric"><span>누적 주행 거리</span><strong id="distance">0.0<em>m</em></strong></div></div>
+<div class="panel maps"><h2 class="section-title">관측이 지도가 되고, 지도가 경로가 되는 과정</h2><div class="mapgrid"><div class="mapcard"><header>01 누적 관측 지도</header><p>백지: Unknown · 짙은 칸: 장애물</p><canvas id="occupancy" role="img" aria-label="Free, Occupied, Unknown을 구분하는 누적 지도"></canvas></div><div class="mapcard"><header>02 Local costmap</header><p>차량 주변 · 붉은 칸: 안전 여유를 둔 장애물</p><canvas id="local" role="img" aria-label="차량 주변 장애물 팽창과 센서 시야 지도"></canvas></div><div class="mapcard"><header>03 Global D* Lite 탐색</header><p>파랑: 이번에 복구한 셀 · 점선: 미관측 경로</p><canvas id="planner" role="img" aria-label="D* Lite의 증분 탐색과 잠정 경로"></canvas></div></div></div>
+<div class="lower"><div class="panel"><div class="sensor-top"><h2 class="section-title">LiDAR + 카메라 방향</h2><strong id="sensorAngle">0°</strong></div><canvas id="sensorView" role="img" aria-label="차량 본체와 독립적으로 회전하는 LiDAR 및 카메라의 시야 방향"></canvas><div class="sensorlegend"><span>민트: LiDAR 140°</span><span>주황: 카메라 80°</span></div><p id="sensorText" class="small">전방 관측 · 센서 원점은 차량 중심입니다.</p></div><div class="panel"><h2 class="section-title">이벤트 기록</h2><div id="events" role="log" aria-label="주행 이벤트 기록"></div></div></div>
+<details class="panel" open><summary>수정된 시나리오와 복귀 조건</summary><ol><li>고정 좌표계에서 S(0, 0)과 G(100, 100)을 설정합니다. 출발 시 차량이 점유한 공간은 비어 있음이 확인됐다고 가정합니다.</li><li>센서 광선이 닿은 공간만 지도에 기록합니다. 장애물 뒤는 Unknown으로 유지합니다.</li><li>D* Lite는 Unknown 통과를 허용해 잠정 경로를 생성하고, 관측으로 바뀐 셀의 비용을 이용해 경로를 증분 갱신합니다. 차량은 관측된 자유 공간에서만 움직입니다.</li><li><b>Normal mode:</b> 누적 지도와 Local costmap을 갱신하며 목표 경로를 주행합니다. 관측된 3방향 통로에서 갈림길과 주행 이력을 기록합니다.</li><li><b>Replanning mode:</b> 현재 경로를 가로막는 새 장애물이 관측되면 정지하고 D* Lite 경로를 갱신합니다. 일반 지도 갱신도 기존 탐색 값을 재사용합니다.</li><li><b>Recovery mode:</b> 선택한 가지에서 경로가 뒤쪽으로 전환되거나 진행이 지속적으로 불가능하면 복구를 시작합니다. 이 판단은 현재 관측에 기반합니다.</li><li><b>차량 정지 1.2초 → LiDAR·카메라 동시 180° 회전 3초 → 후방 재관측 1.5초</b>를 수행합니다. 회전 중에는 차량이 이동하지 않습니다.</li><li>후방 복귀 궤적이 관측된 자유 공간인지 검사합니다. 통과 시 저속 후진하고, 장애물 또는 미확인 영역이 있으면 안전 정지합니다.</li><li>주행 이력을 역으로 따라 갈림길에 복귀합니다. 정지 상태에서 센서를 전방으로 3초간 복원하고 <b>Replanning mode</b>에서 실패 구간을 반영합니다.</li><li><b>Normal mode</b>로 돌아가 목표까지 주행합니다. 경로가 없거나 복귀할 수 없으면 안전 정지합니다.</li></ol></details>
+<details class="panel"><summary>알고리즘·가정·시뮬레이션 범위</summary><p><b>실제 계산:</b> 68 × 64 격자, 장애물에서 차단되는 광선 기반 관측, 8방향 D* Lite, 이전 탐색의 g/rhs 값 재사용, 변경된 간선 비용 반영, 대각선 모서리 통과 금지, 관측 장애물 1셀 팽창, 차량 원형 footprint 검사, 주행 이력 기반 복귀. Frontier는 Free/Unknown 경계이며 복귀 이력과 별도로 갱신됩니다.</p><p><b>경로 비용:</b> 이동 거리 × (Free: 1, Unknown: 선택한 배율) + 복구 실패 지점 주변의 가산 비용. 장애물 수로 경로를 선택하지 않습니다. 이 시연은 별도의 frontier 정보 획득 점수 대신 목표 지향 D* Lite로 대안을 선택합니다.</p><p><b>차량 모델:</b> 제자리 회전과 후진이 가능한 차동구동 UGV를 가정합니다. 센서 yaw는 차량 기준이며 세계 방향은 <code>차량 heading + 센서 yaw</code>로 계산됩니다. 센서는 동기화·정상 동작한다고 가정합니다. 실제 적용 시 회전 엔코더, 센서 타임스탬프, 변환 좌표계와 제동거리를 검사해야 합니다.</p><p><b>범위:</b> 기구학적 설명용 시뮬레이션입니다. SLAM 오차, 실제 카메라 영상·인식, 센서 잡음, 바퀴 미끄러짐, 차체 동역학은 모델링하지 않습니다. 카메라 표시 부분은 영상이 아닌 시야각입니다. 실제 차량을 제어하지 않습니다. 회전 가능한 지향성 LiDAR와 카메라 마운트를 가정하며 360° LiDAR는 물리적 회전이 불필요할 수 있습니다.</p><p>‘실제 환경 보기’는 관찰자에게만 정답 지도를 보여줍니다. Planner는 이 지도에 접근하지 않습니다. 센서 거리와 미관측 비용을 바꾸면 경로와 복구 시점이 달라지며 조기 우회할 수 있습니다. 알고리즘은 <a href="https://idm-lab.org/bib/abstracts/Koen02e.html" target="_blank" rel="noopener noreferrer">Koenig와 Likhachev의 D* Lite</a>를 따릅니다.</p></details>
+<footer>브라우저 안에서 실행 · 외부 라이브러리 없음 · 단위 m / s / ° · 기록은 초기화 또는 페이지 종료 시 삭제됩니다.</footer></section></main><script>
+/* D* Lite: goal-rooted incremental shortest-path repair (Koenig & Likhachev). */
+(function(root){
+'use strict';
+const less=(a,b)=>a[0]<b[0]-1e-9||(Math.abs(a[0]-b[0])<=1e-9&&a[1]<b[1]-1e-9);
+class DStarLite{
+ constructor({width,height,start,goal,edge}){
+  this.width=width;this.height=height;this.start=start;this.lastStart=start;this.goal=goal;this.edge=edge;this.km=0;
+  this.g=new Float64Array(width*height).fill(Infinity);this.rhs=new Float64Array(width*height).fill(Infinity);
+  this.heap=[];this.open=new Map();this.serial=0;this.rhs[goal]=0;this.insert(goal,this.key(goal));
+ }
+ heuristic(a,b){return Math.hypot(a%this.width-b%this.width,Math.floor(a/this.width)-Math.floor(b/this.width));}
+ key(i){let v=Math.min(this.g[i],this.rhs[i]);return [v+this.heuristic(this.start,i)+this.km,v];}
+ insert(i,k){let e={i,k,serial:++this.serial},heap=this.heap,j=heap.length;this.open.set(i,e.serial);heap.push(e);while(j){let p=(j-1)>>1;if(!less(k,heap[p].k))break;heap[j]=heap[p];j=p;}heap[j]=e;}
+ remove(i){this.open.delete(i);}
+ rawPop(){let heap=this.heap,first=heap[0],last=heap.pop();if(heap.length){let j=0;while(j*2+1<heap.length){let c=j*2+1;if(c+1<heap.length&&less(heap[c+1].k,heap[c].k))c++;if(!less(heap[c].k,last.k))break;heap[j]=heap[c];j=c;}heap[j]=last;}return first;}
+ top(){while(this.heap.length&&this.open.get(this.heap[0].i)!==this.heap[0].serial)this.rawPop();return this.heap.length?this.heap[0].k:[Infinity,Infinity];}
+ pop(){this.top();if(!this.heap.length)return null;let e=this.rawPop();this.open.delete(e.i);return e;}
+ neighbors(i){let x=i%this.width,y=Math.floor(i/this.width),out=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;let xx=x+dx,yy=y+dy;if(xx>=1&&yy>=1&&xx<this.width-1&&yy<this.height-1)out.push(yy*this.width+xx);}return out;}
+ updateVertex(u){
+  if(u!==this.goal){let rhs=Infinity;for(let v of this.neighbors(u))rhs=Math.min(rhs,this.edge(u,v)+this.g[v]);this.rhs[u]=rhs;}
+  this.remove(u);if(this.g[u]!==this.rhs[u])this.insert(u,this.key(u));
+ }
+ changedCells(changes){
+  const affected=new Set();for(let i of changes){let x=i%this.width,y=Math.floor(i/this.width);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){let xx=x+dx,yy=y+dy;if(xx>=1&&yy>=1&&xx<this.width-1&&yy<this.height-1)affected.add(yy*this.width+xx);}}
+  for(let i of affected)this.updateVertex(i);
+  return affected.size;
+ }
+ setStart(i){if(i!==this.start){this.km+=this.heuristic(this.lastStart,i);this.start=i;this.lastStart=i;}}
+ repair(){
+  const expanded=[];let guard=0;
+  while(less(this.top(),this.key(this.start))||this.rhs[this.start]!==this.g[this.start]){
+   let e=this.pop();if(!e)break;if(++guard>this.width*this.height*24)throw Error('D* Lite repair exceeded grid limit');let u=e.i,kNew=this.key(u);
+   if(less(e.k,kNew)){this.insert(u,kNew);continue;}
+   expanded.push(u);
+   if(this.g[u]>this.rhs[u]){this.g[u]=this.rhs[u];for(let p of this.neighbors(u))this.updateVertex(p);}
+   else{this.g[u]=Infinity;this.updateVertex(u);for(let p of this.neighbors(u))this.updateVertex(p);}
+  }
+  return expanded;
+ }
+ extract(){
+  if(!Number.isFinite(this.rhs[this.start]))return {path:[],cost:Infinity};
+  const path=[this.start],seen=new Set(path);let current=this.start,cost=0;
+  while(current!==this.goal&&path.length<this.width*this.height){let best=-1,bestValue=Infinity,bestEdge=Infinity;
+   for(let v of this.neighbors(current)){let c=this.edge(current,v),score=c+this.g[v];if(score<bestValue-1e-9){best=v;bestValue=score;bestEdge=c;}}
+   if(best<0||!Number.isFinite(bestValue)||seen.has(best))return {path:[],cost:Infinity};
+   cost+=bestEdge;path.push(best);seen.add(best);current=best;
+  }
+  if(current!==this.goal)return {path:[],cost:Infinity};
+  return {path:path.map(i=>({x:i%this.width,y:Math.floor(i/this.width)})),cost};
+ }
+}
+root.DStarLite=DStarLite;if(typeof module!=='undefined')module.exports=DStarLite;
+})(typeof window==='undefined'?globalThis:window);
+
+</script><script>
+/* Deterministic 2-D occupancy-grid simulation. Truth is used only by sensors and collision checks. */
+(function(root){
+'use strict';
+const W=68,H=64,TAU=Math.PI*2;
+const angle=a=>Math.atan2(Math.sin(a),Math.cos(a));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const DStarLite=typeof module!=='undefined'?require('./dstar.js'):root.DStarLite;
+class Simulation{
+ constructor(options={}){this.options={range:10,unknownCost:1.12,rearBlocked:false,...options};this.reset();}
+ reset(){
+  this.truth=new Uint8Array(W*H).fill(1);this.map=new Int8Array(W*H).fill(-1);this.inflated=new Uint8Array(W*H);
+  const carve=(a,b,r1,r2=r1)=>{let d=dist(a,b);for(let i=0;i<=Math.ceil(d*4);i++){let t=i/Math.ceil(d*4),x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t,r=r1+(r2-r1)*t;for(let yy=Math.max(1,Math.floor(y-r));yy<=Math.min(H-2,Math.ceil(y+r));yy++)for(let xx=Math.max(1,Math.floor(x-r));xx<=Math.min(W-2,Math.ceil(x+r));xx++)if(Math.hypot(xx-x,yy-y)<=r)this.truth[yy*W+xx]=0;}};
+  carve({x:8,y:56},{x:8,y:35},3.5);carve({x:8,y:35},{x:31,y:35},3.5);carve({x:31,y:35},{x:43,y:29},3.5,1.1);
+  carve({x:8,y:35},{x:8,y:15},3.5);carve({x:8,y:15},{x:24,y:6},3.5);carve({x:24,y:6},{x:58,y:6},3.5);
+  // Visible clutter makes the alternate entrance more costly, but leaves a valid corridor.
+  for(const p of [[6,27],[10,23],[7,18],[20,10],[34,8],[46,4]])this.truth[p[1]*W+p[0]]=1;
+  for(let y=55;y<=57;y++)for(let x=7;x<=9;x++)this.map[y*W+x]=0;this.start={x:8,y:56};this.goal={x:58,y:6};this.robot={...this.start,heading:-Math.PI/2};this.sensor=0;this.state='READY';this.mode='Normal mode';this.timer=0;this.time=0;this.distance=0;this.speed=0;this.path=[];this.initialPath=[];this.trail=[{...this.start}];this.checkpoints=[];this.frontiers=[];this.failed=[];this.events=[];this.replans=0;this.recoveries=0;this.collisionCount=0;this.lastPlan=-99;this.lastScan=-99;this.recoveryIndex=0;this.stalled=0;this.visitedStates=['READY'];this.visitedModes=['Normal mode'];this.rays=[];this.expanded=[];this.pendingChanges=new Set();this.pendingBlocking=new Set();this.dstar=null;this.scan();this.plan();this.initialPath=this.path.map(p=>({...p}));this.log('초기화','S(0, 0) 기준 관측 완료 · Unknown을 포함한 D* Lite 잠정 경로 생성');
+ }
+ idx(x,y){x=Math.round(x);y=Math.round(y);return x>=0&&y>=0&&x<W&&y<H?y*W+x:-1;}
+ value(arr,x,y){let i=this.idx(x,y);return i<0?1:arr[i];}
+ log(title,text){this.events.unshift({time:this.time,title,text});this.events=this.events.slice(0,160);}
+ enter(state,text){let mode=['REPLAN','RESUME'].includes(state)?'Replanning mode':['STOP','ROTATE','SCAN','REVERSE','RESTORE'].includes(state)||(state==='HOLD'&&this.recoveries)?'Recovery mode':'Normal mode';if(mode!==this.mode){this.log('모드 전환',`${this.mode} → ${mode}`);this.mode=mode;this.visitedModes.push(mode);}this.state=state;this.timer=0;this.speed=0;this.visitedStates.push(state);if(text)this.log(this.labels()[state],text);}
+ labels(){return {READY:'출발 준비',DRIVE:'목표 주행',REPLAN:'D* Lite 경로 갱신',STOP:'차량 정지',ROTATE:'센서 180° 회전',SCAN:'후방 재관측',REVERSE:'후진 복귀',RESTORE:'전방 센서 복원',RESUME:'대안 경로 갱신',ARRIVED:'목표 도착',HOLD:'안전 정지'};}
+ startRun(){if(this.state==='READY')this.enter('DRIVE','관측된 공간 안에서 주행 · 지도 갱신 시 경로 재검사');}
+ scan(){
+  this.rays=[];let changed=new Set(),previousInflated=this.inflated.slice(),dir=this.robot.heading+this.sensor;
+  for(let ray=0;ray<=100;ray++){
+   let a=dir+(ray/100-.5)*Math.PI*140/180,ex=this.robot.x,ey=this.robot.y,hit=false;
+   for(let d=0;d<=this.options.range;d+=.16){let x=this.robot.x+Math.cos(a)*d,y=this.robot.y+Math.sin(a)*d,i=this.idx(x,y);if(i<0)break;let v=this.truth[i];if(this.map[i]!==v){this.map[i]=v;changed.add(i);if(v===1)this.pendingBlocking.add(i);}ex=x;ey=y;if(v){hit=true;break;}}
+   this.rays.push({x:ex,y:ey,hit,a});
+  }
+  this.inflated.fill(0);
+  for(let i=0;i<this.map.length;i++)if(this.map[i]===1){let x=i%W,y=Math.floor(i/W);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){let k=this.idx(x+dx,y+dy);if(k>=0)this.inflated[k]=1;}}
+  for(let i=0;i<this.inflated.length;i++)if(previousInflated[i]!==this.inflated[i]){changed.add(i);if(this.inflated[i])this.pendingBlocking.add(i);}
+  for(let i of changed)this.pendingChanges.add(i);
+  this.frontiers=[];for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){let i=y*W+x;if(this.map[i]===0&&!this.inflated[i]&&[i-1,i+1,i-W,i+W].some(j=>this.map[j]===-1))this.frontiers.push({x,y});}
+  this.lastScan=this.time;return changed.size;
+ }
+ edgeCost(u,v){
+  let x=u%W,y=Math.floor(u/W),xx=v%W,yy=Math.floor(v/W),dx=xx-x,dy=yy-y;
+  if(Math.abs(dx)>1||Math.abs(dy)>1||(!dx&&!dy)||this.inflated[u]||this.inflated[v])return Infinity;
+  if(dx&&dy&&(this.inflated[y*W+xx]||this.inflated[yy*W+x]))return Infinity;
+  let cost=(dx&&dy?Math.SQRT2:1)*(this.map[v]===-1?this.options.unknownCost:1);
+  if(this.failed.some(p=>Math.hypot(xx-p.x,yy-p.y)<4))cost+=30;
+  return cost;
+ }
+ plan(){
+  let start=this.idx(this.robot.x,this.robot.y),goal=this.idx(this.goal.x,this.goal.y);
+  if(!this.dstar){this.dstar=new DStarLite({width:W,height:H,start,goal,edge:(u,v)=>this.edgeCost(u,v)});this.pendingChanges.clear();}
+  else{this.dstar.setStart(start);this.dstar.changedCells(this.pendingChanges);this.pendingChanges.clear();}
+  this.pendingBlocking.clear();
+  this.expanded=this.dstar.repair();let result=this.dstar.extract();this.path=result.path;this.pathCost=result.cost;this.replans++;this.lastPlan=this.time;
+ }
+ safe(x,y,arr=this.map){for(let dy=-.65;dy<=.65;dy+=.325)for(let dx=-.65;dx<=.65;dx+=.325)if(dx*dx+dy*dy<=.65*.65&&this.value(arr,x+dx,y+dy)!==0)return false;return true;}
+ checkpoint(){
+  let dirs=0;for(let a=0;a<TAU;a+=Math.PI/2){let clear=true;for(let d=1;d<=7;d++)if(this.value(this.map,this.robot.x+Math.cos(a)*d,this.robot.y+Math.sin(a)*d)!==0)clear=false;if(clear)dirs++;}
+  if(dirs>=3&&!this.checkpoints.some(p=>dist(p,this.robot)<9)){
+   let p={x:this.robot.x,y:this.robot.y,trailIndex:this.trail.length-1};this.checkpoints.push(p);this.log('갈림길 기록','관측된 3방향 통로 · 복귀 지점과 주행 이력 저장');
+  }
+ }
+ beginRecovery(){
+  this.recoveries++;this.failed.push({x:this.robot.x,y:this.robot.y});for(let y=Math.floor(this.robot.y-5);y<=Math.ceil(this.robot.y+5);y++)for(let x=Math.floor(this.robot.x-5);x<=Math.ceil(this.robot.x+5);x++){let i=this.idx(x,y);if(i>=0)this.pendingChanges.add(i);}this.returnPoint=this.checkpoints[this.checkpoints.length-1]||{...this.start,trailIndex:0};this.recoveryIndex=this.trail.length-1;this.path=[];
+  this.enter('STOP','관측된 폐색으로 진행 경로가 뒤로 전환됨 · 속도 0 확인');
+  if(this.options.rearBlocked){let a=this.robot.heading+Math.PI,x=this.robot.x+Math.cos(a)*3,y=this.robot.y+Math.sin(a)*3;for(let yy=Math.round(y)-2;yy<=Math.round(y)+2;yy++)for(let xx=Math.round(x)-2;xx<=Math.round(x)+2;xx++){let i=this.idx(xx,yy);if(i>=0)this.truth[i]=1;}this.log('시험 장애물','후방 통로에 가상 장애물 추가 · 센서 재관측 후 판정');}
+ }
+ step(dt){
+  if(['READY','ARRIVED','HOLD'].includes(this.state))return;
+  this.time+=dt;this.timer+=dt;this.speed=0;
+  if(this.time-this.lastScan>.12)this.scan();
+  if(this.state==='REPLAN'){this.scan();if(this.timer>=.55){this.plan();this.enter('DRIVE',`변경된 셀 반영 · D* Lite 탐색 셀 ${this.expanded.length}개 · 경로 갱신`);}return;}
+  if(this.state==='STOP'){if(this.timer>=1.2)this.enter('ROTATE','차량 본체 정지 유지 · LiDAR와 카메라 동시 회전');return;}
+  if(this.state==='ROTATE'){this.sensor=Math.min(Math.PI,this.timer/3*Math.PI);this.scan();if(this.timer>=3){this.sensor=Math.PI;this.enter('SCAN','회전 완료 · 후방 센서 데이터와 복귀 궤적 검증');}return;}
+  if(this.state==='SCAN'){
+   this.scan();if(this.timer<1.5)return;
+   let ahead=this.trail.slice(Math.max(this.returnPoint.trailIndex,this.recoveryIndex-10),this.recoveryIndex+1);
+   if(!ahead.every(p=>this.safe(p.x,p.y))){this.enter('HOLD','후방 복귀 공간이 막혔거나 미확인 상태 · 후진 명령 금지');return;}
+   this.enter('REVERSE','후방 관측 유효 · 기존 주행 이력을 따라 저속 후진');return;
+  }
+  if(this.state==='REVERSE'){
+   if(this.recoveryIndex<=this.returnPoint.trailIndex){this.enter('RESTORE','갈림길 복귀 완료 · 정지 후 센서를 전방으로 복원');return;}
+   let target=this.trail[this.recoveryIndex-1];if(dist(this.robot,target)<.15){this.recoveryIndex--;return;}
+   this.move(target,.85,dt,true);return;
+  }
+  if(this.state==='RESTORE'){this.sensor=Math.max(0,Math.PI*(1-this.timer/3));this.scan();if(this.timer>=3){this.sensor=0;this.enter('RESUME','실패 구간 비용 반영 · 누적 지도에서 대안 경로 탐색');}return;}
+  if(this.state==='RESUME'){if(this.timer>=1){this.plan();if(this.path.length){this.trail=this.trail.slice(0,this.returnPoint.trailIndex+1);this.enter('DRIVE','다른 가지 선택 · Global path와 Local 추종 재개');}else this.enter('HOLD','현재 누적 지도에서 유효한 대안 경로를 찾지 못함');}return;}
+  this.checkpoint();if(dist(this.robot,this.goal)<.65){this.enter('ARRIVED','G(100, 100) 도착 · 차량 정지');return;}
+  this.scan();
+  let blockedPath=this.path.slice(0,20).some(p=>{let x=Math.round(p.x),y=Math.round(p.y);return this.pendingBlocking.has(y*W+x);});
+  if(blockedPath&&this.time-this.lastPlan>.75){this.enter('REPLAN',`현재 경로 장애물 감지 · 변경 영역에서 D* Lite 경로 복구`);return;}
+  if(this.time-this.lastPlan>1.25)this.plan();
+  while(this.path.length>1&&dist(this.robot,this.path[0])<.55)this.path.shift();
+  let target=this.path[0];if(target&&dist(this.robot,target)<.55&&this.path.length>1)target=this.path[1];
+  if(!target){this.stalled+=dt;if(this.stalled>2)this.beginRecovery();return;}
+  let d=angle(Math.atan2(target.y-this.robot.y,target.x-this.robot.x)-this.robot.heading),cp=this.checkpoints[this.checkpoints.length-1];
+  if(Math.abs(d)>2.3&&cp&&dist(cp,this.robot)>8&&this.recoveries===0){this.beginRecovery();return;}
+  this.move(target,1.9,dt,false);
+ }
+ move(target,velocity,dt,reverse){
+  let direction=Math.atan2(target.y-this.robot.y,target.x-this.robot.x),desired=direction+(reverse?Math.PI:0),delta=angle(desired-this.robot.heading);
+  this.robot.heading=angle(this.robot.heading+Math.max(-2.0*dt,Math.min(2.0*dt,delta)));this.scan();if(Math.abs(delta)>.22)return;
+  let length=Math.min(velocity*dt,dist(this.robot,target)),x=this.robot.x+Math.cos(direction)*length,y=this.robot.y+Math.sin(direction)*length;
+  if(!this.safe(x,y)){this.stalled+=dt;if(reverse){this.enter('HOLD','복귀 중 장애물 또는 미관측 공간 감지 · 즉시 정지');}else{if(this.stalled>3)this.beginRecovery();else this.enter('REPLAN','현재 궤적에 장애물 또는 미관측 공간 감지 · 정지 후 경로 갱신');}return;}
+  // Independent ground-truth monitor counts accidental collisions, never supplies a route.
+  if(!this.safe(x,y,this.truth)){this.collisionCount++;this.enter('HOLD','충돌 검증 실패 · 시뮬레이션 정지');return;}
+  this.stalled=0;this.robot.x=x;this.robot.y=y;this.speed=velocity*2*(reverse?-1:1);this.distance+=length*2;
+  if(!reverse&&dist(this.robot,this.trail[this.trail.length-1])>.3)this.trail.push({x,y});
+ }
+}
+root.UGV={Simulation,W,H,angle,dist};if(typeof module!=='undefined')module.exports=root.UGV;
+})(typeof window==='undefined'?globalThis:window);
+
+
+</script><script>
+'use strict';
+const $=id=>document.getElementById(id),{Simulation,W,H}=UGV;
+if(window.matchMedia&&window.matchMedia('(max-width:720px)').matches)document.querySelector('.setup').open=false;
+let sim=new Simulation(),running=false,flat=false,last=performance.now(),acc=0,lastUI=0,eventKey='';
+const palette={mint:'#65e0bf',orange:'#ffb768',blue:'#6f9fff'};
+const canvases=['world','occupancy','local','planner','sensorView'].map($);
+function size(c){let r=c.getBoundingClientRect(),d=Math.min(window.devicePixelRatio||1,2);if(c.width!==Math.round(r.width*d)||c.height!==Math.round(r.height*d)){c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);}let ctx=c.getContext('2d');if(!ctx)throw new Error('이 브라우저에서는 화면 그리기를 사용할 수 없습니다.');ctx.setTransform(d,0,0,d,0,0);return {ctx,w:r.width,h:r.height};}
+function poly(ctx,p,fill,stroke){ctx.beginPath();p.forEach((v,i)=>i?ctx.lineTo(v[0],v[1]):ctx.moveTo(v[0],v[1]));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=.4;ctx.stroke();}}
+function label(ctx,p,text,color='#edf4fb'){ctx.font='600 12px system-ui';let width=ctx.measureText(text).width;ctx.fillStyle='#091420e8';ctx.fillRect(p[0]-width/2-7,p[1]-20,width+14,25);ctx.fillStyle=color;ctx.textAlign='center';ctx.fillText(text,p[0],p[1]-3);}
+function path(ctx,list,P,color,width=2,dash=[]){if(!list.length)return;ctx.beginPath();list.forEach((p,i)=>{let q=P(p.x,p.y,.2);i?ctx.lineTo(...q):ctx.moveTo(...q);});ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);}
+function drawRobot(ctx,P,scale=1){let r=sim.robot,c=Math.cos(r.heading),s=Math.sin(r.heading),T=(x,y)=>P(r.x+x*c-y*s,r.y+x*s+y*c,.75);poly(ctx,[[.9,.65],[.9,-.65],[-.9,-.65],[-.9,.65]].map(p=>T(...p)),'#d8e7f2','#6f9fff');for(let side of [-1,1])poly(ctx,[[.7,side*.9],[.7,side*.65],[-.7,side*.65],[-.7,side*.9]].map(p=>T(...p)),'#172b3b');path(ctx,[{x:r.x,y:r.y},{x:r.x+c*1.2,y:r.y+s*1.2}],P,'#edf4fb',2);let a=r.heading+sim.sensor,q=P(r.x,r.y,1),e=P(r.x+Math.cos(a)*1.7,r.y+Math.sin(a)*1.7,1);ctx.beginPath();ctx.moveTo(...q);ctx.lineTo(...e);ctx.strokeStyle=palette.orange;ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.arc(q[0],q[1],Math.max(2.5,scale*.25),0,Math.PI*2);ctx.fillStyle=palette.orange;ctx.fill();}
+function drawWorld(){let {ctx,w,h}=size($('world'));ctx.clearRect(0,0,w,h);const s=flat?Math.min((w-60)/W,(h-90)/H):Math.min((w-65)/(W+H),(h-100)/((W+H)*.48));const P=(x,y,z=0)=>flat?[w/2+(x-W/2)*s,65+(y)*s-z*s*.35]:[w/2+(x-W/2-(y-H/2))*s,70+(x+y)*s*.48-z*s*.8];
+ let truth=$('truth').checked;
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){let i=y*W+x,v=sim.map[i],vv=truth?sim.truth[i]:v;let color=vv<0?'#223040':vv===0?(v===0?'#2b6257':'#293d3b'):(v===1?'#72859b':'#344254');let p=[P(x-.5,y-.5),P(x+.5,y-.5),P(x+.5,y+.5),P(x-.5,y+.5)];poly(ctx,p,color,((x+y)%2)?'#ffffff06':null);if(vv===1&&(!flat)&&((v===1)||truth)){let z=v===1?.7:.3;poly(ctx,[P(x-.5,y+.5),P(x+.5,y+.5),P(x+.5,y+.5,z),P(x-.5,y+.5,z)],'#394b62');poly(ctx,[P(x-.5,y-.5,z),P(x+.5,y-.5,z),P(x+.5,y+.5,z),P(x-.5,y+.5,z)],v===1?'#8b9bb0':'#425066');}}
+ if($('showPath').checked){path(ctx,sim.path,P,palette.blue,2.1,[5,4]);let known=[];for(let p of sim.path){if(sim.value(sim.map,p.x,p.y)!==0)break;known.push(p);}path(ctx,known,P,palette.blue,2.6);}
+ path(ctx,sim.trail,P,palette.mint,2);if(sim.state==='REVERSE')path(ctx,sim.trail.slice(sim.returnPoint.trailIndex,sim.recoveryIndex+1),P,palette.orange,3);
+ if($('frontier').checked)for(let p of sim.frontiers){let q=P(p.x,p.y,.1);ctx.fillStyle=palette.orange;ctx.fillRect(q[0]-1.5,q[1]-1.5,3,3);}
+ let origin=P(sim.robot.x,sim.robot.y,.25);poly(ctx,[origin,...sim.rays.map(r=>P(r.x,r.y,.25))],'#65e0bf25');for(let i=0;i<sim.rays.length;i+=10){let q=P(sim.rays[i].x,sim.rays[i].y,.25);ctx.beginPath();ctx.moveTo(...origin);ctx.lineTo(...q);ctx.strokeStyle='#65e0bf38';ctx.lineWidth=.6;ctx.stroke();}poly(ctx,[origin,...sim.rays.filter(r=>Math.abs(UGV.angle(r.a-sim.robot.heading-sim.sensor))<40*Math.PI/180).map(r=>P(r.x,r.y,.3))],'#ffb76819');
+ for(let p of sim.checkpoints){let q=P(p.x,p.y,.15);ctx.beginPath();ctx.arc(...q,5,0,Math.PI*2);ctx.strokeStyle=palette.orange;ctx.lineWidth=1.5;ctx.stroke();}for(let p of sim.failed){let q=P(p.x,p.y,.2);ctx.strokeStyle='#ef8495';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(q[0]-4,q[1]-4);ctx.lineTo(q[0]+4,q[1]+4);ctx.moveTo(q[0]+4,q[1]-4);ctx.lineTo(q[0]-4,q[1]+4);ctx.stroke();}
+ drawRobot(ctx,P,s);label(ctx,P(sim.start.x,sim.start.y+4),'S · (0, 0)');label(ctx,P(sim.goal.x,sim.goal.y-3),'G · (100, 100)',palette.mint);if(sim.checkpoints.length)label(ctx,P(sim.checkpoints[0].x-4,sim.checkpoints[0].y),'복귀 지점',palette.orange);
+ ctx.fillStyle='#91a5bb';ctx.font='12px system-ui';ctx.textAlign='left';
+ if(w<620){ctx.fillText(flat?'평면 관측 지도':'입체 시점 · 높이는 장애물 구분용',16,h-32);ctx.fillText(truth?'실제 환경 표시 · 경로 계산에 미사용':'미관측 영역은 Unknown으로 유지',16,h-14);}
+ else{ctx.fillText(flat?'평면 관측 지도':'아이소메트릭 시점 · 높이는 장애물 구분용',16,h-15);ctx.textAlign='right';ctx.fillText(truth?'실제 환경 표시 중 · 계획에는 사용하지 않음':'Unknown은 밝히지 않은 격자로 유지',w-16,h-15);}
+}
+function mini(id,mode){let {ctx,w,h}=size($(id));ctx.fillStyle='#0c1520';ctx.fillRect(0,0,w,h);let n=mode==='local'?25:W,m=mode==='local'?25:H,x0=mode==='local'?Math.round(sim.robot.x)-12:0,y0=mode==='local'?Math.round(sim.robot.y)-12:0,s=Math.min((w-18)/n,(h-12)/m),ox=(w-n*s)/2,oy=(h-m*s)/2,P=(x,y)=>[ox+(x-x0+.5)*s,oy+(y-y0+.5)*s];for(let y=0;y<m;y++)for(let x=0;x<n;x++){let i=sim.idx(x+x0,y+y0),v=i<0?1:sim.map[i];ctx.fillStyle=v===-1?'#e5eaf0':v===1?'#34445a':'#397b68';if(mode==='local'&&i>=0&&sim.inflated[i]&&v!==1)ctx.fillStyle='#c35f79';ctx.fillRect(ox+x*s,oy+y*s,Math.ceil(s),Math.ceil(s));}
+ ctx.save();ctx.beginPath();ctx.rect(ox,oy,n*s,m*s);ctx.clip();if(mode==='planner'){for(let i of sim.expanded){let p=P(i%W,Math.floor(i/W));ctx.fillStyle='#689aff40';ctx.fillRect(p[0]-s/2,p[1]-s/2,s,s);}if($('showPath').checked)path(ctx,sim.path,P,'#315ecc',1.8,[3,2]);}else if(mode==='local'){let ori=P(sim.robot.x,sim.robot.y);poly(ctx,[ori,...sim.rays.map(r=>P(r.x,r.y))],'#65e0bf44');if($('showPath').checked)path(ctx,sim.path,P,palette.blue,2);}else path(ctx,sim.trail,P,'#08382d',1.5);
+ if($('frontier').checked)for(let p of sim.frontiers){let q=P(p.x,p.y);ctx.fillStyle='#ffab33';ctx.fillRect(q[0]-1,q[1]-1,2,2);}let q=P(sim.robot.x,sim.robot.y);ctx.beginPath();ctx.arc(...q,mode==='local'?5:3,0,Math.PI*2);ctx.fillStyle='#102b48';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();q=P(sim.goal.x,sim.goal.y);ctx.fillStyle='#bd3264';ctx.fillRect(q[0]-3,q[1]-3,6,6);ctx.restore();}
+function sensor(){let {ctx,w,h}=size($('sensorView'));ctx.clearRect(0,0,w,h);let cx=w/2,cy=h/2,R=h*.43;ctx.strokeStyle='#294156';ctx.lineWidth=1;for(let r of [R*.5,R]){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();}let a=-Math.PI/2+sim.sensor;for(let [fov,color] of [[140,'#65e0bf40'],[80,'#ffb76844']]){ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,a-fov*Math.PI/360,a+fov*Math.PI/360);ctx.closePath();ctx.fillStyle=color;ctx.fill();}ctx.fillStyle='#bbcedc';ctx.fillRect(cx-8,cy-14,16,28);ctx.fillStyle='#1c2c3a';ctx.fillRect(cx-12,cy-10,4,20);ctx.fillRect(cx+8,cy-10,4,20);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);ctx.strokeStyle=palette.orange;ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#c7d5e2';ctx.textAlign='left';ctx.font='12px system-ui';ctx.fillText('본체 전방 ↑',12,22);ctx.fillText('본체 후방 ↓',12,h-12);ctx.textAlign='right';ctx.fillStyle=palette.mint;ctx.fillText(sim.state==='REVERSE'?'저속 후진':Math.abs(sim.speed)<.01?'차량 정지':'전진',w-12,h-12);}
+const messages={READY:['관측 지도 준비 완료','시연 시작을 누르면 미관측 구간을 포함한 D* Lite 잠정 경로를 따라갑니다.'],DRIVE:['목표 경로 주행','관측한 자유 공간에서 주행하며 갈림길과 주행 이력을 기억합니다.'],REPLAN:['D* Lite 경로 복구','새 장애물이 현재 경로를 가로막아 정지하고 변경된 셀의 비용을 반영합니다.'],STOP:['차량 정지 · 속도 0','현재 가지의 경로가 막혔습니다. 센서 회전 전에 정지 상태를 유지합니다.'],ROTATE:['LiDAR + 카메라 동시 회전','차량 본체는 정지한 채 센서 yaw만 0° → 180°로 회전합니다.'],SCAN:['후방 재관측 · 복귀 경로 확인','180° 회전 완료. 후방 궤적이 관측된 자유 공간인지 검사합니다.'],REVERSE:['저속 후진 · 갈림길로 복귀','센서는 후방을 관측하며, 주행 이력을 역으로 따라갑니다.'],RESTORE:['갈림길 정지 · 센서 전방 복원','후진 복귀 완료. 센서 yaw를 180° → 0°로 되돌립니다.'],RESUME:['대안 경로 재계획','실패 지점 비용과 누적 지도를 반영하여 다음 경로를 선택합니다.'],ARRIVED:['목표 G 도착 · 주행 완료','탐사, 센서 회전, 복귀 및 대안 경로 주행을 마쳤습니다.'],HOLD:['안전 정지 · 주행 재개 금지','복귀 공간 또는 유효한 경로를 확인하지 못했습니다. 이벤트 기록을 확인하세요.']};
+function ui(){let state=sim.state,m=messages[state],yaw=Math.round(sim.sensor*180/Math.PI);$('state').textContent=sim.labels()[state];$('state').style.color=state==='HOLD'?'#ffb768':state==='ARRIVED'?palette.mint:'#edf4fb';$('position').textContent=`차량 (${((sim.robot.x-8)*2).toFixed(1)}, ${((56-sim.robot.y)*2).toFixed(1)}) m · G(100, 100)`;$('action').textContent=m[0];$('description').textContent=m[1];for(let [id,value,unit] of [['speed',sim.speed.toFixed(2),'m/s'],['yaw',yaw,'°'],['time',sim.time.toFixed(1),'s'],['replans',sim.replans,'회'],['distance',sim.distance.toFixed(1),'m']])$(id).innerHTML=`${value}<em>${unit}</em>`;$('sensorAngle').textContent=`${yaw}°`;$('sensorText').textContent=state==='ROTATE'||state==='RESTORE'?'센서 회전 중 · 주행 명령 잠금':yaw===180?'후방 관측 · 차량 본체와 센서 방향을 구분합니다.':'전방 관측 · 센서 원점은 차량 중심입니다.';
+  let phase={READY:0,DRIVE:sim.recoveries?5:0,REPLAN:sim.recoveries?5:0,STOP:1,ROTATE:2,SCAN:3,REVERSE:4,RESTORE:5,RESUME:5,ARRIVED:5,HOLD:3}[state];document.querySelectorAll('.phase').forEach((e,i)=>{e.classList.toggle('active',i===phase);e.classList.toggle('past',i<phase);});document.querySelectorAll('.mode').forEach(e=>e.classList.toggle('active',e.dataset.mode===sim.mode));let key=sim.events.length+'-'+(sim.events.length?sim.events[0].time:'');if(key!==eventKey){eventKey=key;$('events').innerHTML=sim.events.map(e=>`<div class="event"><time>${e.time.toFixed(1)}s</time><div><b>${e.title}</b><p>${e.text}</p></div></div>`).join('');}
+ $('pause').disabled=['READY','ARRIVED','HOLD'].includes(state);$('pause').textContent=state==='READY'?'일시정지':running?'일시정지':'계속 주행';$('start').textContent=state==='READY'?'▶ 전체 시연 시작':'↻ 처음부터 시연';}
+function render(){drawWorld();mini('occupancy','occupancy');mini('local','local');mini('planner','planner');sensor();ui();}
+function reset(){running=false;acc=0;last=performance.now();sim=new Simulation({range:Number($('range').value),unknownCost:Number($('unknown').value),rearBlocked:$('scenario').value==='blocked'});eventKey='';$('rangeLabel').textContent=Number($('range').value)*2+' m';render();}
+$('start').onclick=()=>{if(sim.state!=='READY')reset();sim.startRun();running=true;last=performance.now();ui();};$('pause').onclick=()=>{if(['READY','ARRIVED','HOLD'].includes(sim.state))return;running=!running;last=performance.now();ui();};$('reset').onclick=reset;for(let id of ['scenario','range','unknown'])$(id).onchange=reset;for(let id of ['truth','frontier','showPath'])$(id).onchange=render;$('view').onclick=()=>{flat=!flat;$('view').textContent=flat?'입체 시점':'평면 시점';render();};window.addEventListener('resize',render);
+function frame(now){let dt=Math.max(0,Math.min(.08,(now-last)/1000)),wasRunning=running;last=now;if(running){acc+=dt*Number($('rate').value);while(acc>=.05){sim.step(.05);acc-=.05;if(['HOLD','ARRIVED'].includes(sim.state)){running=false;acc=0;break;}}}if(wasRunning&&(now-lastUI>50||!running)){render();lastUI=now;}requestAnimationFrame(frame);}reset();window.UGVStandalone.ready();requestAnimationFrame(frame);
+
+</script></body></html>

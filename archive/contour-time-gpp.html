@@ -1,0 +1,224 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>등고선 기반 최소시간 GPP · 본문 예시</title><style>:root{color-scheme:light;--bg-primary:#f7f8fa;--bg-secondary:#fff;--bg-tertiary:#edf1f5;--text-primary:#21303f;--text-secondary:#607080;--text-muted:#748292;--border:#d8e0e7;--border-color:#d8e0e7;--accent:#3174aa;--accent-primary:#3174aa;--color-blue-500:#3174aa}*{box-sizing:border-box}body{margin:0;padding:20px;color:var(--text-primary);background:var(--bg-primary);font:16px/1.6 system-ui,-apple-system,'Segoe UI','Malgun Gothic',sans-serif}h2{font-size:24px;line-height:1.4}button,input,select{font:inherit}button,.btn{border:1px solid var(--border);border-radius:6px;padding:7px 13px;background:white;color:var(--text-primary);cursor:pointer}.btn-primary{background:var(--accent);color:white}.form-select,.form-input{padding:7px;border:1px solid var(--border);border-radius:5px;background:white;color:var(--text-primary)}.form-label{font-size:14px}body>div{max-width:1300px;margin:auto}</style></head><body><div id="contour-time-gpp">
+  <h2>등고선과 차량 성능으로 계산하는 최소시간 GPP</h2>
+
+  <div class="viz-controls" aria-label="경로 계산 조건">
+    <label class="form-label" for="gpp-load">적재량
+      <select class="form-select" id="gpp-load">
+        <option value="0">0 kg</option>
+        <option value="10">10 kg</option>
+        <option value="20">20 kg</option>
+      </select>
+    </label>
+    <label class="form-label" for="gpp-view">표시 기준
+      <select class="form-select" id="gpp-view">
+        <option value="time">예상 통과시간 비용</option>
+        <option value="elevation">고도·등고선</option>
+        <option value="slope">진행방향 경사</option>
+      </select>
+    </label>
+    <button class="btn btn-primary" id="gpp-run" type="button">최소시간 경로 계산</button>
+  </div>
+
+  <div class="gpp-pipeline" aria-label="계산 흐름">
+    <span>등고선·고도</span><b>→</b><span>방향별 경사</span><b>→</b><span>예상 속도</span><b>→</b><span>시간 비용</span><b>→</b><span>A* GPP</span>
+  </div>
+
+  <div class="gpp-main">
+    <div class="gpp-map-wrap">
+      <canvas id="gpp-map" role="img" aria-label="등고선 지도와 최소시간 전역 경로"></canvas>
+      <div class="gpp-legend" aria-hidden="true">
+        <span><i class="route-distance"></i>거리 최단</span>
+        <span><i class="route-time"></i>시간 최단</span>
+        <span><i class="contour"></i>등고선</span>
+      </div>
+    </div>
+
+    <div class="gpp-side">
+      <div class="card viz-stat">
+        <span class="text-muted">선택된 전역경로</span>
+        <strong class="viz-stat-value" id="gpp-choice">—</strong>
+        <span id="gpp-reason">계산 전</span>
+      </div>
+      <div class="card viz-stat">
+        <span class="text-muted">예상 도착시간</span>
+        <strong class="viz-stat-value tabular-nums" id="gpp-eta">—</strong>
+        <span id="gpp-distance">—</span>
+      </div>
+      <div class="card viz-stat">
+        <span class="text-muted">최대 경사 / 최저 예상속도</span>
+        <strong class="viz-stat-value tabular-nums" id="gpp-limit">—</strong>
+        <span>선택 경로 기준</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-sm">
+      <thead><tr><th>후보</th><th class="text-end">거리</th><th class="text-end">최대 경사</th><th class="text-end">예상시간</th><th>판정</th></tr></thead>
+      <tbody id="gpp-table"></tbody>
+    </table>
+  </div>
+
+  <div class="gpp-detail" aria-live="polite" id="gpp-detail">시작 위치와 목적지는 고도 지도에 정합된 것으로 가정합니다. LPP와 경로추종은 범위에서 제외합니다.</div>
+</div>
+
+<style>
+#contour-time-gpp{color:var(--foreground);width:100%}
+#contour-time-gpp h2{margin:0 0 12px}
+#contour-time-gpp .gpp-pipeline{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px 0;color:var(--muted-foreground)}
+#contour-time-gpp .gpp-pipeline span{padding:5px 8px;background:color-mix(in srgb,var(--viz-series-1) 10%,transparent)}
+#contour-time-gpp .gpp-pipeline b{font-weight:400;color:var(--muted-foreground)}
+#contour-time-gpp .gpp-main{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start}
+#contour-time-gpp .gpp-map-wrap{position:relative;min-width:0}
+#contour-time-gpp canvas{display:block;width:100%;height:390px;border:1px solid var(--border)}
+#contour-time-gpp .gpp-legend{position:absolute;left:10px;bottom:10px;display:flex;gap:12px;flex-wrap:wrap;padding:6px 8px;background:color-mix(in srgb,var(--background) 88%,transparent);color:var(--foreground)}
+#contour-time-gpp .gpp-legend span{display:flex;align-items:center;gap:5px}
+#contour-time-gpp .gpp-legend i{display:inline-block;width:18px;height:3px}
+#contour-time-gpp .route-distance{background:var(--viz-series-2)}
+#contour-time-gpp .route-time{background:var(--viz-series-1)}
+#contour-time-gpp .contour{background:var(--muted-foreground);height:1px!important}
+#contour-time-gpp .gpp-side{display:grid;gap:10px}
+#contour-time-gpp .gpp-side .card{margin:0}
+#contour-time-gpp .gpp-side span{display:block}
+#contour-time-gpp .gpp-detail{margin-top:10px;padding:9px 0;color:var(--muted-foreground)}
+#contour-time-gpp table{margin-top:12px}
+#contour-time-gpp tr.is-best td{color:var(--foreground);font-weight:500}
+@media(max-width:720px){#contour-time-gpp .gpp-main{grid-template-columns:1fr}#contour-time-gpp .gpp-side{grid-template-columns:repeat(3,1fr)}#contour-time-gpp canvas{height:340px}}
+@media(max-width:480px){#contour-time-gpp .gpp-side{grid-template-columns:1fr}#contour-time-gpp canvas{height:300px}}
+</style>
+
+<script>
+(() => {
+  const root=document.getElementById('contour-time-gpp');
+  const canvas=root.querySelector('#gpp-map');
+  const ctx=canvas.getContext('2d');
+  const loadEl=root.querySelector('#gpp-load');
+  const viewEl=root.querySelector('#gpp-view');
+  const choiceEl=root.querySelector('#gpp-choice');
+  const etaEl=root.querySelector('#gpp-eta');
+  const distanceEl=root.querySelector('#gpp-distance');
+  const limitEl=root.querySelector('#gpp-limit');
+  const reasonEl=root.querySelector('#gpp-reason');
+  const tableEl=root.querySelector('#gpp-table');
+  const detailEl=root.querySelector('#gpp-detail');
+
+  const N=61;
+  const start={x:5,y:30};
+  const goal={x:55,y:30};
+  let result=null;
+
+  const css=name=>{
+    const probe=document.createElement('span');
+    probe.style.color=`var(${name})`;probe.style.display='none';root.appendChild(probe);
+    const color=getComputedStyle(probe).color;probe.remove();return color;
+  };
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const idx=(x,y)=>y*N+x;
+
+  // Synthetic contour surface: a central ridge makes the direct route shorter but steeper.
+  function elevation(x,y){
+    const ridge=15*Math.exp(-Math.pow((x-30)/8,2))*Math.exp(-Math.pow((y-30)/17,4));
+    const shoulder=3.2*Math.exp(-Math.pow((x-31)/15,2))*Math.exp(-Math.pow((y-13)/8,2));
+    return ridge+shoulder+.025*x;
+  }
+
+  // Regression structure retained from the supplied prototype.
+  // It is a demonstrator until coefficients are replaced by measured vehicle data.
+  function speed(thetaDeg,payload){
+    const t=thetaDeg*Math.PI/180;
+    const q=Math.sin(t)+.04*Math.cos(t);
+    return Math.max(.055,1.05-1.60*q-.055*payload*q);
+  }
+
+  const directions=[[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];
+  function edge(a,b,payload,metric){
+    const horizontal=Math.hypot(b.x-a.x,b.y-a.y);
+    const dz=elevation(b.x,b.y)-elevation(a.x,a.y);
+    const slope=Math.atan2(dz,horizontal)*180/Math.PI;
+    const length=Math.hypot(horizontal,dz);
+    const v=speed(slope,payload);
+    const blocked=Math.abs(slope)>28||v<=.056;
+    return {cost:blocked?Infinity:(metric==='distance'?length:length/v),length,slope,v};
+  }
+
+  function astar(payload,metric){
+    const count=N*N,g=new Float64Array(count).fill(Infinity),parent=new Int32Array(count).fill(-1),closed=new Uint8Array(count),heap=[];
+    const sid=idx(start.x,start.y),gid=idx(goal.x,goal.y);
+    const h=(x,y)=>Math.hypot(goal.x-x,goal.y-y)*(metric==='distance'?1:1/1.15);
+    function push(id,f){heap.push({id,f});let i=heap.length-1;while(i){const p=(i-1)>>1;if(heap[p].f<=f)break;heap[i]=heap[p];i=p}heap[i]={id,f}}
+    function pop(){const out=heap[0],last=heap.pop();if(heap.length){let i=0;while(i*2+1<heap.length){let c=i*2+1;if(c+1<heap.length&&heap[c+1].f<heap[c].f)c++;if(heap[c].f>=last.f)break;heap[i]=heap[c];i=c}heap[i]=last}return out}
+    g[sid]=0;push(sid,h(start.x,start.y));
+    while(heap.length){const cur=pop().id;if(closed[cur])continue;closed[cur]=1;if(cur===gid)break;const x=cur%N,y=Math.floor(cur/N);
+      for(const [dx,dy] of directions){const nx=x+dx,ny=y+dy;if(nx<1||ny<1||nx>=N-1||ny>=N-1)continue;
+        const e=edge({x,y},{x:nx,y:ny},payload,metric);if(!isFinite(e.cost))continue;
+        const nid=idx(nx,ny),alt=g[cur]+e.cost;if(alt<g[nid]){g[nid]=alt;parent[nid]=cur;push(nid,alt+h(nx,ny))}
+      }
+    }
+    const path=[];let id=gid;if(parent[id]===-1)return null;while(id!==-1){path.push({x:id%N,y:Math.floor(id/N)});if(id===sid)break;id=parent[id]}path.reverse();
+    let distance=0,time=0,maxSlope=0,minSpeed=Infinity;for(let i=1;i<path.length;i++){const e=edge(path[i-1],path[i],payload,'time');distance+=e.length;time+=e.length/e.v;maxSlope=Math.max(maxSlope,Math.abs(e.slope));minSpeed=Math.min(minSpeed,e.v)}
+    return {path,distance,time,maxSlope,minSpeed};
+  }
+
+  function calculate(){
+    const payload=+loadEl.value;
+    const shortest=astar(payload,'distance');
+    const fastest=astar(payload,'time');
+    result={payload,shortest,fastest};
+    const saved=shortest.time-fastest.time;
+    choiceEl.textContent=saved>.2?'경사 우회 시간최적 경로':'거리최단 경로';
+    etaEl.textContent=fastest.time.toFixed(1)+' s';
+    distanceEl.textContent='주행거리 '+fastest.distance.toFixed(1)+' m';
+    limitEl.textContent=fastest.maxSlope.toFixed(1)+'° / '+fastest.minSpeed.toFixed(2)+' m/s';
+    reasonEl.textContent=saved>.2?'더 길어도 경사에서 속도를 유지':'직선 경로의 시간 비용이 낮음';
+    tableEl.innerHTML=[['거리 최단',shortest],['시간 최단',fastest]].map(([name,r],i)=>`<tr class="${i===1?'is-best':''}"><td>${name}</td><td class="text-end">${r.distance.toFixed(1)} m</td><td class="text-end">${r.maxSlope.toFixed(1)}°</td><td class="text-end">${r.time.toFixed(1)} s</td><td>${i===1?'GPP 선택':'비교 기준'}</td></tr>`).join('');
+    detailEl.textContent=`${payload} kg 조건에서 각 격자의 진행방향 경사를 구하고, 회귀식 v(경사, 적재량)로 속도를 예측한 뒤 Δt=거리/속도를 누적했습니다. 거리최단 대비 ${Math.max(0,saved).toFixed(1)}초 절감 예상입니다.`;
+    draw();
+    if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{payload,eta:+fastest.time.toFixed(1),distance:+fastest.distance.toFixed(1)},privateContent:{view:viewEl.value}}).catch(()=>{});
+  }
+
+  function drawPath(path,color,width,dash=[]){
+    if(!path)return;const {sx,sy}=layout();ctx.beginPath();path.forEach((p,i)=>{const x=sx(p.x),y=sy(p.y);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);
+  }
+
+  function layout(){const w=canvas.clientWidth,h=canvas.clientHeight,pad=18;return{w,h,sx:x=>pad+x/(N-1)*(w-pad*2),sy:y=>pad+y/(N-1)*(h-pad*2)}}
+  function draw(){
+    const ratio=window.devicePixelRatio||1,w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,w,h);
+    const {sx,sy}=layout(),view=viewEl.value,payload=+loadEl.value;
+    const bg=css('--background'),fg=css('--foreground'),muted=css('--muted-foreground'),border=css('--border'),s1=css('--viz-series-1'),s2=css('--viz-series-2');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+    const cellW=(w-36)/(N-1),cellH=(h-36)/(N-1);
+    for(let y=0;y<N-1;y+=2)for(let x=0;x<N-1;x+=2){const z=elevation(x,y);let alpha,fill;
+      if(view==='elevation'){alpha=.08+z/20*.34;fill=`color-mix(in srgb, ${s1} ${Math.round(alpha*100)}%, ${bg})`}
+      else if(view==='slope'){const ex=edge({x,y},{x:x+1,y},payload,'time');alpha=clamp(Math.abs(ex.slope)/28,0,1);fill=`color-mix(in srgb, ${s2} ${Math.round((.08+.42*alpha)*100)}%, ${bg})`}
+      else{const ex=edge({x,y},{x:x+1,y},payload,'time');alpha=clamp((1/ex.v-.7)/5,0,1);fill=`color-mix(in srgb, ${s2} ${Math.round((.06+.46*alpha)*100)}%, ${bg})`}
+      ctx.fillStyle=fill;ctx.fillRect(sx(x),sy(y),cellW*2+.5,cellH*2+.5);
+    }
+    // Browser canvas cannot resolve color-mix strings in some engines; overlay a neutral terrain wash.
+    ctx.globalAlpha=.12;ctx.fillStyle=s1;for(let y=0;y<N-1;y+=2)for(let x=0;x<N-1;x+=2){const z=elevation(x,y);ctx.globalAlpha=.03+z/20*.16;ctx.fillRect(sx(x),sy(y),cellW*2+.5,cellH*2+.5)}ctx.globalAlpha=1;
+    ctx.strokeStyle=border;ctx.lineWidth=1;
+    function crossing(x1,y1,z1,x2,y2,z2,level){
+      if((z1<level&&z2<level)||(z1>=level&&z2>=level)||z1===z2)return null;
+      const t=(level-z1)/(z2-z1);return[sx(x1+(x2-x1)*t),sy(y1+(y2-y1)*t)];
+    }
+    for(let level=2;level<=14;level+=2){ctx.beginPath();
+      for(let y=0;y<N-1;y++)for(let x=0;x<N-1;x++){
+        const z00=elevation(x,y),z10=elevation(x+1,y),z11=elevation(x+1,y+1),z01=elevation(x,y+1);
+        const pts=[crossing(x,y,z00,x+1,y,z10,level),crossing(x+1,y,z10,x+1,y+1,z11,level),crossing(x,y+1,z01,x+1,y+1,z11,level),crossing(x,y,z00,x,y+1,z01,level)].filter(Boolean);
+        if(pts.length===2){ctx.moveTo(pts[0][0],pts[0][1]);ctx.lineTo(pts[1][0],pts[1][1])}
+        else if(pts.length===4){ctx.moveTo(pts[0][0],pts[0][1]);ctx.lineTo(pts[1][0],pts[1][1]);ctx.moveTo(pts[2][0],pts[2][1]);ctx.lineTo(pts[3][0],pts[3][1])}
+      }ctx.stroke();
+    }
+    if(result){drawPath(result.shortest.path,s2,2,[5,4]);drawPath(result.fastest.path,s1,4)}
+    for(const [p,label,color] of [[start,'S',fg],[goal,'G',s1]]){ctx.fillStyle=bg;ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx(p.x),sy(p.y),8,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=color;ctx.font='500 12px system-ui';ctx.textAlign='center';ctx.fillText(label,sx(p.x),sy(p.y)+4)}
+    ctx.fillStyle=muted;ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('낮은 고도',18,h-5);ctx.textAlign='right';ctx.fillText('중앙 능선 · 높은 고도',w-18,16);
+  }
+
+  root.querySelector('#gpp-run').addEventListener('click',calculate);
+  loadEl.addEventListener('change',calculate);
+  viewEl.addEventListener('change',draw);
+  new ResizeObserver(draw).observe(canvas);
+  const saved=window.openai?.widgetState?.privateContent;if(saved?.view)viewEl.value=saved.view;
+  calculate();
+})();
+</script>
+</body></html>

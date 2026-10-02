@@ -1,0 +1,638 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>적응형 통과비용 · 본문 예시</title><style>:root{color-scheme:light;--bg-primary:#f7f8fa;--bg-secondary:#fff;--bg-tertiary:#edf1f5;--text-primary:#21303f;--text-secondary:#607080;--text-muted:#748292;--border:#d8e0e7;--border-color:#d8e0e7;--accent:#3174aa;--accent-primary:#3174aa;--color-blue-500:#3174aa}*{box-sizing:border-box}body{margin:0;padding:20px;color:var(--text-primary);background:var(--bg-primary);font:16px/1.6 system-ui,-apple-system,'Segoe UI','Malgun Gothic',sans-serif}h2{font-size:24px;line-height:1.4}button,input,select{font:inherit}button,.btn{border:1px solid var(--border);border-radius:6px;padding:7px 13px;background:white;color:var(--text-primary);cursor:pointer}.btn-primary{background:var(--accent);color:white}.form-select,.form-input{padding:7px;border:1px solid var(--border);border-radius:5px;background:white;color:var(--text-primary)}.form-label{font-size:14px}body>div{max-width:1300px;margin:auto}</style></head><body><div id="offroad-adaptive-sim">
+  <style>
+    #offroad-adaptive-sim {
+      --font-size-base: 16px;
+      --sim-sky: light-dark(#d9ecf5, #12232d);
+      --sim-far: light-dark(#73917b, #314b3a);
+      --sim-near: light-dark(#8b6a47, #49392c);
+      --sim-ground: light-dark(#d4b879, #5b4a2e);
+      --sim-road: light-dark(#b99262, #796044);
+      --sim-road-edge: light-dark(#8b653d, #aa8a5d);
+      --sim-autumn-1: light-dark(#b54d2d, #c4613e);
+      --sim-autumn-2: light-dark(#d78b27, #d99b42);
+      --sim-autumn-3: light-dark(#7c7831, #98954a);
+      --sim-low-cost: light-dark(#bfe6fb, #173f56);
+      --sim-high-cost: light-dark(#153b7c, #5ba9e8);
+      --sim-fog: light-dark(#71838b, #26353d);
+      color: var(--foreground);
+      width: 100%;
+    }
+    #offroad-adaptive-sim * { box-sizing: border-box; }
+    #offroad-adaptive-sim [hidden] { display:none !important; }
+    #offroad-adaptive-sim .sim-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:8px; }
+    #offroad-adaptive-sim .sim-title h2 { margin:0; }
+    #offroad-adaptive-sim .sim-title p { margin:4px 0 0; color:var(--muted-foreground); }
+    #offroad-adaptive-sim .sim-controls { display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; }
+    #offroad-adaptive-sim .control-block { min-width:132px; }
+    #offroad-adaptive-sim .control-block .form-label { display:block; margin-bottom:4px; }
+    #offroad-adaptive-sim .mode-buttons { display:flex; gap:6px; flex-wrap:wrap; }
+    #offroad-adaptive-sim .sim-stats { margin:6px 0 8px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+    #offroad-adaptive-sim .viz-stat-value { white-space:nowrap; }
+    #offroad-adaptive-sim .metric-item { display:grid; gap:1px; padding:3px 2px; }
+    #offroad-adaptive-sim .main-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(330px,1fr); gap:12px; align-items:stretch; }
+    #offroad-adaptive-sim .map-column { min-width:0; }
+    #offroad-adaptive-sim .map-wrap { position:relative; width:100%; }
+    #offroad-adaptive-sim #terrain-map { display:block; width:100%; height:auto; color:var(--foreground); }
+    #offroad-adaptive-sim .map-caption { position:absolute; left:16px; top:14px; max-width:min(390px, 64%); background:color-mix(in srgb, var(--card) 88%, transparent); color:var(--card-foreground); padding:9px 11px; border-radius:10px; backdrop-filter:blur(5px); }
+    #offroad-adaptive-sim .map-caption strong { display:block; font-weight:500; }
+    #offroad-adaptive-sim .map-caption span { color:var(--muted-foreground); }
+    #offroad-adaptive-sim .event-banner { position:absolute; left:50%; top:16px; transform:translateX(-50%); background:var(--primary); color:var(--primary-foreground); padding:8px 12px; border-radius:999px; opacity:0; transition:opacity .18s ease; pointer-events:none; white-space:nowrap; }
+    #offroad-adaptive-sim .event-banner.show { opacity:1; }
+    #offroad-adaptive-sim .legend { display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-top:8px; color:var(--muted-foreground); }
+    #offroad-adaptive-sim .legend-item { display:inline-flex; align-items:center; gap:6px; }
+    #offroad-adaptive-sim .legend-line { width:28px; height:4px; border-radius:3px; background:var(--viz-series-1); }
+    #offroad-adaptive-sim .legend-line.old { background:var(--muted-foreground); opacity:.65; }
+    #offroad-adaptive-sim .legend-swatch { width:16px; height:16px; border-radius:4px; background:linear-gradient(90deg,var(--sim-low-cost),var(--sim-high-cost)); }
+    #offroad-adaptive-sim .comparison { margin-top:14px; }
+    #offroad-adaptive-sim .comparison[hidden] { display:none; }
+    #offroad-adaptive-sim .compare-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; }
+    #offroad-adaptive-sim .compare-side { display:grid; gap:6px; }
+    #offroad-adaptive-sim .compare-side.right { text-align:right; }
+    #offroad-adaptive-sim .compare-time { font-size:1.35em; font-weight:500; }
+    #offroad-adaptive-sim .compare-arrow { color:var(--viz-series-1); }
+    #offroad-adaptive-sim .timeline { height:9px; background:var(--muted); border-radius:999px; overflow:hidden; margin-top:10px; }
+    #offroad-adaptive-sim .timeline > div { height:100%; width:0%; background:var(--viz-series-1); transition:width .12s linear; }
+    #offroad-adaptive-sim svg text { fill:var(--foreground); font-family:inherit; font-size:20px; font-weight:500; }
+    #offroad-adaptive-sim svg .small-label { fill:var(--muted-foreground); font-size:16px; font-weight:400; }
+    #offroad-adaptive-sim svg .route-base { fill:none; stroke:var(--sim-road); stroke-width:34; stroke-linecap:round; stroke-linejoin:round; }
+    #offroad-adaptive-sim svg .route-edge { fill:none; stroke:var(--sim-road-edge); stroke-width:39; opacity:.35; stroke-linecap:round; stroke-linejoin:round; }
+    #offroad-adaptive-sim svg .route-active { fill:none; stroke:var(--viz-series-1); stroke-width:7; stroke-linecap:round; stroke-linejoin:round; filter:url(#softGlow); }
+    #offroad-adaptive-sim svg .route-old { fill:none; stroke:var(--muted-foreground); stroke-width:5; stroke-linecap:round; stroke-dasharray:10 10; opacity:.7; }
+    #offroad-adaptive-sim svg .cost-zone { fill:var(--sim-low-cost); opacity:.18; transition:fill .35s ease, opacity .35s ease; }
+    #offroad-adaptive-sim svg .cost-zone.hot { fill:var(--sim-high-cost); opacity:.55; }
+    #offroad-adaptive-sim svg .contour { fill:none; stroke:color-mix(in srgb, var(--foreground) 22%, transparent); stroke-width:1.2; }
+    #offroad-adaptive-sim svg .tree-trunk { fill:var(--sim-near); }
+    #offroad-adaptive-sim svg .rock { fill:color-mix(in srgb, var(--muted-foreground) 55%, var(--sim-ground)); }
+    #offroad-adaptive-sim svg .node { fill:var(--card); stroke:var(--viz-series-1); stroke-width:3; }
+    #offroad-adaptive-sim svg .goal { fill:var(--viz-series-1); }
+    #offroad-adaptive-sim svg .ugv-body { fill:light-dark(#52616d, #a9b7c0); stroke:var(--foreground); stroke-width:1.4; }
+    #offroad-adaptive-sim svg .ugv-deck { fill:light-dark(#6f7f61, #7f916f); stroke:var(--foreground); stroke-width:1.2; }
+    #offroad-adaptive-sim svg .ugv-wheel { fill:light-dark(#252b2e, #111619); stroke:var(--foreground); stroke-width:1; }
+    #offroad-adaptive-sim svg .ugv-sensor { fill:var(--viz-series-1); }
+    #offroad-adaptive-sim svg .load-crate { fill:var(--sim-autumn-2); stroke:var(--foreground); stroke-width:1; }
+    #offroad-adaptive-sim svg .sensor-range { fill:color-mix(in srgb, var(--viz-series-1) 12%, transparent); stroke:color-mix(in srgb, var(--viz-series-1) 70%, transparent); stroke-width:2; stroke-dasharray:7 7; }
+    #offroad-adaptive-sim svg .frontier-marker { fill:var(--card); stroke:var(--viz-series-1); stroke-width:3; }
+    #offroad-adaptive-sim svg .frontier-label { paint-order:stroke; stroke:var(--card); stroke-width:5px; stroke-linejoin:round; }
+    #offroad-adaptive-sim svg .goal-beacon { fill:var(--viz-series-1); stroke:var(--card); stroke-width:4; }
+    #offroad-adaptive-sim svg .goal-ring { fill:none; stroke:var(--viz-series-1); stroke-width:3; stroke-dasharray:6 6; }
+    #offroad-adaptive-sim .sr-status { min-height:1.4em; margin-top:7px; color:var(--muted-foreground); }
+    #offroad-adaptive-sim .live-panel { display:flex; flex-direction:column; min-height:100%; padding:12px; }
+    #offroad-adaptive-sim .live-panel h3 { margin:0 0 10px; }
+    #offroad-adaptive-sim .stage-list { display:grid; gap:7px; margin-bottom:12px; }
+    #offroad-adaptive-sim .stage-item { display:grid; grid-template-columns:16px 1fr; align-items:start; gap:8px; color:var(--muted-foreground); }
+    #offroad-adaptive-sim .stage-dot { width:11px; height:11px; border-radius:50%; background:var(--muted); margin-top:4px; }
+    #offroad-adaptive-sim .stage-item.active { color:var(--foreground); font-weight:500; }
+    #offroad-adaptive-sim .stage-item.active .stage-dot { background:var(--viz-series-1); box-shadow:0 0 0 4px color-mix(in srgb, var(--viz-series-1) 18%, transparent); }
+    #offroad-adaptive-sim .stage-item.done .stage-dot { background:var(--green); }
+    #offroad-adaptive-sim .log-title { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:2px 0 7px; }
+    #offroad-adaptive-sim .event-log { list-style:none; padding:0; margin:0; display:grid; gap:5px; max-height:220px; overflow:auto; }
+    #offroad-adaptive-sim .event-log li { display:grid; grid-template-columns:48px 1fr; gap:8px; padding:7px 0; border-top:1px solid var(--border); }
+    #offroad-adaptive-sim .event-log time { color:var(--viz-series-1); font-variant-numeric:tabular-nums; }
+    #offroad-adaptive-sim .event-log .empty-log { display:block; color:var(--muted-foreground); border-top:0; }
+    @media (max-width:720px) {
+      #offroad-adaptive-sim .main-grid { grid-template-columns:1fr; }
+      #offroad-adaptive-sim .sim-stats { grid-template-columns:1fr; }
+      #offroad-adaptive-sim .compare-grid { grid-template-columns:1fr; }
+      #offroad-adaptive-sim .compare-side.right { text-align:left; }
+      #offroad-adaptive-sim .compare-arrow { transform:rotate(90deg); }
+      #offroad-adaptive-sim .map-caption { max-width:76%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #offroad-adaptive-sim * { scroll-behavior:auto !important; transition:none !important; }
+    }
+  </style>
+
+  <div class="sim-head">
+    <div class="sim-title">
+      <h2>주행경험 기반 야지 경로 재계획</h2>
+      <p>목표 좌표만 알고 출발해, 센서로 지도를 밝히며 다음 탐색 방향을 선택합니다.</p>
+    </div>
+    <div class="sim-controls viz-controls" aria-label="시뮬레이션 제어">
+      <label class="control-block">
+        <span class="form-label">적재 상태</span>
+        <select id="payload-select" class="form-select">
+          <option value="loaded" selected>적재 80%</option>
+          <option value="empty">무적재</option>
+        </select>
+      </label>
+      <label class="control-block">
+        <span class="form-label">재생 속도</span>
+        <select id="speed-select" class="form-select">
+          <option value="1">1×</option>
+          <option value="2" selected>2×</option>
+          <option value="4">4×</option>
+        </select>
+      </label>
+      <div>
+        <span class="form-label">시나리오</span>
+        <div class="mode-buttons">
+          <button type="button" class="btn" id="run-static">기준: 목표지향 탐색</button>
+          <button type="button" class="btn btn-primary" id="run-adaptive">제안: 경험기반 탐색</button>
+          <button type="button" class="btn btn-ghost" id="reset-sim">초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="viz-grid sim-stats" aria-label="현재 주행 상태">
+    <div class="metric-item">
+      <span class="text-muted">경과시간</span>
+      <span class="viz-stat-value tabular-nums" id="elapsed-value">0.0 s</span>
+      <span class="text-small text-muted" id="eta-context">도착 전</span>
+    </div>
+    <div class="metric-item">
+      <span class="text-muted">기대 / 실제속도</span>
+      <span class="viz-stat-value tabular-nums" id="speed-value">1.0 / 1.0 m/s</span>
+      <span class="text-small text-muted" id="speed-context">성능 비율 1.00</span>
+    </div>
+    <div class="metric-item">
+      <span class="text-muted">학습된 경사 비용</span>
+      <span class="viz-stat-value tabular-nums" id="cost-value">1.00</span>
+      <span class="text-small text-muted" id="route-context">센서 범위 내 지도 생성</span>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="map-column">
+      <div class="map-wrap">
+    <svg id="terrain-map" viewBox="0 0 1000 500" role="img" aria-labelledby="map-title map-desc">
+      <title id="map-title">대한민국 가을 산악 야지에서 주행하는 6륜 무인차량</title>
+      <desc id="map-desc">짧지만 급경사가 두 번 있는 경로와 길지만 완만한 우회로를 비교하는 자율주행 시뮬레이션입니다.</desc>
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sim-sky)"/><stop offset="1" stop-color="var(--sim-ground)"/></linearGradient>
+        <linearGradient id="slopeGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="var(--sim-low-cost)"/><stop offset="1" stop-color="var(--sim-high-cost)"/></linearGradient>
+        <filter id="softGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <mask id="fog-mask">
+          <rect width="1000" height="500" fill="white"/>
+          <g id="reveal-holes"><circle cx="78" cy="386" r="88" fill="black"/></g>
+        </mask>
+      </defs>
+      <rect x="0" y="0" width="1000" height="500" rx="16" fill="url(#skyGrad)"/>
+      <path d="M0 235 L95 135 L170 195 L270 80 L360 176 L455 92 L550 170 L645 58 L760 165 L870 84 L1000 178 L1000 500 L0 500Z" fill="var(--sim-far)" opacity=".72"/>
+      <path d="M0 330 Q110 245 220 305 T440 282 T660 295 T880 260 T1000 300 L1000 500 L0 500Z" fill="var(--sim-ground)"/>
+      <path class="contour" d="M30 418 Q170 345 300 410 T570 390 T850 405 T980 370"/>
+      <path class="contour" d="M35 455 Q175 385 310 446 T590 425 T860 448 T980 412"/>
+      <path class="contour" d="M145 280 Q275 190 420 252 T690 220 T930 240"/>
+
+      <g aria-hidden="true">
+        <g transform="translate(110 255)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="8" r="18" fill="var(--sim-autumn-1)"/></g>
+        <g transform="translate(165 230)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="20" fill="var(--sim-autumn-2)"/></g>
+        <g transform="translate(255 145)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="19" fill="var(--sim-autumn-3)"/></g>
+        <g transform="translate(365 150)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="22" fill="var(--sim-autumn-1)"/></g>
+        <g transform="translate(470 120)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="19" fill="var(--sim-autumn-2)"/></g>
+        <g transform="translate(600 120)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="23" fill="var(--sim-autumn-3)"/></g>
+        <g transform="translate(745 112)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="21" fill="var(--sim-autumn-1)"/></g>
+        <g transform="translate(865 135)"><rect class="tree-trunk" x="-3" y="14" width="6" height="20"/><circle cx="0" cy="7" r="19" fill="var(--sim-autumn-2)"/></g>
+        <path class="rock" d="M286 355 l16-15 20 6 8 20-48 3Z"/><path class="rock" d="M404 360 l12-12 17 4 8 17-38 4Z"/>
+        <path class="rock" d="M706 336 l17-17 18 7 10 19-48 6Z"/><path class="rock" d="M820 302 l14-14 18 5 9 17-42 5Z"/>
+      </g>
+
+      <path class="route-edge" d="M78 386 C135 365 164 342 205 330 C256 314 280 245 334 214 C382 187 430 228 500 235 C560 237 590 168 645 151 C700 133 744 190 800 180 C848 171 878 176 929 188"/>
+      <path class="route-base" id="direct-route" d="M78 386 C135 365 164 342 205 330 C256 314 280 245 334 214 C382 187 430 228 500 235 C560 237 590 168 645 151 C700 133 744 190 800 180 C848 171 878 176 929 188"/>
+      <path class="route-edge" d="M500 235 C535 285 548 345 610 392 C678 443 775 439 845 366 C886 323 905 250 929 188"/>
+      <path class="route-base" id="detour-route" d="M500 235 C535 285 548 345 610 392 C678 443 775 439 845 366 C886 323 905 250 929 188"/>
+
+      <ellipse id="cost-zone-1" class="cost-zone" cx="314" cy="243" rx="76" ry="53" transform="rotate(-37 314 243)"/>
+      <ellipse id="cost-zone-2" class="cost-zone" cx="626" cy="172" rx="78" ry="51" transform="rotate(-23 626 172)"/>
+      <path id="active-route" class="route-active" d="M78 386 C135 365 164 342 205 330 C256 314 280 245 334 214 C382 187 430 228 500 235 C560 237 590 168 645 151 C700 133 744 190 800 180 C848 171 878 176 929 188"/>
+      <path id="old-route" class="route-old" d=""/>
+
+      <g transform="translate(78 386)"><circle class="node" r="9"/><text x="-12" y="30">출발</text></g>
+      <g transform="translate(500 235)"><circle class="node" r="9"/><text x="-28" y="-17">재계획 분기점</text></g>
+      <g transform="translate(929 188)"><circle class="goal" r="11"/><text x="-17" y="-21">목적지</text></g>
+      <text x="278" y="185">급경사 1</text><text x="596" y="113">급경사 2</text>
+      <text x="670" y="468">완만한 장거리 우회로</text>
+      <text class="small-label" x="272" y="201">동일 지면·동일 경사군</text>
+
+      <rect id="fog-overlay" x="0" y="0" width="1000" height="500" rx="16" fill="var(--sim-fog)" opacity=".97" mask="url(#fog-mask)"/>
+      <g id="frontier-a" hidden transform="translate(548 212)">
+        <circle class="frontier-marker" r="11"/><text class="frontier-label" x="18" y="-8">Frontier A</text><text class="small-label frontier-label" x="18" y="14">목표에 가깝지만 급경사</text>
+      </g>
+      <g id="frontier-b" hidden transform="translate(523 270)">
+        <circle class="frontier-marker" r="11"/><text class="frontier-label" x="18" y="-8">Frontier B</text><text class="small-label frontier-label" x="18" y="14">평탄하지만 연결 여부 미확인</text>
+      </g>
+      <g transform="translate(929 188)">
+        <circle class="goal-ring" r="24"/><circle class="goal-beacon" r="9"/><text class="frontier-label" x="-112" y="-32">알려진 목표 좌표</text>
+      </g>
+      <g id="sensor-visual" transform="translate(78 386)"><circle class="sensor-range" r="76"/></g>
+
+      <g id="ugv" transform="translate(78 386)">
+        <g transform="translate(-28 -19)">
+          <rect class="ugv-body" x="2" y="10" width="56" height="24" rx="5"/>
+          <rect class="ugv-deck" x="12" y="3" width="33" height="17" rx="3"/>
+          <rect class="load-crate" id="load-crate" x="34" y="5" width="18" height="13" rx="2"/>
+          <rect class="ugv-body" x="16" y="-4" width="4" height="10"/>
+          <circle class="ugv-sensor" cx="18" cy="-5" r="5"/>
+          <circle class="ugv-wheel" cx="10" cy="36" r="7"/><circle class="ugv-wheel" cx="30" cy="36" r="7"/><circle class="ugv-wheel" cx="50" cy="36" r="7"/>
+          <circle class="ugv-wheel" cx="10" cy="8" r="7"/><circle class="ugv-wheel" cx="30" cy="8" r="7"/><circle class="ugv-wheel" cx="50" cy="8" r="7"/>
+        </g>
+      </g>
+    </svg>
+    <div class="map-caption" aria-live="polite">
+      <strong id="phase-title">목표 좌표만 주어진 미지 환경</strong>
+      <span id="phase-detail">차량은 센서 범위만큼 지도를 만들며 탐색합니다.</span>
+    </div>
+    <div id="event-banner" class="event-banner" aria-hidden="true">경로 재계획</div>
+      </div>
+
+      <div class="timeline" role="progressbar" aria-label="주행 진행도" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="timeline-bar"></div></div>
+      <div class="legend text-small" aria-label="지도 범례">
+        <span class="legend-item"><span class="legend-line"></span>현재 선택 경로</span>
+        <span class="legend-item"><span class="legend-line old"></span>취소된 경로</span>
+        <span class="legend-item"><span class="legend-swatch"></span>경험 기반 지형 비용</span>
+        <span class="legend-item">◌ 센서 탐색 범위</span>
+        <span class="legend-item">■ 미탐색 영역</span>
+      </div>
+      <div class="sr-status text-small" id="status-line" aria-live="polite">같은 미지 환경에서 두 탐색 전략을 차례로 실행해 비교해보세요.</div>
+    </div>
+
+    <aside class="card live-panel" aria-label="실시간 판단 과정">
+      <h3>실시간 판단 과정</h3>
+      <div class="stage-list" id="stage-list">
+        <div class="stage-item active" data-stage="0"><span class="stage-dot"></span><span>주변 지도 생성</span></div>
+        <div class="stage-item" data-stage="1"><span class="stage-dot"></span><span>급경사 경험 수집</span></div>
+        <div class="stage-item" data-stage="2"><span class="stage-dot"></span><span>두 Frontier 비교</span></div>
+        <div class="stage-item" data-stage="3"><span class="stage-dot"></span><span>미지 영역 탐색</span></div>
+        <div class="stage-item" data-stage="4"><span class="stage-dot"></span><span>목적지 도착</span></div>
+      </div>
+      <div class="log-title"><strong>이벤트 로그</strong><span class="text-small text-muted" id="log-mode">대기</span></div>
+      <ol class="event-log text-small" id="event-log" aria-live="polite">
+        <li class="empty-log">시나리오를 실행하면 차량의 판단 과정이 기록됩니다.</li>
+      </ol>
+    </aside>
+  </div>
+
+  <section id="comparison" class="comparison" hidden aria-label="시뮬레이션 결과 비교">
+    <hr>
+    <div class="compare-grid">
+      <div class="compare-side">
+        <strong>기준: 목표지향 탐색</strong>
+        <span class="compare-time tabular-nums" id="static-result">—</span>
+        <span class="text-muted">목표에 가까운 급경사 Frontier 선택</span>
+      </div>
+      <div class="compare-arrow" aria-hidden="true"><i data-lucide="arrow-right"></i></div>
+      <div class="compare-side right">
+        <strong>제안: 경험기반 탐색</strong>
+        <span class="compare-time tabular-nums" id="adaptive-result">—</span>
+        <span class="text-muted">학습된 비용으로 평탄한 미지 Frontier 선택</span>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      const root = document.getElementById('offroad-adaptive-sim');
+      const $ = (s) => root.querySelector(s);
+      const directPath = $('#direct-route');
+      const detourPath = $('#detour-route');
+      const activePath = $('#active-route');
+      const oldPath = $('#old-route');
+      const ugv = $('#ugv');
+      const payloadSelect = $('#payload-select');
+      const speedSelect = $('#speed-select');
+      const elapsedValue = $('#elapsed-value');
+      const speedValue = $('#speed-value');
+      const speedContext = $('#speed-context');
+      const costValue = $('#cost-value');
+      const routeContext = $('#route-context');
+      const phaseTitle = $('#phase-title');
+      const phaseDetail = $('#phase-detail');
+      const eventBanner = $('#event-banner');
+      const timeline = $('.timeline');
+      const timelineBar = $('#timeline-bar');
+      const comparison = $('#comparison');
+      const statusLine = $('#status-line');
+      const cost1 = $('#cost-zone-1');
+      const cost2 = $('#cost-zone-2');
+      const loadCrate = $('#load-crate');
+      const eventLog = $('#event-log');
+      const logMode = $('#log-mode');
+      const stageItems = [...root.querySelectorAll('.stage-item')];
+      const revealHoles = $('#reveal-holes');
+      const sensorVisual = $('#sensor-visual');
+      const frontierA = $('#frontier-a');
+      const frontierB = $('#frontier-b');
+      let raf = null;
+      let run = null;
+      let results = { static: null, adaptive: null };
+      let eventTimer = null;
+      let runCount = 0;
+      let lastReveal = { x:78, y:386 };
+      let syncingState = false;
+
+      const saved = window.openai?.widgetState?.privateContent || {};
+      if (saved.payload === 'empty' || saved.payload === 'loaded') payloadSelect.value = saved.payload;
+      if (['1','2','4'].includes(String(saved.speed))) speedSelect.value = String(saved.speed);
+
+      function saveState() {
+        if (syncingState) return;
+        window.openai?.setWidgetState?.({
+          modelContent: { payload: payloadSelect.value, completed: Object.keys(results).filter(k => results[k] !== null) },
+          privateContent: { payload: payloadSelect.value, speed: speedSelect.value }
+        }).catch(() => {});
+      }
+
+      function showEvent(text) {
+        clearTimeout(eventTimer);
+        eventBanner.textContent = text;
+        eventBanner.classList.add('show');
+        eventTimer = setTimeout(() => eventBanner.classList.remove('show'), 1300);
+      }
+
+      function setStage(index) {
+        stageItems.forEach((item, i) => {
+          item.classList.toggle('active', i === index);
+          item.classList.toggle('done', i < index);
+        });
+      }
+
+      function clearLog(mode) {
+        const empty = eventLog.querySelector('.empty-log');
+        if (empty) empty.remove();
+        runCount += 1;
+        logMode.textContent = mode === 'static' ? '목표지향 탐색' : mode === 'adaptive' ? '경험기반 탐색' : '대기';
+        logEvent(0, `실행 ${runCount} 시작 · ${logMode.textContent} · ${payloadSelect.options[payloadSelect.selectedIndex].text}`);
+      }
+
+      function resetFog() {
+        revealHoles.innerHTML = '<circle cx="78" cy="386" r="88" fill="black"/>';
+        sensorVisual.setAttribute('transform', 'translate(78 386)');
+        frontierA.setAttribute('hidden', '');
+        frontierB.setAttribute('hidden', '');
+        lastReveal = { x:78, y:386 };
+      }
+
+      function revealAt(x, y) {
+        sensorVisual.setAttribute('transform', `translate(${x} ${y})`);
+        if (Math.hypot(x-lastReveal.x, y-lastReveal.y) < 22) return;
+        const hole = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hole.setAttribute('cx', x.toFixed(1));
+        hole.setAttribute('cy', y.toFixed(1));
+        hole.setAttribute('r', '82');
+        hole.setAttribute('fill', 'black');
+        revealHoles.append(hole);
+        lastReveal = { x, y };
+      }
+
+      function logEvent(seconds, text) {
+        const empty = eventLog.querySelector('.empty-log');
+        if (empty) empty.remove();
+        const item = document.createElement('li');
+        const time = document.createElement('time');
+        const message = document.createElement('span');
+        time.textContent = `${seconds.toFixed(1)}s`;
+        message.textContent = text;
+        item.append(time, message);
+        eventLog.append(item);
+        eventLog.scrollTop = eventLog.scrollHeight;
+      }
+
+      function routePoint(mode, p) {
+        const directLen = directPath.getTotalLength();
+        const branchPoint = directLen * 0.49;
+        if (mode !== 'adaptive' || p < 0.48 || payloadSelect.value === 'empty') {
+          const frac = mode === 'adaptive' && payloadSelect.value === 'loaded' ? Math.min(p / 0.48 * 0.49, 0.49) : p;
+          const a = directPath.getPointAtLength(directLen * frac);
+          const b = directPath.getPointAtLength(Math.min(directLen, directLen * frac + 2));
+          return { x:a.x, y:a.y, angle:Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI };
+        }
+        const dp = (p - 0.48) / 0.52;
+        const detourLen = detourPath.getTotalLength();
+        const a = detourPath.getPointAtLength(detourLen * dp);
+        const b = detourPath.getPointAtLength(Math.min(detourLen, detourLen * dp + 2));
+        return { x:a.x, y:a.y, angle:Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI };
+      }
+
+      function durationFor(mode) {
+        const loaded = payloadSelect.value === 'loaded';
+        if (!loaded) return mode === 'static' ? 15.4 : 15.7;
+        return mode === 'static' ? 28.6 : 21.2;
+      }
+
+      function motionProgress(mode, t) {
+        const loaded = payloadSelect.value === 'loaded';
+        if (!loaded) return t;
+        const segments = mode === 'static'
+          ? [[0,.18,.12],[.18,.35,.28],[.35,.50,.13],[.50,.68,.30],[.68,1,.17]]
+          : [[0,.18,.14],[.18,.35,.30],[.35,.48,.14],[.48,1,.42]];
+        let timeStart = 0;
+        for (const [p0,p1,dt] of segments) {
+          if (t <= timeStart + dt || timeStart + dt >= 1) {
+            const local = Math.max(0, Math.min(1, (t-timeStart)/dt));
+            return p0 + (p1-p0)*local;
+          }
+          timeStart += dt;
+        }
+        return 1;
+      }
+
+      function updateRouteVisual(mode, p) {
+        const adaptiveLoaded = mode === 'adaptive' && payloadSelect.value === 'loaded';
+        if (adaptiveLoaded && p >= 0.35) {
+          cost1.classList.add('hot'); cost2.classList.add('hot');
+          costValue.textContent = p < 0.48 ? '2.35' : '2.70';
+        } else {
+          cost1.classList.remove('hot'); cost2.classList.remove('hot');
+          costValue.textContent = '1.00';
+        }
+        if (adaptiveLoaded && p >= 0.48) {
+          activePath.setAttribute('d', detourPath.getAttribute('d'));
+          oldPath.setAttribute('d', 'M500 235 C560 237 590 168 645 151 C700 133 744 190 800 180 C848 171 878 176 929 188');
+          routeContext.textContent = 'Frontier B · 평탄한 미지 영역';
+        } else {
+          activePath.setAttribute('d', directPath.getAttribute('d'));
+          oldPath.setAttribute('d', '');
+          routeContext.textContent = p < .40 ? '센서 범위 내 지도 생성' : 'Frontier A · 목표 방향';
+        }
+        const showFrontiers = p >= .38;
+        if (showFrontiers) {
+          frontierA.removeAttribute('hidden');
+          frontierB.removeAttribute('hidden');
+        } else {
+          frontierA.setAttribute('hidden', '');
+          frontierB.setAttribute('hidden', '');
+        }
+      }
+
+      function updateNarrative(mode, p) {
+        const loaded = payloadSelect.value === 'loaded';
+        let expected = 1.0, actual = loaded ? 0.92 : 1.0, terrainState = '평탄 구간';
+        if (p >= 0.18 && p < 0.32) { expected=.78; actual=loaded?.34:.72; terrainState='오르막 +12°'; }
+        else if (p >= 0.32 && p < 0.43) { expected=1.15; actual=loaded?.91:1.10; terrainState='내리막 −10°'; }
+        if (mode === 'static' && p >= 0.50 && p < 0.65) { expected=.78; actual=loaded?.31:.70; terrainState='오르막 +12°'; }
+        else if (mode === 'static' && p >= 0.65 && p < 0.78) { expected=1.15; actual=loaded?.88:1.08; terrainState='내리막 −10°'; }
+        if (mode === 'adaptive' && loaded && p >= 0.48) { expected=.90; actual=.82; terrainState='완만한 우회로 +3°'; }
+        speedValue.textContent = `${expected.toFixed(1)} / ${actual.toFixed(2)} m/s`;
+        speedContext.textContent = `${terrainState} · 성능 비율 ${(actual/expected).toFixed(2)}`;
+
+        if (p < 0.12) {
+          phaseTitle.textContent = '목표 좌표 수신 · 주변 지도 생성';
+          phaseDetail.textContent = '전체 경로는 보이지 않습니다. 센서가 관측한 영역만 지도에 추가됩니다.';
+        } else if (p < 0.35) {
+          phaseTitle.textContent = '첫 급경사를 통과하며 주행경험 수집';
+          phaseDetail.textContent = loaded ? '같은 구동 명령인데 실제속도가 낮아져 이 지형의 통과비용을 높입니다.' : '무적재 상태에서는 기대속도와 실제속도의 차이가 작습니다.';
+        } else if (mode === 'adaptive' && loaded && p < 0.48) {
+          phaseTitle.textContent = '분기점에서 두 Frontier 비교';
+          phaseDetail.textContent = 'A는 목표에 가깝지만 학습된 급경사 비용이 높고, B는 평탄하지만 아직 연결 여부를 모릅니다.';
+        } else if (mode === 'adaptive' && loaded && p < 0.78) {
+          phaseTitle.textContent = '평탄한 미지 Frontier를 선택해 탐색';
+          phaseDetail.textContent = '이동하며 지도를 밝히고, 우회 경로가 목표 방향과 연결되는지 확인합니다.';
+        } else if (mode === 'static' && p < 0.76) {
+          phaseTitle.textContent = '목표에 가까운 Frontier A 선택';
+          phaseDetail.textContent = '이전 급경사 경험을 다음 지형에 반영하지 않아 다시 급경사로 진입합니다.';
+        } else {
+          phaseTitle.textContent = '새로 밝힌 지도에서 목표 연결 확인';
+          phaseDetail.textContent = mode === 'adaptive' && loaded ? '평탄한 미지 경로를 탐색한 결과 목표 좌표까지 연결됨을 확인했습니다.' : '선택한 Frontier를 따라 목적지로 이동합니다.';
+        }
+      }
+
+      function finish(mode, total) {
+        cancelAnimationFrame(raf); raf = null;
+        results[mode] = total;
+        elapsedValue.textContent = `${total.toFixed(1)} s`;
+        $('#eta-context').textContent = '목적지 도착';
+        phaseTitle.textContent = mode === 'static' ? '목표지향 탐색 완료' : '경험기반 탐색 완료';
+        phaseDetail.textContent = mode === 'static' ? '목표에 가까운 Frontier를 선택해 급경사 지연이 반복되었습니다.' : (payloadSelect.value === 'loaded' ? '첫 경사 경험을 활용해 평탄한 미지 경로를 탐색하고 목표에 도착했습니다.' : '무적재에서는 목표 방향 경로를 유지했습니다.');
+        statusLine.textContent = `${mode === 'static' ? '목표지향 탐색' : '경험기반 탐색'}: ${total.toFixed(1)}초에 목적지 도착`;
+        setStage(4);
+        logEvent(total, `목적지 도착 · 총 주행시간 ${total.toFixed(1)}초`);
+        if (results.static !== null && results.adaptive !== null) {
+          comparison.hidden = false;
+          $('#static-result').textContent = `${results.static.toFixed(1)} s`;
+          $('#adaptive-result').textContent = `${results.adaptive.toFixed(1)} s`;
+        }
+        saveState();
+      }
+
+      function start(mode) {
+        if (raf) cancelAnimationFrame(raf);
+        comparison.hidden = true;
+        $('#eta-context').textContent = '주행 중';
+        const total = durationFor(mode);
+        run = { mode, start:performance.now(), total, replanned:false, multiplier:Number(speedSelect.value), events:{} };
+        resetFog();
+        activePath.setAttribute('d', directPath.getAttribute('d'));
+        oldPath.setAttribute('d','');
+        cost1.classList.remove('hot'); cost2.classList.remove('hot');
+        loadCrate.style.display = payloadSelect.value === 'loaded' ? '' : 'none';
+        statusLine.textContent = `${mode === 'static' ? '목표지향 탐색' : '경험기반 탐색'} 시나리오 실행 중`;
+        clearLog(mode);
+        stageItems[3].querySelector('span:last-child').textContent = mode === 'static' ? '급경사 Frontier 탐색' : '미지 영역 탐색';
+        setStage(0);
+        logEvent(0, '목표 좌표 수신 · 전체 지도는 미지');
+        logEvent(0, '센서 범위 내 점유·지형 지도 생성 시작');
+
+        function frame(now) {
+          const elapsedReal = (now - run.start)/1000 * run.multiplier;
+          const timeRatio = Math.min(1, elapsedReal / total);
+          const p = motionProgress(mode, timeRatio);
+          const point = routePoint(mode, p);
+          ugv.setAttribute('transform', `translate(${point.x} ${point.y}) rotate(${point.angle})`);
+          revealAt(point.x, point.y);
+          elapsedValue.textContent = `${Math.min(total, elapsedReal).toFixed(1)} s`;
+          timelineBar.style.width = `${timeRatio*100}%`;
+          timeline.setAttribute('aria-valuenow', String(Math.round(timeRatio*100)));
+          updateRouteVisual(mode, p);
+          updateNarrative(mode, p);
+          if (p >= .12 && !run.events.departed) {
+            run.events.departed = true;
+            logEvent(elapsedReal, '관측된 자유공간을 따라 다음 Frontier로 이동');
+          }
+          if (p >= .20 && !run.events.slope1) {
+            run.events.slope1 = true;
+            setStage(1);
+            logEvent(elapsedReal, '급경사 1 진입 · 기대속도 1.0m/s');
+          }
+          if (p >= .31 && !run.events.degraded) {
+            run.events.degraded = true;
+            logEvent(elapsedReal, payloadSelect.value === 'loaded' ? '실제속도 0.34m/s · 급경사 통과비용 상향' : '실제속도 0.86m/s · 허용 범위');
+          }
+          if (p >= .34 && !run.events.descent1) {
+            run.events.descent1 = true;
+            logEvent(elapsedReal, payloadSelect.value === 'loaded' ? '내리막 전환 · 실제속도 0.91m/s로 회복' : '내리막 전환 · 실제속도 1.10m/s');
+          }
+          if (p >= .38 && !run.events.costDecision) {
+            run.events.costDecision = true;
+            setStage(2);
+            if (mode === 'adaptive' && payloadSelect.value === 'loaded') {
+              logEvent(elapsedReal, '경사·지면 특성이 유사한 영역 비용 1.00 → 2.35');
+            } else {
+              logEvent(elapsedReal, mode === 'static' ? '이전 경험을 다음 Frontier 비용에 반영하지 않음' : '성능 저하가 작아 기존 비용 유지');
+            }
+          }
+          if (mode === 'adaptive' && payloadSelect.value === 'loaded' && p >= .48 && !run.replanned) {
+            run.replanned = true;
+            setStage(3);
+            showEvent('Frontier B 선택 · 미지 영역 탐색');
+            logEvent(elapsedReal, 'Frontier B 선택 · 평탄하지만 연결 여부는 미확인');
+          } else if (mode === 'static' && p >= .48 && !run.events.branch) {
+            run.events.branch = true;
+            setStage(3);
+            logEvent(elapsedReal, 'Frontier A 선택 · 목표 좌표에 더 가까운 방향');
+          }
+          if (mode === 'adaptive' && payloadSelect.value === 'loaded' && p >= .72 && !run.events.connection) {
+            run.events.connection = true;
+            logEvent(elapsedReal, '지도 확장 · 우회 경로가 목표 방향과 연결됨을 확인');
+          }
+          if (mode === 'static' && p >= .52 && !run.events.slope2) {
+            run.events.slope2 = true;
+            logEvent(elapsedReal, payloadSelect.value === 'loaded' ? '급경사 2 진입 · 실제속도 0.31m/s' : '급경사 2 진입 · 실제속도 0.70m/s');
+          }
+          if (mode === 'static' && p >= .66 && !run.events.descent2) {
+            run.events.descent2 = true;
+            logEvent(elapsedReal, payloadSelect.value === 'loaded' ? '두 번째 내리막 · 실제속도 0.88m/s' : '두 번째 내리막 · 실제속도 1.08m/s');
+          }
+          if (timeRatio >= .999) finish(mode, total); else raf = requestAnimationFrame(frame);
+        }
+        raf = requestAnimationFrame(frame);
+      }
+
+      function reset(preserveLog = false) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = null; run = null;
+        results = { static:null, adaptive:null };
+        resetFog();
+        const p = directPath.getPointAtLength(0);
+        ugv.setAttribute('transform', `translate(${p.x} ${p.y})`);
+        activePath.setAttribute('d', directPath.getAttribute('d'));
+        oldPath.setAttribute('d','');
+        cost1.classList.remove('hot'); cost2.classList.remove('hot');
+        elapsedValue.textContent='0.0 s'; speedValue.textContent='1.0 / 1.0 m/s'; speedContext.textContent='평탄 구간 · 성능 비율 1.00'; costValue.textContent='1.00'; routeContext.textContent='센서 범위 내 지도 생성';
+        phaseTitle.textContent='목표 좌표만 주어진 미지 환경';
+        phaseDetail.textContent='차량은 센서 범위만큼 지도를 만들며 탐색합니다.';
+        timelineBar.style.width='0%'; timeline.setAttribute('aria-valuenow','0'); comparison.hidden=true;
+        statusLine.textContent='같은 미지 환경에서 두 탐색 전략을 차례로 실행해 비교해보세요.';
+        stageItems[3].querySelector('span:last-child').textContent='미지 영역 탐색';
+        setStage(0);
+        if (!preserveLog) {
+          eventLog.innerHTML='<li class="empty-log">시나리오를 실행하면 차량의 판단 과정이 기록됩니다.</li>';
+          logMode.textContent='대기';
+          runCount = 0;
+        } else {
+          logEvent(0, `조건 변경 · ${payloadSelect.options[payloadSelect.selectedIndex].text}`);
+        }
+        loadCrate.style.display = payloadSelect.value === 'loaded' ? '' : 'none';
+        saveState();
+      }
+
+      $('#run-static').addEventListener('click', () => start('static'));
+      $('#run-adaptive').addEventListener('click', () => start('adaptive'));
+      $('#reset-sim').addEventListener('click', () => reset(false));
+      payloadSelect.addEventListener('change', () => reset(true));
+      speedSelect.addEventListener('change', saveState);
+      window.addEventListener('openai:set_globals', (event) => {
+        if (run) return;
+        const s = event.detail?.globals?.widgetState?.privateContent;
+        if (!s) return;
+        syncingState = true;
+        if (s.payload === 'empty' || s.payload === 'loaded') payloadSelect.value = s.payload;
+        if (['1','2','4'].includes(String(s.speed))) speedSelect.value = String(s.speed);
+        reset(true);
+        syncingState = false;
+      });
+      loadCrate.style.display = payloadSelect.value === 'loaded' ? '' : 'none';
+      if (window.lucide) window.lucide.createIcons({ attrs:{ width:18, height:18 } });
+    })();
+  </script>
+</div>
+</body></html>

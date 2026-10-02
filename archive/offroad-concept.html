@@ -1,0 +1,73 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>야지 자율주행 전체 구성 · 초기 도식</title><style>:root{color-scheme:light;--bg-primary:#f7f8fa;--bg-secondary:#fff;--bg-tertiary:#edf1f5;--text-primary:#21303f;--text-secondary:#607080;--text-muted:#748292;--border:#d8e0e7;--border-color:#d8e0e7;--accent:#3174aa;--accent-primary:#3174aa;--color-blue-500:#3174aa}*{box-sizing:border-box}body{margin:0;padding:20px;color:var(--text-primary);background:var(--bg-primary);font:16px/1.6 system-ui,-apple-system,'Segoe UI','Malgun Gothic',sans-serif}h2{font-size:24px;line-height:1.4}button,input,select{font:inherit}button,.btn{border:1px solid var(--border);border-radius:6px;padding:7px 13px;background:white;color:var(--text-primary);cursor:pointer}.btn-primary{background:var(--accent);color:white}.form-select,.form-input{padding:7px;border:1px solid var(--border);border-radius:5px;background:white;color:var(--text-primary)}.form-label{font-size:14px}body>div{max-width:1300px;margin:auto}</style></head><body><div id="offroad-concept">
+  <h2>야지 자율주행 · 구성안 탐색</h2>
+  <div class="text-small">구상용 프로토타입 · 물리 시뮬레이터 미연결 · 알고리즘/엣지케이스 미확정</div>
+  <div class="nav nav-pills" role="tablist" aria-label="구성안 보기">
+    <button class="nav-link active" role="tab" id="oc-tab1" aria-controls="oc-structure" aria-selected="true" type="button">01 전체 연결</button>
+    <button class="nav-link" role="tab" id="oc-tab2" aria-controls="oc-test" aria-selected="false" type="button">02 시험장·반복시험</button>
+    <button class="nav-link" role="tab" id="oc-tab3" aria-controls="oc-evidence" aria-selected="false" type="button">03 요구·설계·검증</button>
+  </div>
+  <section id="oc-structure" role="tabpanel" aria-labelledby="oc-tab1">
+    <div class="oc-flow">
+      <div class="oc-stage"><span>운용 입력</span><p>목적지 · 운용 범위</p></div>
+      <div class="oc-arrow">↓</div>
+      <div class="viz-grid"><button class="btn" data-module="loc">위치추정<br>카메라 + IMU → 위치·자세</button><button class="btn" data-module="per">환경인지<br>영상 분할 + LiDAR → 주변 정보</button></div>
+      <div class="oc-arrow">↓ 위치·자세 + 인지·거리 정보</div>
+      <button class="btn btn-block" data-module="map">맵 생성·센서융합 → 경로계획용 환경 표현</button>
+      <div class="oc-arrow">↓</div>
+      <div class="viz-grid"><button class="btn" data-module="gpp">GPP · 목적지까지 큰 경로</button><button class="btn" data-module="lpp">LPP · 주변에서 실행할 궤적</button><button class="btn" data-module="control">차량제어 · 조향·속도</button></div>
+      <div class="oc-arrow">GPP → LPP → 차량제어 → 센서로 이동 결과 확인</div>
+    </div>
+    <div class="card" id="oc-detail" aria-live="polite">모듈을 누르면 입력·출력과 시험 항목이 표시됩니다.</div>
+    <hr>
+    <div class="viz-row"><span class="viz-badge">공통</span><span>GUI · 상태관리 · 기록 · 하드웨어 · 안전정지</span></div>
+  </section>
+  <section id="oc-test" role="tabpanel" aria-labelledby="oc-tab2" hidden>
+    <div class="viz-controls">
+      <label class="form-label">시험맵<select class="form-select" id="oc-scene"><option value="0">01 열린 공간</option><option value="1">02 중앙 장애물</option><option value="2">03 우회 통로</option><option value="3">04 좁은 문</option><option value="4">05 ㄱ자 진입</option><option value="5">06 지그재그</option><option value="6">07 완전 차단</option><option value="7">08 장애물 밀집</option></select></label>
+      <label class="form-label">GPP 데모<select class="form-select" id="oc-algo"><option value="astar">A*</option><option value="dijkstra">Dijkstra</option></select></label>
+      <label class="form-label">단순 여유폭 <span id="oc-pad-value">0</span>칸<input class="form-range" id="oc-pad" type="range" min="0" max="2" value="0"></label>
+    </div>
+    <div class="viz-row"><button class="btn btn-primary" id="oc-run" type="button">경로 계산</button><button class="btn" id="oc-batch" type="button">2개 × 8맵 × 5회 실행</button><label class="form-label">맵 클릭<select class="form-select" id="oc-edit"><option value="wall">장애물 추가·제거</option><option value="goal">목적지 이동</option></select></label></div>
+    <div id="oc-grid" role="group" aria-label="20 곱하기 14 시험격자. 칸을 선택해 장애물 또는 목적지를 변경"></div>
+    <div class="viz-row text-small"><span>출 출발</span><span>목 목적지</span><span>■ 장애물</span><span>· 여유폭</span><span>● 계산 경로</span></div>
+    <div id="oc-result" aria-live="polite">맵을 선택하고 경로를 계산하세요.</div>
+    <div class="text-small">격자 탐색만 실제 실행합니다. 차량 동역학·인지·학습·LPP는 포함하지 않습니다. 여유폭은 회전반경 검증이 아닙니다.</div>
+    <div class="table-responsive"><table class="table table-sm"><thead><tr><th>반복시험</th><th>도달 가능한 맵</th><th>평균 계산시간</th><th>성공 경로 길이 평균</th></tr></thead><tbody id="oc-results"><tr><td colspan="4">실행 전 · 결과 없음</td></tr></tbody></table></div>
+    <div class="text-small">시간: 현재 브라우저의 탐색 호출 평균(ms). 길이: 격자 이동 수. 비교에는 선택한 여유폭을 공통 적용하며 수동 편집은 제외합니다. 이 값으로 실차 알고리즘을 선정하지 않습니다.</div>
+    <hr><h3>실제 LPP 비교로 확장</h3>
+    <div class="oc-sequence"><span>동일 맵·차량·GPP</span><span>→ 후보 LPP 교체</span><span>→ Isaac Sim / Gazebo</span><span>→ 로그·영상</span><span>→ 완주·충돌·시간 비교</span></div>
+    <div class="text-small">시뮬레이터·LPP 후보·반복 횟수·성능 가중치: TBD · 안전 기준 통과 후 성능 비교</div>
+  </section>
+  <section id="oc-evidence" role="tabpanel" aria-labelledby="oc-tab3" hidden>
+    <h3>엣지케이스를 골라 영향 범위 보기</h3>
+    <label class="form-label">연구 후보<select class="form-select" id="oc-case"><option value="baseline">기본 주행부터 검증</option><option value="corner">좁은 ㄱ자 통로 · 회전 불가능</option><option value="height">높이 제한 · 바닥은 비어 있지만 상부 충돌</option><option value="learning">시험환경에서 반복되는 영상 분할 오류</option></select></label>
+    <div id="oc-case-detail" aria-live="polite"></div>
+    <hr><h3>최소 문서 연결 · 작성 예시 / 미승인</h3>
+    <table class="table"><thead><tr><th>요구 SRS</th><th>설계 SDD</th><th>시험 STD·결과</th></tr></thead><tbody><tr><td>R-001<br>지정 목적지까지 충돌 없이 이동</td><td>D-001<br>위치·인지·맵·계획·제어 연결</td><td>T-001<br>동일 코스 반복 주행<br>완주·충돌·개입 기록</td></tr><tr><td>R-002<br>경로 확보 불가 시 정지·상태 표시</td><td>D-002<br>실패 판단·정지·GUI 연결</td><td>T-002<br>차단 코스에서 정지 확인<br>정지거리 기준 TBD</td></tr></tbody></table>
+    <hr><h3>기본설계 검토까지 정할 것</h3>
+    <div class="text-small">10월 5일은 다른 팀의 일정으로 전달받은 참고 날짜 · 우리 마감은 미확정</div>
+    <div class="oc-sequence"><span>운용환경·성공 기준</span><span>→ 최소 모듈·입출력</span><span>→ 차량·센서 구성</span><span>→ 시험장·평가 방법</span></div>
+  </section>
+</div>
+<style>
+#offroad-concept section{padding-top:18px}#offroad-concept .oc-flow{padding:12px 0}#offroad-concept .oc-stage{text-align:center}#offroad-concept .oc-stage p{margin:6px 0}#offroad-concept .oc-arrow{text-align:center;padding:12px 0;color:var(--muted-foreground)}#offroad-concept .oc-sequence{display:flex;flex-wrap:wrap;gap:12px;padding:14px 0}#offroad-concept #oc-grid{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:2px;margin:16px 0;max-width:650px}#offroad-concept .oc-cell{padding:0;min-width:0;aspect-ratio:1;border:0;background:var(--muted);color:var(--foreground);cursor:pointer}#offroad-concept .oc-cell.wall{background:var(--foreground);color:var(--background)}#offroad-concept .oc-cell.pad{background:var(--secondary);color:var(--secondary-foreground)}#offroad-concept .oc-cell.route{background:var(--viz-series-1);color:var(--background)}#offroad-concept .oc-cell.endpoint{background:var(--primary);color:var(--primary-foreground)}#offroad-concept #oc-result{padding:12px 0}#offroad-concept .oc-case-line{padding:10px 0;border-bottom:1px solid var(--border)}
+</style>
+<script>
+(()=>{
+const root=document.getElementById('offroad-concept'),$=s=>root.querySelector(s),W=20,H=14,start=121;let goal=158,walls=new Set(),route=[],inflated=new Set();
+const detail={loc:['위치추정','카메라·IMU','위치·자세·시각·상태','위치 오차·실패 구간'],per:['환경인지','영상·LiDAR','분할 결과·거리情報','오분류·장애물 누락'],map:['맵 생성·센서융합','위치·시각·인지·점군','경로계획용 지도 / 표현 방식 TBD','좌표 정합·갱신 지연'],gpp:['GPP','지도·현재 위치·목적지','목적지까지 전역 경로','탐색 성공·길이·계산시간'],lpp:['LPP','전역 경로·주변 환경·차량 상태','지역 궤적 또는 제어 명령 / 인터페이스 TBD','충돌·완주·処理時間'],control:['차량제어','경로·목표 속도·차량 상태','조향·구동 명령','추종 오차·정지 동작']};
+root.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{let d=detail[b.dataset.module];$('#oc-detail').textContent=d[0]+' | 입력: '+d[1]+' → 출력: '+d[2]+' | 확인: '+d[3];});
+function scene(n){let s=new Set();function line(x1,y1,x2,y2){for(let y=y1;y<=y2;y++)for(let x=x1;x<=x2;x++)s.add(y*W+x);}
+if(n===1)line(8,4,11,9);if(n===2)line(9,0,10,10);if(n===3){line(9,0,9,5);line(9,7,9,13);}if(n===4){line(7,3,7,10);line(7,10,16,10);line(10,0,10,7);}if(n===5){line(6,0,6,9);line(12,4,12,13);}if(n===6)line(10,0,10,13);if(n===7){[[4,3],[5,9],[8,6],[11,2],[13,9],[16,4]].forEach(p=>line(p[0],p[1],p[0]+1,p[1]+2));}s.delete(start);s.delete(158);return s;}
+function expand(s,p){let a=new Set(s);for(let i of s){let x=i%W,y=Math.floor(i/W);for(let dy=-p;dy<=p;dy++)for(let dx=-p;dx<=p;dx++){let xx=x+dx,yy=y+dy;if(xx>=0&&xx<W&&yy>=0&&yy<H)a.add(yy*W+xx);}}return a;}
+function solve(s,p,alg,g){let blocked=expand(s,p),t=performance.now();if(blocked.has(start)||blocked.has(g))return {path:[],ms:performance.now()-t,expanded:0};let open=[start],closed=new Set(),dist=new Map([[start,0]]),prev=new Map(),count=0;const h=i=>alg==='astar'?Math.abs(i%W-g%W)+Math.abs(Math.floor(i/W)-Math.floor(g/W)):0;
+while(open.length){open.sort((a,b)=>(dist.get(a)+h(a))-(dist.get(b)+h(b)));let c=open.shift();if(closed.has(c))continue;closed.add(c);count++;if(c===g){let path=[c];while(prev.has(c)){c=prev.get(c);path.push(c);}return {path:path.reverse(),ms:performance.now()-t,expanded:count};}let x=c%W,y=Math.floor(c/W);for(let [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){let xx=x+dx,yy=y+dy,k=yy*W+xx;if(xx<0||xx>=W||yy<0||yy>=H||blocked.has(k)||closed.has(k))continue;let d=dist.get(c)+1;if(d<(dist.get(k)??Infinity)){dist.set(k,d);prev.set(k,c);open.push(k);}}}return {path:[],ms:performance.now()-t,expanded:count};}
+function draw(){inflated=expand(walls,+$('#oc-pad').value);let ps=new Set(route),frag=document.createDocumentFragment();for(let i=0;i<W*H;i++){let b=document.createElement('button');b.type='button';b.className='oc-cell'+(walls.has(i)?' wall':inflated.has(i)?' pad':ps.has(i)?' route':'')+((i===start||i===goal)?' endpoint':'');b.textContent=i===start?'出':i===goal?'目':walls.has(i)?'':ps.has(i)?'●':inflated.has(i)?'·':'';if(i===start)b.textContent='출';if(i===goal)b.textContent='목';b.setAttribute('aria-label',`${i%W+1}열 ${Math.floor(i/W)+1}행 ${i===start?'출발':i===goal?'목적지':walls.has(i)?'장애물':'빈 칸'}`);b.onclick=()=>{if(i===start)return;if($('#oc-edit').value==='goal'){if(walls.has(i))return;goal=i;}else{if(i===goal)return;walls.has(i)?walls.delete(i):walls.add(i);}route=[];draw();$('#oc-result').textContent='맵 변경 · 다시 계산하세요.';};frag.append(b);}$('#oc-grid').replaceChildren(frag);}
+$('#oc-scene').onchange=()=>{walls=scene(+$('#oc-scene').value);goal=158;route=[];draw();$('#oc-result').textContent='시험맵 변경 · 실행 전';};$('#oc-pad').oninput=()=>{$('#oc-pad-value').textContent=$('#oc-pad').value;route=[];draw();$('#oc-result').textContent='여유폭 변경 · 실행 전';};$('#oc-algo').onchange=()=>{route=[];draw();$('#oc-result').textContent='후보 변경 · 실행 전';};
+$('#oc-run').onclick=()=>{let r=solve(walls,+$('#oc-pad').value,$('#oc-algo').value,goal);route=r.path;draw();$('#oc-result').textContent=(route.length?'경로 발견 · '+(route.length-1)+'칸 이동':'경로 없음')+' | 탐색 '+r.expanded+'칸 | '+r.ms.toFixed(3)+' ms · 브라우저 측정';};
+$('#oc-batch').onclick=()=>{let rows=[];for(let alg of ['astar','dijkstra']){let times=0,lengths=[],ok=0;for(let n=0;n<8;n++){let last;for(let j=0;j<5;j++){last=solve(scene(n),+$('#oc-pad').value,alg,158);times+=last.ms;}if(last.path.length){ok++;lengths.push(last.path.length-1);}}rows.push('<tr><td>'+(alg==='astar'?'A*':'Dijkstra')+' · 40회</td><td>'+ok+'/8</td><td>'+(times/40).toFixed(3)+' ms</td><td>'+(lengths.length?(lengths.reduce((a,b)=>a+b,0)/lengths.length).toFixed(1)+'칸':'—')+'</td></tr>');}$('#oc-results').innerHTML=rows.join('');$('#oc-result').textContent='총 80회 격자 탐색 완료 · 고정 8맵 · LPP/실차 성능 아님';};
+const cases={baseline:['전체 연결','지정 목적지 도착 / 막힌 코스 정지','위치·맵·경로·제어','학습 없음 · 기존 모듈 우선','기본 반복시험'],corner:['차량이 들어가지만 회전할 수 없는 통로','폼보드로 ㄱ자 통로 재현','차량 형상·회전 제약을 반영한 계획','학습 없이도 접근 가능','통과·접촉·개입 비교'],height:['바닥은 비어 있지만 상부가 걸리는 구간','안전한 폼 가로대 / 센서 관측 가능 여부 선확인','높이를 반영한 지도·통과 가능성','학습 필요성은 미정','높이별 통과·회피 판정'],learning:['기존 분할 모델이 실제로 틀리는 조건','같은 코스의 별도 촬영 회차·배치·조명','인지 → 지도 → 주행 영향','기존 모델과 추가학습 모델 비교 / 평가 데이터 분리','분할 오류·불필요한 정지·완주']};
+function showCase(){let c=cases[$('#oc-case').value],labels=['문제','재현','영향 모듈','학습','검증'];$('#oc-case-detail').replaceChildren(...c.map((v,i)=>{let d=document.createElement('div');d.className='oc-case-line';d.textContent=labels[i]+' — '+v;return d;}));}$('#oc-case').onchange=showCase;walls=scene(0);draw();showCase();
+})();
+</script>
+</body></html>
