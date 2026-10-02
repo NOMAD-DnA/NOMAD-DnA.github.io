@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23187765%22/%3E%3Cpath d=%22M9 24V8h3l8 11V8h3v16h-3L12 13v11z%22 fill=%22%23fffefa%22/%3E%3C/svg%3E">
+<meta name="description" content="인지와 VIO를 병렬로 활용하는 NOMAD 야지 주행 통합 개념 및 사전 구성 시나리오">
+<title>NOMAD · 야지 자율주행 통합 개념 · VIO 상호작용</title>
+<style>
+:root{color-scheme:light;--paper:#f5f4ef;--surface:#fffefa;--ink:#243739;--muted:#607174;--line:#d9dfd9;--green:#187765;--soft:#e7f1eb;--orange:#ac632c;--orange-soft:#f6eee2;--blue:#426a82}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif}main{max-width:1160px;margin:auto;padding:38px 28px 30px}h1,h2,h3,p{margin:0}h1{font-size:clamp(25px,3.5vw,36px);line-height:1.35;letter-spacing:-.04em;margin:10px 0}h2{font-size:19px;letter-spacing:-.025em}h3{font-size:16px}header{padding-bottom:25px;border-bottom:1px solid var(--line)}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.12em;color:var(--green)}.subtitle{max-width:860px;color:var(--muted);font-size:15px}.meta{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.edition{font-size:12px;color:var(--muted)}.disclaimer{font-size:13px;padding:12px 15px;border-left:3px solid var(--orange);background:var(--orange-soft);margin-top:18px;line-height:1.65}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:25px 0 12px}.section-head>span{font-size:12px;color:var(--muted)}.system{display:grid;grid-template-columns:1.8fr 24px 1fr 24px .8fr;align-items:center;gap:10px}.parallel{display:grid;grid-template-columns:1fr 1fr;gap:9px;position:relative}.block{background:var(--surface);border:1px solid var(--line);padding:15px;border-radius:9px;min-width:0}.block p{font-size:13px;color:var(--muted);line-height:1.65;margin-top:5px}.block .term{display:block;font-size:12px;color:var(--green);font-weight:650;letter-spacing:.02em;margin-bottom:3px}.block.perception{border-top:3px solid var(--green)}.block.vio{border-top:3px solid var(--blue)}.arrow{font-size:22px;color:var(--muted);text-align:center}.flow-note{margin-top:10px;color:var(--muted);font-size:13px}.flow-note b{font-weight:650;color:var(--ink)}.demo{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-top:25px;overflow:hidden}.demo-head{padding:18px 20px 14px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.demo-head p{font-size:12px;color:var(--muted);margin-top:2px}.controls{display:flex;gap:7px;flex-wrap:wrap}button{font:inherit;font-size:14px;min-height:44px;border:1px solid #becbc5;background:var(--surface);color:var(--ink);padding:9px 15px;border-radius:7px;cursor:pointer;touch-action:manipulation}button:hover{background:var(--soft)}button:focus-visible{outline:3px solid #548eaa;outline-offset:3px}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--green);border-color:var(--green);color:#fff}button.primary:hover{background:#126452}.map-wrap{position:relative;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#eff1eb}canvas{display:block;width:100%;height:420px;touch-action:pan-y}.map-note{position:absolute;top:12px;left:17px;font-size:12px;color:var(--muted);pointer-events:none}.legend{display:flex;gap:15px;flex-wrap:wrap;padding:11px 20px;font-size:12px;color:var(--muted)}.legend span{display:inline-flex;gap:6px;align-items:center}.swatch{display:inline-block;width:13px;height:10px;border-radius:2px;background:#eef0ea;border:1px solid #c9d1c9}.swatch.known{background:#dae9da;border-color:#bacfbd}.swatch.trail{background:var(--green);height:3px;border:0}.swatch.return{background:var(--orange);height:3px;border:0}.stagebox{display:grid;grid-template-columns:190px 1fr;gap:18px;padding:17px 20px;background:#f5f8f3;border-top:1px solid var(--line)}.stage-index{font-size:12px;color:var(--green);font-weight:650;letter-spacing:.04em}.stagebox h3{margin-top:3px;font-size:17px}.stagebox p{font-size:14px;color:var(--muted);align-self:center}.stage-list{display:grid;grid-template-columns:repeat(7,1fr);list-style:none;padding:0;margin:0 20px 17px;gap:5px}.stage-list li{padding-top:9px;border-top:3px solid #e0e7df;color:var(--muted);font-size:12px}.stage-list li.is-current{border-color:var(--green);color:var(--green);font-weight:700}.stage-list li.is-past{border-color:#a7c7b5}.scene-scope{margin:0 20px 17px;font-size:12px;color:var(--muted)}.notes{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:25px}.note-panel{border-top:2px solid #bdcbc2;padding-top:12px}.note-panel h2{font-size:17px;margin-bottom:8px}.note-panel p{font-size:14px;color:var(--muted)}.note-panel ul{margin:0;padding-left:19px;font-size:14px;color:var(--muted)}.note-panel li+li{margin-top:7px}.note-panel strong{font-weight:650;color:var(--ink)}footer{font-size:12px;color:var(--muted);margin-top:24px;padding-top:14px;border-top:1px solid var(--line)}.startup{padding:13px 16px;margin-bottom:18px;background:var(--orange-soft);border:1px solid #dbc6a8;border-radius:7px;font-size:14px}.startup[hidden]{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:850px){.system{grid-template-columns:1.4fr 20px 1fr 20px .8fr;gap:6px}.parallel{grid-template-columns:1fr}.block{padding:12px}.stage-list{grid-template-columns:repeat(4,1fr);row-gap:12px}.stagebox{grid-template-columns:160px 1fr}.notes{gap:18px}}
+@media(max-width:620px){main{padding:23px 15px}.system{display:flex;flex-direction:column;gap:7px}.parallel{width:100%;grid-template-columns:1fr 1fr}.system>.block{width:100%}.arrow{transform:rotate(90deg);font-size:20px;line-height:1}.block{padding:12px}.block h3{font-size:15px}.block p{font-size:13px}.section-head{align-items:start}.section-head>span{max-width:130px;text-align:right}.demo-head{padding:15px}.demo-head>div:first-child{width:100%}.controls{width:100%}.controls button{flex:1;padding:9px 7px;font-size:13px}canvas{height:370px}.map-note{left:12px;font-size:11px;max-width:90%}.stagebox{grid-template-columns:1fr;gap:7px;padding:15px}.stage-list{margin:0 15px 16px;font-size:11px}.stage-list li{font-size:11px;line-height:1.5}.scene-scope{margin:0 15px 16px}.legend{padding:11px 15px;gap:10px;font-size:11px}.notes{grid-template-columns:1fr;gap:20px}.disclaimer{font-size:12px}.subtitle{font-size:14px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+body{font-family:"Pretendard",system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif}
+.compat-help{font-size:12px;color:var(--muted);margin-bottom:14px}.compat-help[hidden]{display:none}.js-controls,.js-mode{display:none}#concept[data-ready="true"] .js-controls{display:flex}#concept[data-ready="true"] .js-mode{display:block}#concept[data-ready="true"] .viewer-fallback{display:none}.viewer-fallback{display:block}.compat-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 20px 15px;flex-wrap:wrap}.compat-toolbar>span{color:var(--green);font-size:13px;font-weight:650}.compat-controls{display:flex;gap:7px;flex-wrap:wrap}.compat-controls label{font-size:14px;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 15px;border:1px solid #becbc5;border-radius:7px;background:var(--surface);cursor:pointer;touch-action:manipulation}.compat-controls label:hover{background:var(--soft)}#compat-playing:checked~.compat-toolbar label[for="compat-playing"],#compat-paused:checked~.compat-toolbar label[for="compat-paused"]{background:var(--green);color:white;border-color:var(--green)}#compat-ready:focus~.compat-toolbar label[for="compat-ready"],#compat-playing:focus~.compat-toolbar label[for="compat-playing"],#compat-paused:focus~.compat-toolbar label[for="compat-paused"]{outline:3px solid #548eaa;outline-offset:3px}
+.compat-map{position:relative;width:100%;height:0;padding-top:55%;overflow:hidden;background:#eef0ea;--compat-start-angle:63.5442deg;--compat-up-angle:6.4831deg;--compat-down-angle:141.4993deg;--compat-back-diagonal:321.4993deg;--compat-back-down:186.4831deg;--compat-b1:30.3027deg;--compat-b2:75.2626deg;--compat-b3:80.0182deg}.compat-ground{position:absolute;inset:0;width:100%;height:100%;display:block}.compat-map-note{position:absolute;top:11px;left:14px;font-size:11px;color:#68776e}.compat-map-foot{position:absolute;right:12px;bottom:9px;font-size:11px;color:#68776e}.compat-car{position:absolute;left:10%;top:83%;width:36px;height:42px;transform:translate(-50%,-50%) rotate(var(--compat-start-angle));transform-origin:center;z-index:2;color:#245c4e;--compat-animation:compat-drive}.compat-car svg{display:block;width:36px;height:42px;overflow:visible}.compat-label{position:absolute;font-size:12px;font-weight:650;line-height:1.4;color:#3e5d55;white-space:nowrap}.compat-label-start{left:10%;top:83%;transform:translate(-50%,26px)}.compat-label-goal{left:88%;top:17%;transform:translate(calc(-100% - 14px),-26px)}.compat-label-j{left:31%;top:64%;transform:translate(calc(-100% - 23px),18px);--compat-animation:compat-reveal-j;opacity:0}.compat-label-a{left:62%;top:64%;transform:translate(-50%,26px);--compat-animation:compat-reveal-a;opacity:0;color:#645f4d}.compat-label-b{left:52%;top:26%;transform:translate(-50%,-25px);--compat-animation:compat-reveal-b;opacity:0;color:#655f34}.compat-label-block{left:86%;top:64%;transform:translate(calc(-100% - 8px),53px);--compat-animation:compat-reveal-block;opacity:0;color:#855528}.compat-zone-j{opacity:0;--compat-animation:compat-reveal-j}.compat-zone-a{opacity:0;--compat-animation:compat-reveal-a}.compat-zone-b{opacity:0;--compat-animation:compat-reveal-b}.compat-blocked{opacity:0;--compat-animation:compat-reveal-block}.compat-animated{animation-name:none;animation-duration:29.5s;animation-timing-function:linear;animation-fill-mode:both;animation-iteration-count:1;animation-play-state:paused}
+#compat-playing:checked~.compat-map .compat-animated,#compat-paused:checked~.compat-map .compat-animated,#compat-playing:checked~.compat-stage .compat-animated,#compat-paused:checked~.compat-stage .compat-animated{animation-name:var(--compat-animation)}#compat-playing:checked~.compat-map .compat-animated,#compat-playing:checked~.compat-stage .compat-animated{animation-play-state:running}#compat-ready:checked~.compat-map .compat-animated,#compat-ready:checked~.compat-stage .compat-animated{animation-name:none}.compat-stage{position:relative;min-height:66px;background:#f5f8f3;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:15px}.compat-stage p{font-size:13px;position:absolute;top:13px;left:20px;right:20px;margin:0;line-height:1.6;color:var(--muted)}.compat-stage .compat-animated{opacity:0}.compat-stage strong{color:var(--ink);font-weight:650}#compat-playing:checked~.compat-stage .compat-stage-ready,#compat-paused:checked~.compat-stage .compat-stage-ready{display:none}.compat-phase-1{--compat-animation:compat-phase-1}.compat-phase-2{--compat-animation:compat-phase-2}.compat-phase-3{--compat-animation:compat-phase-3}.compat-phase-4{--compat-animation:compat-phase-4}.compat-phase-5{--compat-animation:compat-phase-5}.compat-phase-6{--compat-animation:compat-phase-6}
+@keyframes compat-drive{
+0%{left:10%;top:83%;transform:translate(-50%,-50%) rotate(var(--compat-start-angle))}
+10.2078%{left:31%;top:64%;transform:translate(-50%,-50%) rotate(var(--compat-start-angle))}
+10.2079%{left:31%;top:64%;transform:translate(-50%,-50%) rotate(90deg)}
+15.2542%,18.6440%{left:45%;top:64%;transform:translate(-50%,-50%) rotate(90deg)}
+18.6441%{left:45%;top:64%;transform:translate(-50%,-50%) rotate(var(--compat-up-angle))}
+24.9321%{left:46%;top:48%;transform:translate(-50%,-50%) rotate(var(--compat-up-angle))}
+24.9322%{left:46%;top:48%;transform:translate(-50%,-50%) rotate(90deg)}
+30.0313%{left:59%;top:48%;transform:translate(-50%,-50%) rotate(90deg)}
+30.0314%{left:59%;top:48%;transform:translate(-50%,-50%) rotate(var(--compat-down-angle))}
+36.8815%{left:66%;top:64%;transform:translate(-50%,-50%) rotate(var(--compat-down-angle))}
+36.8816%{left:66%;top:64%;transform:translate(-50%,-50%) rotate(90deg)}
+42.3729%,52.5423%{left:80%;top:64%;transform:translate(-50%,-50%) rotate(90deg)}
+52.5424%{left:80%;top:64%;transform:translate(-50%,-50%) rotate(270deg)}
+56.3646%{left:66%;top:64%;transform:translate(-50%,-50%) rotate(270deg)}
+56.3647%{left:66%;top:64%;transform:translate(-50%,-50%) rotate(var(--compat-back-diagonal))}
+61.1328%{left:59%;top:48%;transform:translate(-50%,-50%) rotate(var(--compat-back-diagonal))}
+61.1329%{left:59%;top:48%;transform:translate(-50%,-50%) rotate(270deg)}
+64.6821%{left:46%;top:48%;transform:translate(-50%,-50%) rotate(270deg)}
+64.6822%{left:46%;top:48%;transform:translate(-50%,-50%) rotate(var(--compat-back-down))}
+69.0590%{left:45%;top:64%;transform:translate(-50%,-50%) rotate(var(--compat-back-down))}
+69.0591%{left:45%;top:64%;transform:translate(-50%,-50%) rotate(270deg)}
+72.8813%{left:31%;top:64%;transform:translate(-50%,-50%) rotate(270deg)}
+72.8814%{left:31%;top:64%;transform:translate(-50%,-50%) rotate(var(--compat-b1))}
+80.2523%{left:40%;top:36%;transform:translate(-50%,-50%) rotate(var(--compat-b1))}
+80.2524%{left:40%;top:36%;transform:translate(-50%,-50%) rotate(var(--compat-b2))}
+86.6418%{left:63%;top:25%;transform:translate(-50%,-50%) rotate(var(--compat-b2))}
+86.6419%{left:63%;top:25%;transform:translate(-50%,-50%) rotate(var(--compat-b3))}
+93.2203%,100%{left:88%;top:17%;transform:translate(-50%,-50%) rotate(var(--compat-b3))}}
+@keyframes compat-reveal-j{0%{opacity:0}10.2079%,100%{opacity:1}}@keyframes compat-reveal-a{0%,15.2542%{opacity:0}28%,100%{opacity:1}}@keyframes compat-reveal-block{0%,38%{opacity:0}42.3729%,100%{opacity:1}}@keyframes compat-reveal-b{0%,72.8813%{opacity:0}86.6418%,100%{opacity:1}}
+@keyframes compat-phase-1{0%,15.2542%{opacity:1}15.2543%,100%{opacity:0}}@keyframes compat-phase-2{0%,15.2542%{opacity:0}15.2543%,42.3728%{opacity:1}42.3729%,100%{opacity:0}}@keyframes compat-phase-3{0%,42.3728%{opacity:0}42.3729%,52.5423%{opacity:1}52.5424%,100%{opacity:0}}@keyframes compat-phase-4{0%,52.5423%{opacity:0}52.5424%,72.8813%{opacity:1}72.8814%,100%{opacity:0}}@keyframes compat-phase-5{0%,72.8813%{opacity:0}72.8814%,93.2202%{opacity:1}93.2203%,100%{opacity:0}}@keyframes compat-phase-6{0%,93.2202%{opacity:0}93.2203%,100%{opacity:1}}
+@media(max-width:620px){.compat-toolbar{padding:0 15px 14px;gap:8px}.compat-controls{width:100%}.compat-controls label{flex:1;font-size:13px;padding:9px 7px}.compat-map{padding-top:100%;--compat-start-angle:47.8624deg;--compat-up-angle:3.5763deg;--compat-down-angle:156.3706deg;--compat-back-diagonal:336.3706deg;--compat-back-down:183.5763deg;--compat-b1:17.8189deg;--compat-b2:64.44deg;--compat-b3:72.2553deg}.compat-stage p{left:15px;right:15px}.compat-stage{min-height:77px}.compat-map-foot{font-size:10px}.compat-label{font-size:11px}}
+@media print{body{background:white}main{padding:10px}.controls,.startup{display:none}.demo,.block{break-inside:avoid}.notes{break-inside:avoid}canvas{height:340px}}
+
+
+/* Presentation addition: a separate synthetic sensor-to-map scene. */
+.presentation-scope{margin:0 20px 15px;padding:10px 13px;border-left:3px solid var(--orange);background:var(--orange-soft);font-size:12px;color:#775334;line-height:1.6}
+.presentation-scope strong{font-weight:650}
+.vio-intro{padding:0 20px 12px;font-size:13px;color:var(--muted)}
+.vio-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:0 20px 14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.vio-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--ink)}
+.vio-toggle input{width:17px;height:17px;accent-color:var(--green)}
+.vio-panels{display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:0 20px}
+.vio-panel{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#f5f8f3}
+.vio-panel h3{font-size:13px;padding:10px 12px 0;color:var(--blue)}
+.vio-panel p{font-size:11px;line-height:1.5;padding:3px 12px 8px;color:var(--muted)}
+.vio-panel canvas{height:255px;background:#eff1eb;border-top:1px solid var(--line)}
+.vio-metrics{display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:10px 20px 8px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.vio-metrics small{display:block;font-size:11px;color:var(--muted)}
+.vio-scope{padding:0 20px 15px;font-size:11px;color:var(--muted);line-height:1.6}
+#vioTransformMessage.is-off{color:var(--orange);font-weight:650}
+@media(max-width:620px){.presentation-scope{margin:0 15px 14px}.vio-intro,.vio-toolbar{padding-left:15px;padding-right:15px}.vio-panels{grid-template-columns:1fr;padding:0 15px}.vio-panel canvas{height:240px}.vio-metrics{grid-template-columns:1fr;padding:10px 15px}.vio-scope{padding:0 15px 15px}}
+</style>
+</head>
+<body>
+<main id="concept" data-ready="false" data-stage="0">
+<p id="startup" class="compat-help" role="status">JavaScript 또는 Canvas 재생을 사용할 수 없는 환경을 위한 간소화한 애니메이션입니다. 아래 CSS 재생은 CSS 애니메이션을 지원하는 뷰어에서만 동작합니다.</p>
+<header>
+<div class="meta"><span class="eyebrow">NOMAD / CONCEPT NOTE</span><span class="edition">발표용 · 2026.10.02 · 기존 예시 + VIO 연결</span></div>
+<h1>야지 자율주행 통합 개념</h1>
+<p class="subtitle">사전 지형지도 없이 알려진 동일한 최종 목표로 향하는 목표 지향 미지환경 주행입니다. 전역 경로계획(Global Path Planning, GPP)은 자유공간 가정(freespace assumption)으로 임시 경로를 만들고, 실제 이동은 센서로 확인한 주행가능 구간에서만 실행합니다.</p>
+</header>
+
+<section aria-labelledby="structureHeading">
+<div class="section-head"><h2 id="structureHeading">01 / 시스템 구성</h2><span>Perception + VIO는 병렬 기능</span></div>
+<div class="system">
+<div class="parallel" aria-label="병렬 기능: 인지와 VIO">
+<div class="block perception"><span class="term">Perception</span><h3>인지 · 지도 누적</h3><p>의미분할, 깊이/LiDAR 지형 관측<br>장애물·여유 공간·경사 판단<br>주행가능성 지도 생성·갱신</p></div>
+<div class="block vio"><span class="term">VIO</span><h3>위치 · 자세 추정</h3><p>출력: 위치·자세<br>인지·Planning에 전달</p></div>
+</div>
+<span class="arrow" aria-hidden="true">→</span>
+<div class="block"><span class="term">Planning</span><h3>경로 · 행동 판단</h3><p>GPP 전역 경로계획: D* Lite 증분 재계획<br>LPP 지역 경로계획: 주변 장애물 회피<br>차량 실행가능 경로로 연결</p></div>
+<span class="arrow" aria-hidden="true">→</span>
+<div class="block"><span class="term">Control</span><h3>주행 명령 실행</h3><p>판단한 경로·행동에 따른 조향·속도·정지 제어</p></div>
+</div>
+<p class="flow-note"><b>Mapping은 Perception 안의 역할입니다.</b> VIO의 위치·자세를 인지와 Planning에 전달합니다.<br>관측에 따른 지도 비용 변경 → D* Lite 증분 재계획(incremental replanning) → 차량 실행가능성 확인·제어</p>
+</section>
+
+
+<section class="demo synthetic-vio" aria-labelledby="vioSceneHeading">
+<div class="demo-head"><div><h2 id="vioSceneHeading">02 / VIO 관측의 지도 정합</h2><p>한 고정 장애물을 여러 차량 위치에서 관측하는 합성 예시입니다.</p></div><div class="controls"><button class="primary" id="vioPlay" type="button">재생</button><button id="vioPause" type="button" disabled>일시정지</button><button id="vioReset" type="button">처음으로</button></div></div>
+<p class="vio-intro">차량 기준 관측점은 이동·회전에 따라 달라집니다. 합성 VIO의 위치·회전을 적용하면 같은 장애물의 관측이 지도 위 같은 위치에 누적됩니다.</p>
+<div class="vio-toolbar"><label class="vio-toggle"><input id="vioUsePose" type="checkbox" checked>합성 VIO pose로 좌표 변환 적용</label><span id="vioTransformMessage" role="status">지도점 = 회전 × 차량 기준 관측점 + 위치</span></div>
+<div class="vio-panels">
+<div class="vio-panel"><h3>① 합성 깊이 관측 · 차량 기준</h3><p>차량 원점은 고정 · 같은 장애물의 상대 좌표가 바뀜</p><canvas id="vioLocalCanvas" role="img" aria-label="차량 기준 좌표축에서 움직이는 합성 장애물 관측점">Canvas를 지원하는 브라우저에서 관측점 이동을 확인할 수 있습니다.</canvas></div>
+<div class="vio-panel"><h3>② 합성 VIO pose 입력 → 지도 누적</h3><p>파랑: 차량 pose · 초록: 변환한 관측 · 점선 원: 기준 장애물</p><canvas id="vioMapCanvas" role="img" aria-label="합성 VIO pose로 변환한 장애물 관측점이 누적되는 지도">Canvas를 지원하는 브라우저에서 지도 누적을 확인할 수 있습니다.</canvas></div>
+</div>
+<div class="vio-metrics"><div><span id="vioInputPose">합성 pose</span><small id="vioLocalPoint">차량 기준 관측점</small></div><div><span id="vioMappedPoint">지도 좌표 · 관측 누적 1회</span><small id="vioSampleStatus">재생 시간 0.7초마다 관측 · 도식 단위</small></div></div>
+<p class="vio-scope">오차 없는 합성 VIO pose 입력과 깊이 관측을 사용하는 2D 예시입니다. 차량 기준 관측에 위치·회전을 적용해 지도 좌표를 계산합니다. 실제 카메라·IMU·VIO 알고리즘·D* Lite·복귀는 실행하지 않습니다.</p>
+<noscript><p class="vio-scope">이 좌표 변환 장면에는 JavaScript가 필요합니다.</p></noscript>
+</section>
+
+<section class="demo" aria-labelledby="demoHeading">
+<div class="demo-head"><div><h2 id="demoHeading">03 / 기존 동작 흐름 예시</h2><p>지도는 관측과 이동에 따라 드러납니다. 실제 거리·시간을 나타내지 않습니다.</p></div><div class="controls js-controls"><button class="primary" id="play" type="button">재생</button><button id="next" type="button">다음 단계</button><button id="reset" type="button">처음으로</button></div></div>
+<p class="presentation-scope"><strong>발표 시점의 상태:</strong> 기존 복귀·재계획 장면은 이전 구상으로 남겨 두었습니다. 복귀는 위치·지도·후방 안전 조건 때문에 현재 보류 중이며, 조기 회피와 필요한 GPP 변경을 확장 연구 방향으로 검토합니다.</p>
+<div class="viewer-fallback" aria-label="간소화 애니메이션: JavaScript 없이 재생하는 사전 구성 장면">
+<input class="sr-only" id="compat-ready" type="radio" name="compat-playback" checked aria-label="간소화 애니메이션 처음으로">
+<input class="sr-only" id="compat-playing" type="radio" name="compat-playback" aria-label="간소화 애니메이션 시작 또는 계속 재생">
+<input class="sr-only" id="compat-paused" type="radio" name="compat-playback" aria-label="간소화 애니메이션 일시정지">
+<div class="compat-toolbar"><span>간소화한 애니메이션 · JavaScript 없이 재생(CSS)</span><div class="compat-controls" role="group" aria-label="간소화 애니메이션 제어"><label for="compat-playing">재생</label><label for="compat-paused">일시정지</label><label for="compat-ready">처음으로</label></div></div>
+<div class="compat-map" role="img" aria-label="이동·회피 후 막힘에 정지하고, 재계획 경로의 복귀 구간과 대안 구간을 이어 목표에 도착하는 사전 구성 장면">
+<svg class="compat-ground" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+<defs><pattern id="compat-grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1.2" fill="#d7ded5"/></pattern></defs>
+<rect width="1000" height="1000" fill="url(#compat-grid)"/>
+<ellipse cx="100" cy="830" rx="110" ry="140" fill="#dce8d7"/><path d="M100 830L153 782" fill="none" stroke="#f5f4e9" stroke-width="70" stroke-linecap="round"/>
+<g class="compat-animated compat-zone-j"><path d="M100 830L310 640L450 640" fill="none" stroke="#dce8d7" stroke-width="170" stroke-linejoin="round" stroke-linecap="round"/><path d="M100 830L310 640L450 640" fill="none" stroke="#f5f4e9" stroke-width="70" stroke-linejoin="round" stroke-linecap="round"/></g>
+<g class="compat-animated compat-zone-a"><path d="M450 640L460 480L590 480L660 640L860 640M450 640L660 640" fill="none" stroke="#dce8d7" stroke-width="170" stroke-linejoin="round" stroke-linecap="round"/><path d="M450 640L460 480L590 480L660 640L860 640M450 640L660 640" fill="none" stroke="#f5f4e9" stroke-width="70" stroke-linejoin="round" stroke-linecap="round"/><circle cx="540" cy="640" r="31" fill="#8c9384"/><circle cx="560" cy="660" r="17" fill="#a6ab9a"/></g>
+<g class="compat-animated compat-zone-b"><path d="M310 640L400 360L630 250L880 170" fill="none" stroke="#dce8d7" stroke-width="170" stroke-linejoin="round" stroke-linecap="round"/><path d="M310 640L400 360L630 250L880 170" fill="none" stroke="#e9e6cc" stroke-width="70" stroke-linejoin="round" stroke-linecap="round"/><path d="M387 400L412 370M437 355L459 327M507 322L529 294M580 287L602 259M666 249L688 221M753 224L775 196" stroke="#c3bf93" stroke-width="3" fill="none"/></g>
+<path class="compat-animated compat-blocked" d="M860 510L860 770" fill="none" stroke="#8b8675" stroke-width="30" stroke-linecap="round"/>
+<circle cx="100" cy="830" r="9" fill="#45685d"/><circle cx="880" cy="170" r="23" fill="#eef0ea" stroke="#187765" stroke-width="5"/><circle cx="880" cy="170" r="6" fill="#187765"/>
+</svg>
+<span class="compat-map-note">도식 · 관측 영역은 간소화한 표현</span>
+<span class="compat-label compat-label-start">S · 출발</span><span class="compat-label compat-label-goal">G · 최종 목표</span><span class="compat-label compat-label-j compat-animated">갈림길</span><span class="compat-label compat-label-a compat-animated">A · 평지</span><span class="compat-label compat-label-b compat-animated">B · 완만한 경사</span><span class="compat-label compat-label-block compat-animated">진행 불가</span>
+<div class="compat-car compat-animated" aria-label="경로에 따라 이동하는 차량"><svg viewBox="-18 -21 36 42" aria-hidden="true"><ellipse cx="1" cy="3" rx="18" ry="21" fill="#1e3028" opacity=".17"/><g fill="#283536"><rect x="-16" y="-14" width="6" height="10" rx="1"/><rect x="10" y="-14" width="6" height="10" rx="1"/><rect x="-16" y="5" width="6" height="10" rx="1"/><rect x="10" y="5" width="6" height="10" rx="1"/></g><rect x="-11" y="-19" width="22" height="38" rx="4" fill="currentColor" stroke="#fffefa" stroke-width="1.5"/><rect x="-7" y="-9" width="14" height="7" fill="#b7d1cf" stroke="#e6efeb" stroke-width="1"/><rect x="-7" y="6" width="14" height="5" fill="#91afac"/><path d="M-8 -16H-3M3 -16H8" stroke="#e6e8d1" stroke-width="2"/><path d="M-7 16H7" stroke="#263e3a" stroke-width="2"/></svg></div>
+<span class="compat-map-foot">방향은 경로 표시용 · 후진/회차 제어 미정</span>
+</div>
+<div class="compat-stage" aria-label="간소화 애니메이션 진행 설명"><p class="compat-stage-ready"><strong>사전 지도 없이 출발</strong> · 목표 G는 알려져 있고, 나머지는 미관측(Unknown)입니다.</p><p class="compat-animated compat-phase-1"><strong>관측하며 이동</strong> · 센서로 확인한 주행가능 구간에서만 진행합니다.</p><p class="compat-animated compat-phase-2"><strong>LPP 장애물 회피</strong> · 여유 공간을 살펴 잠시 정지한 뒤 우회합니다.</p><p class="compat-animated compat-phase-3"><strong>정지 · 지도 갱신</strong> · 주변 관측 결과를 지도에 반영해 GPP 재계획합니다.</p><p class="compat-animated compat-phase-4"><strong>이전 복귀 구상 · 현재 보류</strong> · 새 경로가 지나온 통로를 포함하는 이전 예시입니다.</p><p class="compat-animated compat-phase-5"><strong>재계획 경로 · 계속 주행</strong> · 같은 경로의 B 구간을 따라 목표로 이동합니다.</p><p class="compat-animated compat-phase-6"><strong>최종 목표 도착</strong> · 다시 보려면 처음으로를 눌러 주세요.</p></div>
+</div>
+<div class="js-mode">
+<div class="map-wrap"><canvas id="map" role="img" aria-label="미관측 지도에서 출발해 장애물을 회피하고, 막힘에 정지·지도 갱신·재계획한 뒤 동일 경로의 복귀 구간과 B 구간을 이어 목표에 도착하는 개념 도식">캔버스 표시가 지원되지 않습니다. 아래 단계 설명을 읽어 주세요.</canvas><p class="map-note">도식 · 관측 영역의 확대는 설명용 표현</p></div>
+<div class="legend" aria-label="지도 범례"><span><i class="swatch"></i>미관측(Unknown)</span><span><i class="swatch known"></i>관측 지도</span><span><i class="swatch trail"></i>주행 표시</span><span><i class="swatch return"></i>이전 복귀 구간 · 현재 보류</span></div>
+<div class="stagebox" aria-live="polite" aria-atomic="true"><div><span class="stage-index" id="stepCount">01 / 07</span><h3 id="stageTitle">사전 지도 없이 출발</h3></div><p id="stageText">최종 목표 G는 알려져 있지만 사전 지형지도는 없습니다. 출발 주변만 관측되어 있고 나머지는 미관측(Unknown)입니다. 계획상의 자유공간 가정은 실제 주행 허가가 아닙니다.</p></div>
+<ol class="stage-list" id="stageList" aria-label="시나리오 진행 단계"><li class="is-current" aria-current="step">01 출발</li><li>02 관측·이동</li><li>03 장애물 회피</li><li>04 정지·재계획</li><li>05 이전 복귀 · 보류</li><li>06 계속 주행</li><li>07 도착</li></ol>
+</div>
+<p class="scene-scope">사전 구성한 장면: A는 평지이지만 이후 막혀 있고, B는 완만한 경사로 목표에 연결됩니다. 갈림길과 B는 예시 환경이며, 막히면 반드시 이곳으로 돌아온다는 보장은 아닙니다. 이동 경로는 재계획 결과를 설명하기 위해 미리 정했으며, 실제 D* Lite·인지·VIO·차량 제어를 구현하거나 검증한 결과는 아닙니다.</p>
+</section>
+
+<section class="notes" aria-label="개념의 범위와 멘토 확인 사항">
+<div class="note-panel"><h2>전체 구성에 대한 의견을 부탁드립니다</h2><p><strong>이전 구상 · 복귀는 현재 보류:</strong> 고정 거리만큼 기존 궤적을 리와인드하지 않고, 같은 최종 목표까지 GPP 재탐색(증분 재계획)으로 새 경로를 구합니다. 새 경로에 되돌아오는 구간이 포함되면 그 구간을 따릅니다. 후진/회차 실행은 별도 설계입니다. 저장 궤적을 정확히 되감거나 갈림길·B로 반드시 돌아가는 방식은 아니며, 안전하게 실행할 경로가 없으면 정지·재평가합니다.<br><strong>자유공간 가정:</strong> 지도에는 미관측을 Unknown으로 유지하되 GPP 계획에서는 통과 가능(유한 비용)으로 가정해 임시 전역 경로를 만듭니다. <strong>가정 경로는 주행 허가가 아닙니다.</strong> 실제 이동은 센서로 확인한 주행가능 구간에서만 실행하며, 차량 실행가능성을 확인한 경로를 제어로 연결합니다. 이와 같은 구성과 운용 흐름에 대해 의견을 주시면 감사하겠습니다.</p></div>
+<div class="note-panel"><h2>회피 방식에 대한 저희의 해석</h2><ul><li><strong>장애물 회피:</strong> 저희는 장애물이 화면 중앙 부근에서 가장자리로 이동하도록 회피 경로를 생성하고, 영상 속 장애물의 위치 변화와 크기 감소를 회피 동작의 피드백으로 활용하는 방향으로 이해했습니다. 말씀하신 연구 방향과 저희의 해석이 다르다면, 어떤 방향을 의도하셨는지 설명해주시면 감사하겠습니다. 이 영상 피드백은 구상 중이며 본 예시에 구현하지 않았습니다.</li><li><strong>LPP 확인 사항:</strong> 영상 위치·크기 피드백의 활용 방법, 여유 공간 없음 또는 회피 도중 실패의 판정 및 GPP 전환 조건은 멘토 확인이 필요하며 아직 확정·구현하지 않았습니다. 회피가 불가능하거나 실패하면 정지하고, 주변 관측 결과가 반영된 지도로 GPP 재계획하는 구상입니다.</li><li><strong>상세 설계:</strong> 누적 관측 지도를 사용하며, 미관측 영역에 부여할 구체적인 유한 비용 값과 후진/회차의 실행 조건·제어 방식은 미정입니다.</li></ul></div>
+</section>
+<footer>이 HTML 파일 하나로 실행됩니다. 인터넷 연결이나 별도 설치가 필요하지 않습니다. 휴대전화의 파일 미리보기에서 버튼이 작동하지 않으면 저장한 파일을 외부 브라우저 또는 PC에서 열어 주세요.</footer>
+</main>
+<script>
+(function(){
+'use strict';
+var root=document.getElementById('concept'),notice=document.getElementById('startup');
+function fail(){running=false;if(frameId&&window.cancelAnimationFrame)window.cancelAnimationFrame(frameId);frameId=0;notice.hidden=false;notice.textContent='JavaScript/Canvas 재생을 시작하지 못해 간소화한 애니메이션(CSS)을 표시합니다. CSS 애니메이션을 지원하는 뷰어에서만 재생됩니다.';root.setAttribute('data-ready','error');}
+window.addEventListener('error',fail);
+try{
+var canvas=document.getElementById('map'),ctx=canvas.getContext('2d');
+if(!ctx)throw new Error('Canvas unavailable');
+if(typeof window.requestAnimationFrame!=='function'||typeof window.cancelAnimationFrame!=='function'||!window.performance||typeof window.performance.now!=='function')throw new Error('Animation timing unavailable');
+var buttons={play:document.getElementById('play'),next:document.getElementById('next'),reset:document.getElementById('reset')};
+var S=[.10,.83],J=[.31,.64],G=[.88,.17],approach=[.45,.64];
+var startPath=[S,J,approach];
+var avoidPath=[approach,[.46,.48],[.59,.48],[.66,.64],[.80,.64]];
+var alternativePath=[J,[.40,.36],[.63,.25],G];
+// Predetermined spatial illustration of one replanned route; no D* Lite search is implemented here.
+var replannedReturnSegment=avoidPath.slice().reverse().concat([J]);
+var steps=[
+ {title:'사전 지도 없이 출발',text:'최종 목표 G는 알려져 있지만 사전 지형지도는 없습니다. 출발 주변만 관측되어 있고 나머지는 미관측(Unknown)입니다. 계획상의 자유공간 가정은 실제 주행 허가가 아닙니다.',path:[S,S],duration:2},
+ {title:'관측하며 이동',text:'인지가 장애물·여유 공간·경사를 판단하고 관측 지도를 넓힙니다. 실제 이동은 센서로 확인한 주행가능 구간에서만 실행합니다. VIO의 위치·자세는 지도 누적과 경로 판단에 함께 쓰입니다.',path:startPath,duration:4.5},
+ {title:'LPP 장애물 회피',text:'LPP에서 여유 공간을 미리 살펴 회피 조향 방향을 정하고, 장애물 앞에서 잠시 정지한 뒤 우회하는 장면입니다. 여유 공간 없음·회피 실패의 판정과 GPP 전환 조건은 멘토 확인이 필요하며 아직 확정·구현하지 않았습니다. 약 1초 정지와 우회 동작은 사전 구성한 예시입니다.',path:avoidPath,duration:8},
+ {title:'정지 · 지도 갱신 · GPP 재계획',text:'진행할 수 없으면 우선 정지합니다. 이 예시는 인지·맵핑으로 A 방향의 막힘을 지도에 반영한 뒤 D* Lite 기반 GPP로 같은 최종 목표까지 증분 재계획하는 장면입니다. 실제 실패 판정·경로 탐색 계산은 구현하지 않았습니다.',path:[avoidPath[avoidPath.length-1],avoidPath[avoidPath.length-1]],duration:3},
+ {title:'이전 복귀 구상 · 현재 보류',text:'위치·지도·후방 안전 조건 때문에 복귀는 현재 보류 중입니다. 아래 움직임은 이전 구상입니다. 막힌 지점에서 이미 다시 구한 경로를 따라 지나온 통로를 돌아나옵니다. 별도 복귀 지점을 먼저 정하거나 저장 궤적을 되감는 단계가 아니라, 최종 목표까지 이어지는 새 경로의 일부입니다. 후진/회차 제어 방식은 미정입니다.',path:replannedReturnSegment,duration:6},
+ {title:'이전 재계획 경로 · 계속 주행',text:'이전 구상에 포함된 장면입니다. 같은 재계획 경로의 B 구간을 따라 최종 목표로 계속 이동합니다. 돌아온 뒤에야 재계획하는 순서가 아닙니다. 주행 중 새 관측으로 지도가 바뀌면 GPP 경로를 다시 갱신하는 구상입니다.',path:alternativePath,duration:6},
+ {title:'최종 목표 도착',text:'관측·회피·재계획 경로 주행을 이어 최종 목표 G에 도착했습니다. 미리 정한 경로로 설명한 개념 예시이며, 실제 D* Lite·인지·VIO·차량 제어 성능을 검증한 결과는 아닙니다.',path:[G,G],duration:2}
+];
+var stage=0,progress=1,running=false,frameId=0,last=0,width=0,height=0;
+function point(path,t){var lengths=[],total=0,i;for(i=1;i<path.length;i++){var dx=path[i][0]-path[i-1][0],dy=path[i][1]-path[i-1][1];var length=Math.sqrt(dx*dx+dy*dy);lengths.push(length);total+=length;}if(!total)return path[path.length-1].slice();var distance=Math.max(0,Math.min(1,t))*total;for(i=0;i<lengths.length;i++){if(distance<=lengths[i]||i===lengths.length-1){var f=lengths[i]?distance/lengths[i]:1;return[path[i][0]+(path[i+1][0]-path[i][0])*f,path[i][1]+(path[i+1][1]-path[i][1])*f];}distance-=lengths[i];}return path[path.length-1].slice();}
+function partial(path,t){var result=[path[0]],count=Math.max(1,Math.ceil(70*t));for(var i=1;i<=count;i++)result.push(point(path,t*i/count));return result;}
+function xy(p){return[22+p[0]*(width-44),39+p[1]*(height-66)];}
+function line(points,color,size,dashes){if(!points.length)return;ctx.beginPath();for(var i=0;i<points.length;i++){var p=xy(points[i]);if(!i)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);}ctx.strokeStyle=color;ctx.lineWidth=size;ctx.lineJoin='round';ctx.lineCap='round';ctx.setLineDash(dashes||[]);ctx.stroke();ctx.setLineDash([]);}
+function dot(p,r,color){var a=xy(p);ctx.beginPath();ctx.arc(a[0],a[1],r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
+function textAt(text,p,dx,dy,color,align){var a=xy(p);ctx.font='600 '+(width<450?12:14)+'px Pretendard, system-ui, sans-serif';ctx.fillStyle=color||'#243739';ctx.textAlign=align||'left';ctx.textBaseline='middle';ctx.fillText(text,a[0]+dx,a[1]+dy);}
+function drawVehicle(position,color,heading){
+ var p=xy(position);ctx.save();ctx.translate(p[0],p[1]);ctx.rotate(heading);
+ ctx.fillStyle='rgba(30,48,40,.17)';ctx.beginPath();ctx.ellipse(1,4,19,22,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#283536';for(var side=-1;side<=1;side+=2){for(var axle=-1;axle<=1;axle+=2){ctx.fillRect(side<0?-16:10,axle<0?-14:5,6,10);ctx.fillStyle='#64706c';ctx.fillRect(side<0?-15:11,axle<0?-12:7,4,1);ctx.fillRect(side<0?-15:11,axle<0?-8:11,4,1);ctx.fillStyle='#283536';}}
+ ctx.beginPath();ctx.moveTo(-7,-19);ctx.lineTo(7,-19);ctx.quadraticCurveTo(11,-19,11,-15);ctx.lineTo(11,15);ctx.quadraticCurveTo(11,19,7,19);ctx.lineTo(-7,19);ctx.quadraticCurveTo(-11,19,-11,15);ctx.lineTo(-11,-15);ctx.quadraticCurveTo(-11,-19,-7,-19);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fffefa';ctx.lineWidth=1.5;ctx.stroke();
+ ctx.fillStyle='#b7d1cf';ctx.fillRect(-7,-9,14,7);ctx.fillStyle='#91afac';ctx.fillRect(-7,6,14,5);ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1;ctx.strokeRect(-7,-9,14,7);ctx.fillStyle='#e6e8d1';ctx.fillRect(-8,-17,5,2);ctx.fillRect(3,-17,5,2);ctx.fillStyle='#263e3a';ctx.fillRect(-7,15,14,2);
+ ctx.restore();
+}
+function movementProgress(index,f){return index===2?Math.max(0,Math.min(1,(f*steps[2].duration-1)/(steps[2].duration-1))):f;}
+/* Icon orientation only: does not model steering, reverse driving or turning. */
+function pathVector(path,t){
+ var lengths=[],total=0,i,lastVector=null;
+ for(i=1;i<path.length;i++){var dx=path[i][0]-path[i-1][0],dy=path[i][1]-path[i-1][1],length=Math.sqrt(dx*dx+dy*dy);lengths.push(length);total+=length;if(length>1e-9)lastVector=[dx,dy];}
+ if(!lastVector)return null;
+ var distance=Math.max(0,Math.min(1,t))*total;
+ for(i=0;i<lengths.length;i++){if(lengths[i]>1e-9&&distance<=lengths[i]+1e-9)return[path[i+1][0]-path[i][0],path[i+1][1]-path[i][1]];distance-=lengths[i];}
+ return lastVector;
+}
+function vehicleHeading(index,f){
+ var vector=null,i,briefStop=index===2&&f*steps[2].duration<1;
+ if(!briefStop)vector=pathVector(steps[index].path,movementProgress(index,f));
+ if(!vector)for(i=index-1;i>=0&&!vector;i--)vector=pathVector(steps[i].path,1);
+ if(!vector)for(i=index+1;i<steps.length&&!vector;i++)vector=pathVector(steps[i].path,0);
+ if(!vector)return 0;
+ var bounds=canvas.getBoundingClientRect();
+ return Math.atan2(vector[1]*(bounds.height-66),vector[0]*(bounds.width-44))+Math.PI/2;
+}
+function completedMotion(){var trails=[];for(var i=1;i<=stage;i++){if(i===1||i===2||i===4||i===5)trails.push({index:i,points:partial(steps[i].path,i<stage?1:movementProgress(i,progress))});}return trails;}
+function observed(){var pts=[S];for(var i=1;i<=stage;i++){if(i!==1&&i!==2&&i!==5)continue;var current=i<stage?1:movementProgress(i,progress);var samples=partial(steps[i].path,current);for(var k=0;k<samples.length;k++)pts.push(samples[k]);}return pts;}
+function draw(){
+ var box=canvas.getBoundingClientRect();width=box.width;height=box.height;var ratio=Math.min(window.devicePixelRatio||1,2);if(canvas.width!==Math.round(width*ratio)||canvas.height!==Math.round(height*ratio)){canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);}ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#eef0ea';ctx.fillRect(0,0,width,height);
+ ctx.fillStyle='#d7ded5';for(var gx=18;gx<width;gx+=24)for(var gy=22;gy<height;gy+=24){ctx.beginPath();ctx.arc(gx,gy,.75,0,Math.PI*2);ctx.fill();}
+ ctx.fillStyle='#8b9990';ctx.font='13px Pretendard, system-ui, sans-serif';ctx.textAlign='center';ctx.fillText('미관측 영역',width*.58,height*.84);
+ var pts=observed(),radius=Math.max(44,Math.min(width,height)*.21);ctx.save();ctx.beginPath();for(var j=0;j<pts.length;j++){var op=xy(pts[j]);ctx.moveTo(op[0]+radius,op[1]);ctx.arc(op[0],op[1],radius,0,Math.PI*2);}ctx.clip();
+ ctx.fillStyle='#dce8d7';ctx.fillRect(0,0,width,height);
+ var road=Math.max(23,Math.min(width,height)*.10);line([S,J,[.86,.64]],'#f5f4e9',road);line([J,[.40,.36],[.63,.25],G],'#e9e6cc',road);line([[.43,.64],[.46,.48],[.59,.48],[.66,.64]],'#f5f4e9',road*.82);
+ for(var q=0;q<8;q++){var slope=point(alternativePath,.20+q*.07),a=xy(slope);ctx.strokeStyle='#c3bf93';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0]-5,a[1]+6);ctx.lineTo(a[0]+5,a[1]-6);ctx.stroke();}
+ dot([.54,.64],width<450?10:14,'#8c9384');dot([.56,.66],width<450?5:7,'#a6ab9a');line([[.86,.51],[.86,.77]],'#8b8675',Math.max(9,road*.4));
+ ctx.restore();
+ var history=completedMotion();for(var h=0;h<history.length;h++)line(history[h].points,history[h].index===4?'#ac632c':'#187765',history[h].index===4?3.2:2.5,history[h].index===4?[5,4]:[]);
+ dot(S,5,'#45685d');textAt('S · 출발',S,0,31,'#3e5d55','center');
+ var target=xy(G);ctx.beginPath();ctx.arc(target[0],target[1],11,0,Math.PI*2);ctx.strokeStyle='#187765';ctx.lineWidth=2;ctx.stroke();dot(G,3,'#187765');textAt('G · 최종 목표',G,-14,-19,'#245c4e','right');
+ if(stage>=1&&(stage>1||progress>.8)){dot(J,3,'#718b73');textAt('갈림길',J,-23,20,'#536b59','right');}
+ if(stage>=2){textAt('A · 평지',[.62,.64],0,29,'#645f4d','center');if(stage>=3){textAt('진행 불가',[.86,.64],-8,55,'#855528','right');}}
+ if(stage>=5){textAt('B · 완만한 경사',[.52,.26],0,-22,'#655f34','center');}
+ // Playback is explicitly requested by the user; draw the same live pose in all motion-preference modes.
+ var actual=point(steps[stage].path,movementProgress(stage,progress));drawVehicle(actual,stage===4?'#ac632c':'#245c4e',vehicleHeading(stage,progress));
+ ctx.font='11px Pretendard, system-ui, sans-serif';ctx.textAlign='right';ctx.fillStyle='#68776e';ctx.fillText('방향은 경로 표시용 · 후진/회차 제어 미정',width-12,height-12);
+}
+function ui(){root.setAttribute('data-stage',String(stage));document.getElementById('stepCount').textContent=('0'+(stage+1)).slice(-2)+' / 07';document.getElementById('stageTitle').textContent=steps[stage].title;document.getElementById('stageText').textContent=steps[stage].text;buttons.play.textContent=running?'일시정지':stage===steps.length-1&&progress>=1?'다시 재생':'재생';buttons.play.setAttribute('aria-pressed',running?'true':'false');buttons.next.disabled=stage===steps.length-1;var items=document.getElementById('stageList').children;for(var i=0;i<items.length;i++){items[i].className=i===stage?'is-current':i<stage?'is-past':'';if(i===stage)items[i].setAttribute('aria-current','step');else items[i].removeAttribute('aria-current');}}
+function stop(){running=false;if(frameId)cancelAnimationFrame(frameId);frameId=0;ui();}
+function frame(now){frameId=0;if(!running)return;var dt=Math.max(0,Math.min(.12,(now-last)/1000));last=now;progress+=dt/steps[stage].duration;if(progress>=1){progress=1;if(stage<steps.length-1){stage++;progress=0;ui();}else{stop();draw();return;}}draw();frameId=requestAnimationFrame(frame);}
+buttons.play.addEventListener('click',function(){if(running){stop();return;}if(stage===steps.length-1&&progress>=1){stage=0;progress=1;}if(progress>=1&&stage<steps.length-1){stage++;progress=0;}running=true;last=performance.now();ui();draw();frameId=requestAnimationFrame(frame);});
+buttons.next.addEventListener('click',function(){stop();if(stage<steps.length-1)stage++;progress=1;ui();draw();});
+buttons.reset.addEventListener('click',function(){stop();stage=0;progress=1;ui();draw();});
+window.addEventListener('resize',draw);document.addEventListener('visibilitychange',function(){if(document.hidden&&running)stop();});
+window.nomadConcept={getState:function(){return{stage:stage,stageTitle:steps[stage].title,progress:progress,motionProgress:movementProgress(stage,progress),briefStop:stage===2&&progress*steps[2].duration<1,running:running,position:point(steps[stage].path,movementProgress(stage,progress)),observedSamples:observed().length,stepCount:steps.length,scenarioOnly:true,headingRadians:vehicleHeading(stage,progress)};}};
+ui();root.setAttribute('data-ready','true');draw();notice.hidden=true;
+}catch(error){fail();if(window.console)console.error(error);}
+}());
+</script>
+
+<script>
+(function(){
+'use strict';
+var localCanvas=document.getElementById('vioLocalCanvas'),mapCanvas=document.getElementById('vioMapCanvas');
+var localCtx=localCanvas.getContext('2d'),mapCtx=mapCanvas.getContext('2d');
+var play=document.getElementById('vioPlay'),pause=document.getElementById('vioPause'),reset=document.getElementById('vioReset'),usePose=document.getElementById('vioUsePose');
+var message=document.getElementById('vioTransformMessage');
+if(!localCtx||!mapCtx||!window.requestAnimationFrame){message.textContent='Canvas와 JavaScript를 지원하는 브라우저에서 재생해 주세요.';play.disabled=true;pause.disabled=true;return;}
+var cadence=.7,intervals=12,totalTime=cadence*intervals,obstacle={x:64,y:52};
+function trueVehiclePose(f){return{x:18+28*f,y:18+10*f+12*f*f,yaw:Math.atan2(10+24*f,28)};}
+/* Synthetic depth producer: only ground-truth geometry enters this function; supplied VIO pose does not. */
+function produceDepthObservation(truth,landmark){
+ var dx=landmark.x-truth.x,dy=landmark.y-truth.y,c=Math.cos(truth.yaw),s=Math.sin(truth.yaw);
+ return{forward:c*dx+s*dy,left:-s*dx+c*dy};
+}
+/* Independent, exact synthetic pose input. This is scripted data, not an estimator. */
+function suppliedVioPose(f){var truth=trueVehiclePose(f);return{x:truth.x,y:truth.y,yaw:truth.yaw};}
+var inputs=[];
+for(var i=0;i<=intervals;i++){
+ var f=i/intervals,truth=trueVehiclePose(f);
+ inputs.push({time:i*cadence,observation:produceDepthObservation(truth,obstacle),pose:suppliedVioPose(f)});
+}
+/* Map consumer has no landmark or truth-pose input: result depends on observation and supplied pose. */
+function projectPoint(observation,pose,enabled){
+ if(!enabled)return{x:observation.forward,y:observation.left};
+ var c=Math.cos(pose.yaw),s=Math.sin(pose.yaw);
+ return{x:pose.x+c*observation.forward-s*observation.left,y:pose.y+s*observation.forward+c*observation.left};
+}
+var elapsed=0,count=1,mapped=[],running=false,frameId=0,lastTime=0;
+function remap(){
+ mapped=[];
+ for(var j=0;j<count;j++)mapped.push(projectPoint(inputs[j].observation,inputs[j].pose,usePose.checked));
+}
+function resizeCanvas(canvas,context){
+ var bounds=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);
+ var w=Math.round(bounds.width*ratio),h=Math.round(bounds.height*ratio);
+ if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+ context.setTransform(ratio,0,0,ratio,0,0);context.clearRect(0,0,bounds.width,bounds.height);
+ return{width:bounds.width,height:bounds.height};
+}
+function plot(context,bounds,minX,maxX,minY,maxY,local){
+ var pad={left:35,right:18,top:25,bottom:33},w=bounds.width-pad.left-pad.right,h=bounds.height-pad.top-pad.bottom;
+ function at(x,y){return[pad.left+(x-minX)*w/(maxX-minX),pad.top+(maxY-y)*h/(maxY-minY)];}
+ context.fillStyle='#eff1eb';context.fillRect(0,0,bounds.width,bounds.height);
+ context.lineWidth=.75;context.strokeStyle='#d5ddd4';
+ for(var x=Math.ceil(minX/10)*10;x<=maxX;x+=10){var a=at(x,minY),b=at(x,maxY);context.beginPath();context.moveTo(a[0],a[1]);context.lineTo(b[0],b[1]);context.stroke();}
+ for(var y=Math.ceil(minY/10)*10;y<=maxY;y+=10){var a=at(minX,y),b=at(maxX,y);context.beginPath();context.moveTo(a[0],a[1]);context.lineTo(b[0],b[1]);context.stroke();}
+ var origin=at(0,0),right=at(maxX,0),up=at(0,maxY);
+ context.strokeStyle='#738c83';context.lineWidth=1.5;context.beginPath();context.moveTo(origin[0],origin[1]);context.lineTo(right[0],right[1]);context.moveTo(origin[0],origin[1]);context.lineTo(up[0],up[1]);context.stroke();
+ context.fillStyle='#607174';context.font='11px system-ui, sans-serif';context.textAlign='right';context.fillText(local?'+앞':'+x',right[0],right[1]-7);context.textAlign='left';context.fillText(local?'+왼쪽':'+y',up[0]+6,up[1]+2);context.fillText('0',origin[0]+4,origin[1]+14);
+ return at;
+}
+function marker(context,p,r,color){
+ context.beginPath();context.arc(p[0],p[1],r,0,Math.PI*2);context.fillStyle=color;context.fill();
+}
+function vehicle(context,p,yaw){
+ context.save();context.translate(p[0],p[1]);context.rotate(-yaw);
+ context.fillStyle='#426a82';context.beginPath();context.moveTo(12,0);context.lineTo(-9,-7);context.lineTo(-6,0);context.lineTo(-9,7);context.closePath();context.fill();context.restore();
+}
+function draw(){
+ var current=inputs[count-1],point=mapped[mapped.length-1];
+ var localBounds=resizeCanvas(localCanvas,localCtx),mapBounds=resizeCanvas(mapCanvas,mapCtx);
+ var localAt=plot(localCtx,localBounds,0,65,-25,35,true),mapAt=plot(mapCtx,mapBounds,0,100,-20,80,false);
+ var origin=localAt(0,0),localPoint=localAt(current.observation.forward,current.observation.left);
+ localCtx.fillStyle='rgba(66,106,130,.07)';localCtx.beginPath();localCtx.moveTo(origin[0],origin[1]);var a=localAt(60,30),b=localAt(60,-25);localCtx.lineTo(a[0],a[1]);localCtx.lineTo(b[0],b[1]);localCtx.closePath();localCtx.fill();
+ localCtx.strokeStyle='#ac632c';localCtx.setLineDash([4,4]);localCtx.beginPath();localCtx.moveTo(origin[0],origin[1]);localCtx.lineTo(localPoint[0],localPoint[1]);localCtx.stroke();localCtx.setLineDash([]);
+ vehicle(localCtx,origin,0);marker(localCtx,localPoint,7,'#ac632c');
+ localCtx.font='12px system-ui, sans-serif';localCtx.fillStyle='#855528';localCtx.textAlign='center';localCtx.fillText('같은 장애물',localPoint[0],localPoint[1]-13);
+ var reference=mapAt(obstacle.x,obstacle.y);mapCtx.beginPath();mapCtx.arc(reference[0],reference[1],13,0,Math.PI*2);mapCtx.strokeStyle='#8b9990';mapCtx.setLineDash([4,3]);mapCtx.lineWidth=1.5;mapCtx.stroke();mapCtx.setLineDash([]);
+ mapCtx.fillStyle='#607174';mapCtx.font='11px system-ui, sans-serif';mapCtx.textAlign='center';mapCtx.fillText('고정 장애물 · 기준 위치',reference[0],reference[1]-19);
+ mapCtx.strokeStyle='#9eb8c5';mapCtx.lineWidth=2;mapCtx.beginPath();
+ for(var k=0;k<count;k++){var car=mapAt(inputs[k].pose.x,inputs[k].pose.y);if(k)mapCtx.lineTo(car[0],car[1]);else mapCtx.moveTo(car[0],car[1]);}
+ mapCtx.stroke();
+ for(var k=0;k<mapped.length;k++)marker(mapCtx,mapAt(mapped[k].x,mapped[k].y),5,usePose.checked?'rgba(24,119,101,.30)':'rgba(172,99,44,.65)');
+ var carPoint=mapAt(current.pose.x,current.pose.y),projectedPoint=mapAt(point.x,point.y);
+ mapCtx.strokeStyle=usePose.checked?'#187765':'#ac632c';mapCtx.lineWidth=1;mapCtx.setLineDash([4,4]);mapCtx.beginPath();mapCtx.moveTo(carPoint[0],carPoint[1]);mapCtx.lineTo(projectedPoint[0],projectedPoint[1]);mapCtx.stroke();mapCtx.setLineDash([]);
+ var ahead=mapAt(current.pose.x+Math.cos(current.pose.yaw),current.pose.y+Math.sin(current.pose.yaw));
+ var screenYaw=Math.atan2(carPoint[1]-ahead[1],ahead[0]-carPoint[0]);
+ vehicle(mapCtx,carPoint,screenYaw);marker(mapCtx,projectedPoint,6,usePose.checked?'#187765':'#ac632c');
+ document.getElementById('vioInputPose').textContent='합성 pose · x '+current.pose.x.toFixed(1)+' / y '+current.pose.y.toFixed(1)+' / θ '+(current.pose.yaw*180/Math.PI).toFixed(1)+'°';
+ document.getElementById('vioLocalPoint').textContent='합성 깊이 관측 · 앞 '+current.observation.forward.toFixed(1)+' / 왼쪽 '+current.observation.left.toFixed(1);
+ document.getElementById('vioMappedPoint').textContent='지도 좌표 · ('+point.x.toFixed(1)+', '+point.y.toFixed(1)+') · 관측 누적 '+count+'회';
+ document.getElementById('vioSampleStatus').textContent='관측 '+count+' / '+inputs.length+' · 재생 시간 0.7초마다 취득 · 도식 단위';
+ message.textContent=usePose.checked?'지도점 = 회전 × 차량 기준 관측점 + 위치':'변환 미적용: 차량 기준 좌표를 지도 좌표로 그대로 배치';
+ message.className=usePose.checked?'':'is-off';
+ play.disabled=running;pause.disabled=!running;play.textContent=elapsed>=totalTime?'다시 재생':'재생';
+}
+function halt(){running=false;if(frameId)window.cancelAnimationFrame(frameId);frameId=0;draw();}
+function frame(now){
+ frameId=0;if(!running)return;
+ var dt=Math.max(0,Math.min(.12,(now-lastTime)/1000));lastTime=now;elapsed=Math.min(totalTime,elapsed+dt);
+ var nextCount=Math.min(inputs.length,Math.floor((elapsed+1e-9)/cadence)+1);
+ if(nextCount!==count){count=nextCount;remap();}
+ if(elapsed>=totalTime){running=false;draw();return;}
+ draw();frameId=window.requestAnimationFrame(frame);
+}
+play.addEventListener('click',function(){
+ if(running)return;
+ if(elapsed>=totalTime){elapsed=0;count=1;remap();}
+ running=true;lastTime=performance.now();draw();frameId=window.requestAnimationFrame(frame);
+});
+pause.addEventListener('click',halt);
+reset.addEventListener('click',function(){running=false;if(frameId)window.cancelAnimationFrame(frameId);frameId=0;elapsed=0;count=1;remap();draw();});
+usePose.addEventListener('change',function(){remap();draw();});
+window.addEventListener('resize',draw);
+document.addEventListener('visibilitychange',function(){if(document.hidden&&running)halt();});
+window.nomadVioScene={
+ getState:function(){return{running:running,elapsed:elapsed,sampleCount:count,totalSamples:inputs.length,transformApplied:usePose.checked,syntheticOnly:true,accurateSyntheticInputs:true,mappedPoints:mapped.map(function(p){return{x:p.x,y:p.y};}),inputSamples:inputs.slice(0,count).map(function(s){return{time:s.time,observation:{forward:s.observation.forward,left:s.observation.left},pose:{x:s.pose.x,y:s.pose.y,yaw:s.pose.yaw}};})};},
+ projectPoint:projectPoint
+};
+remap();draw();
+}());
+</script>
+
+</body>
+</html>
+
+
