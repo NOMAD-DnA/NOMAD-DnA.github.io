@@ -12,7 +12,8 @@
 @media(max-width:800px){main{padding:18px 14px}header{display:block}nav{margin-top:7px}h1{font-size:23px}.comparison,.reading{grid-template-columns:1fr}.controls .info{width:100%;margin:0}.flow{font-size:12px;gap:8px}.metrics strong{font-size:17px}.panel h2{font-size:18px}.map{aspect-ratio:28/18}}
 @media print{.controls,nav,details,.log{display:none}body{background:white}main{padding:8px}.comparison,.reading{grid-template-columns:1fr 1fr}.map{aspect-ratio:28/18}}
 .map-badges{position:absolute;top:9px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;font-size:12px}.map-badges span{padding:4px 8px;background:#ffffffee;border:1px solid #d8e0e6;border-radius:4px;font-weight:650}.map-badges [data-phase="detect"],.map-badges [data-phase="map"],.map-badges [data-phase="plan"]{background:#fff0e4;border-color:#dba47d;color:#a84c25}.flow{flex-wrap:wrap}.state{font-size:13px}.legend{font-size:10px}
-.scene-caption{position:absolute;left:12px;right:12px;top:45px;padding:7px 10px;background:#fffffff2;border-left:4px solid var(--blue);border-radius:3px;pointer-events:none;box-shadow:0 2px 9px #20374712}.scene-caption strong{font-size:15px;display:block;line-height:1.3}.scene-caption span{font-size:11px;color:var(--muted);display:block;margin-top:2px;line-height:1.3}.scene-caption[data-tone="stop"]{background:#fff1eaf7;border-color:#c45930;color:#a04424}.scene-caption[data-tone="clear"]{background:#eef9f5f7;border-color:var(--new);color:var(--new)}.map{min-height:300px}.legend{max-width:calc(100% - 24px);font-size:10px}.panel-head p{font-size:12px}
+.scene-caption{position:absolute;left:12px;right:12px;top:45px;padding:7px 10px;background:#fffffff2;border-left:4px solid var(--blue);border-radius:3px;pointer-events:none;box-shadow:0 2px 9px #20374712}.scene-caption strong{font-size:15px;display:block;line-height:1.3}.scene-caption span{font-size:11px;color:var(--muted);display:block;margin-top:2px;line-height:1.3}.scene-caption[data-tone="stop"]{background:#fff1eaf7;border-color:#c45930;color:#a04424}.scene-caption[data-tone="clear"]{background:#eef9f5f7;border-color:var(--new);color:var(--new)}.map{height:clamp(400px,50vh,490px);min-height:400px;aspect-ratio:auto}.legend{max-width:calc(100% - 24px);font-size:10px}.panel-head p{font-size:12px}
+@media(max-width:800px){.map{height:380px;min-height:380px}}
 </style>
 </head>
 <body>
@@ -40,7 +41,7 @@
 <details><summary>비교 조건·계산 방식·근거</summary><div class="detail">
 <p><strong>부분 관측:</strong> 시험구역 범위·시작·목표 좌표만 주어집니다. 시작점에서 보이는 긴 벽만 먼저 관측하며, 벽 뒤 통로와 코너 너머 보조벽은 미관측입니다. 반경 6.5 m·360°의 이상적 광선 관측을 0.24초마다 수행합니다. 벽에 가려진 영역은 끝을 돌아야 점차 드러납니다. 관측한 영역은 계속 기억합니다. 실제 센서·VIO 결과가 아닙니다.</p>
 <p><strong>동일 조건:</strong> 양쪽 모두 같은 환경·센서·차체·조향 한계·전진 전용 LPP입니다. 달라지는 것은 GPP의 여유거리 비용입니다. 이후 경로에 따라 관측 결과는 달라집니다. 장애물 감지 후 약 2.88초 정지는 흐름을 보여주기 위한 시간으로, 실제 처리·제동시간이 아닙니다.</p>
-<p><strong>헤어핀 GPP:</strong> 긴 가림벽의 끝을 돌아 반대 방향으로 이어지는 길을 구성했습니다. 양쪽 모두 0.25 m·4방향 A*를 사용합니다. 기존은 거리 비용, 5안은 <code>구간 거리 × (1 + 10 exp(−여유거리 / 1.0))</code> 비용입니다. 여유거리는 관측된 벽과 이미 아는 시험구역 경계까지의 거리로 계산합니다. 미관측 구간은 GPP에서 통과 가능으로 가정하며 점선으로 표시합니다. 정지 위치나 성공 궤적을 지정하지 않습니다.</p>
+<p><strong>헤어핀 GPP:</strong> 긴 가림벽의 끝을 돌아 반대 방향으로 이어지는 길을 구성했습니다. U턴 후 차량 왼편의 벽은 기존 코너 위치를 유지한 채, 1 m 바깥으로 물려 목표 측으로 길게 이어집니다. 같은 선상으로 목표까지 연장하면 안전 검사상 통로가 지나치게 좁아지므로 이 구성을 사용했습니다. 양쪽 모두 같은 벽과 0.25 m·4방향 A*를 사용합니다. 기존은 거리 비용, 5안은 <code>구간 거리 × (1 + 10 exp(−여유거리 / 1.0))</code> 비용입니다. 여유거리는 관측된 벽과 이미 아는 시험구역 경계까지의 거리로 계산합니다. 미관측 구간은 GPP에서 통과 가능으로 가정하며 점선으로 표시합니다. 정지 위치나 성공 궤적을 지정하지 않습니다.</p>
 <p><strong>공통 LPP:</strong> 차체 1.2×0.8 m, 휠베이스 0.9 m, 최대 조향 ±30°, 최소 회전반경 1.56 m. 속도 1.2·0.75·0.35 m/s와 조향 21개를 조합한 63개 후보를 3초 예측하며, GPP 목표점을 2 m 앞에서 선택합니다. 관측된 자유공간 안에서 안전한 후보만 실행합니다. 후보가 없으면 정지하며 후진·복귀는 하지 않습니다.</p>
 <p><strong>주행 중 정지 원인:</strong> 기존 차량은 실제 벽 끝을 지난 후 약116° 방향을 바꾼 위치에서 멈춥니다. 관측된 보조벽과 현재 자세 때문에 63개 전진 후보가 모두 안전 조건을 위반합니다. 차체 외접원+0.16 m 안전여유와 보수적인 격자 거리보정(0.25√2 m)을 적용했습니다. 물리적 조향각만으로 모든 회피가 불가능하다는 증명은 아닙니다. 연속 조향 변경·다른 LPP·후진을 쓰면 결과가 달라질 수 있습니다.</p>
 <p><strong>차량 방향·회전 예측:</strong> 표시 각도는 출발 방향(0°)에 대한 차량 방향 변화입니다. 180°면 반대 방향입니다. 정지 화면의 붉은 점선·반투명 차량은 실제 계산된 탈락 LPP 후보 하나를 예로 보여줍니다. 얇은 회색 원호는 남은 방향 전환을 최대 조향으로 시도하는 보조 예측입니다. 둘 다 실제 이동이 아니며, 차량을 충돌시키거나 예측 원호로 강제 주행시키지 않습니다.</p>
@@ -55,7 +56,7 @@
 window.AvoidanceDemo = (() => {
   const C={w:28,h:18,grid:.25,length:1.2,width:.8,wheelbase:.9,maxSteer:Math.PI/6,maxSpeed:1.2,dt:.12,horizon:3,sensorRange:6.5};
   C.radius=Math.hypot(C.length/2,C.width/2); C.hard=C.radius+.16;
-  const obstacles=[{x:0,y:7.5,w:19,h:2.5},{x:20.5,y:12.5,w:7.5,h:1}];
+  const obstacles=[{x:0,y:7.5,w:19,h:2.5},{x:20.5,y:12.5,w:7.5,h:1},{x:8,y:13.5,w:20,h:1}];
   const start={x:12,y:5.7,yaw:0},goal={x:16,y:11.8};
   // Display/audit probe only; the planners never read this scenario marker.
   const scene={cornerExit:{x:16,y:11.8}};
@@ -155,7 +156,7 @@ function conflict(ctx,f,scale){
 }
 function draw(index){const canvas=canvases[index],rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(rect.width*ratio));canvas.height=Math.max(1,Math.round(rect.height*ratio));const ctx=canvas.getContext('2d'),w=rect.width,h=rect.height;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#e8eef1';ctx.fillRect(0,0,w,h);
   // Both panels use the same camera. Zoom changes presentation only, not sensor data or simulation.
-  const focus=ease((elapsed-focusStart)/6),scale=Math.min((w-24)/E.C.w,(h-108)/E.C.h)*(1+1.35*focus),cx=14+(20.6-14)*focus,cy=9+.5*focus,ox=w/2-scale*cx,oy=88+(h-116)/2-scale*cy;
+  const focus=ease((elapsed-focusStart)/6),scale=Math.min((w-24)/E.C.w,(h-108)/E.C.h)*(1+focus),cx=14+(20.6-14)*focus,cy=9+.9*focus,ox=w/2-scale*cx,oy=88+(h-116)/2-scale*cy;
   ctx.save();ctx.beginPath();ctx.rect(0,87,w,h-113);ctx.clip();ctx.translate(ox,oy);ctx.scale(scale,scale);
   const f=frameAt(runs[index],elapsed),shown=runs[index].frames.filter(p=>p.time<=elapsed);
   // Only observation memory is drawn. No ground-truth obstacle geometry is exposed.
