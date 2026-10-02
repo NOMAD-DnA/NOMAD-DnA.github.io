@@ -159,7 +159,7 @@ function conflict(ctx,f,scale){
   vehicle(ctx,q,true);
   const wall=probe.contactWall,point={x:Math.max(wall.x,Math.min(wall.x+wall.w,contact.x)),y:Math.max(wall.y,Math.min(wall.y+wall.h,contact.y))};
   ctx.fillStyle='#e84b3530';ctx.beginPath();ctx.arc(point.x,point.y,.4,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#b6402c';ctx.lineWidth=.09;ctx.beginPath();ctx.moveTo(point.x-.18,point.y-.18);ctx.lineTo(point.x+.18,point.y+.18);ctx.moveTo(point.x+.18,point.y-.18);ctx.lineTo(point.x-.18,point.y+.18);ctx.stroke();
-  tag(ctx,q,'최대 30° 회전 예측 · 벽 침범',scale,'#a1442b',-72,-29);
+  tag(ctx,q,'최대 조향 시 벽 접촉',scale,'#a1442b',-72,-29);
   tag(ctx,point,'차체 접촉 지점',scale,'#a1442b',34,27);
 }
 function draw(index){const canvas=canvases[index],rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(rect.width*ratio));canvas.height=Math.max(1,Math.round(rect.height*ratio));const ctx=canvas.getContext('2d'),w=rect.width,h=rect.height;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#e8eef1';ctx.fillRect(0,0,w,h);
