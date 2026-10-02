@@ -120,7 +120,7 @@ function draw(index){const canvas=canvases[index],rect=canvas.getBoundingClientR
   const f=frameAt(runs[index],elapsed),shown=runs[index].frames.filter(p=>p.time<=elapsed);
   // Only observation memory is drawn. No ground-truth obstacle geometry is exposed.
   ctx.fillStyle='#cbd3d9';ctx.fillRect(0,0,E.C.w,E.C.h);
-  for(let y=0;y<E.ny;y++)for(let x=0;x<E.nx;x++){const k=y*E.nx+x,v=f.map.cells[k];if(!v)continue;ctx.fillStyle=v===2?'#a46547':'#f2f5ed';ctx.fillRect(x*E.C.grid-E.C.grid/2,y*E.C.grid-E.C.grid/2,E.C.grid+.005,E.C.grid+.005);if(index===1&&v===1){const gap=f.map.ds[k]-E.C.grid*Math.SQRT2-E.C.radius;if(gap>.16&&gap<3.2){ctx.fillStyle=`rgba(20,125,116,${.20*Math.exp(-gap/1.0)})`;ctx.fillRect(x*E.C.grid-.125,y*E.C.grid-.125,.25,.25);}}}
+  for(let y=0;y<E.ny;y++)for(let x=0;x<E.nx;x++){const k=y*E.nx+x,v=f.map.cells[k];if(!v)continue;ctx.fillStyle=v===2?'#a46547':'#f2f5ed';ctx.fillRect(x*E.C.grid-E.C.grid/2,y*E.C.grid-E.C.grid/2,E.C.grid+.005,E.C.grid+.005);if(index===1&&v===1){const gap=E.mapClearance(x*E.C.grid,y*E.C.grid,f.map.ds)-E.C.radius;if(gap>.16&&gap<3.2){ctx.fillStyle=`rgba(20,125,116,${.20*Math.exp(-gap/1.0)})`;ctx.fillRect(x*E.C.grid-.125,y*E.C.grid-.125,.25,.25);}}}
   ctx.save();ctx.strokeStyle='#93a3af55';ctx.lineWidth=.035;for(let x=0;x<=E.C.w;x++){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,E.C.h);ctx.stroke();}for(let y=0;y<=E.C.h;y++){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(E.C.w,y);ctx.stroke();}ctx.restore();
   for(let k=1;k<f.path.length;k++){const p=f.path[k],q=f.path[k-1],known=f.map.cells[Math.round(p.y/E.C.grid)*E.nx+Math.round(p.x/E.C.grid)]!==0;line(ctx,[q,p],known?colors[index]:'#7c8c98',known?.14:.075,known?[]:[.16,.18]);}
   line(ctx,shown,'#283f53',.10,[.12,.18]);
