@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "resolution_m": 0.05,
+    "height_band_m": 0.1,
+    "min_cell_points": 3,
+    "huber_m": 0.05,
+    "inlier_m": 0.1,
+    "min_inlier_fraction": 0.7,
+    "radii_m": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "min_xy_std_m": 0.15,
+    "min_support": 24,
+    "small_radius_m": 0.12,
+    "step_m": 0.075,
+    "scale_difference_deg": 5.0
+  },
+  "cells": 21609,
+  "representative_valid": 13659,
+  "small_valid": 15471,
+  "step_candidates": 9897,
+  "multiple_height_modes": 10423,
+  "scale_unstable": 724,
+  "accuracy_verified": false,
+  "ground_semantics_verified": false,
+  "uncertainty_interval_calibrated": false,
+  "traversability_inferred": false,
+  "notes": "Small slopes are diagnostics, not confirmed hazards. Step threshold and graph can reject steep ground or bridge finite objects. VIO/systematic uncertainty not modeled. Equal-frame medians; no pose/distance uncertainty weighting yet. Missing small values mean unknown, never flat."
+}
