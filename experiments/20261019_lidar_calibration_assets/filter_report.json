@@ -1,0 +1,16 @@
+{
+  "source": "original map / SHA256 verified locally",
+  "source_sha256": "1c5b7759c680b323e3660d2f5af5842b992f0e8a8f71d74e6dd3ae663be24cab",
+  "original_points": 100329,
+  "kept_points": 98020,
+  "removed_points": 2309,
+  "removed_percent": 2.3014283008900716,
+  "method": "All three conditions: mean16NN > max(0.20m, median+4*scaledMAD); third neighbor >0.12m; voxel observations<=2",
+  "mean16nn_median_m": 0.06305984289185168,
+  "mean16nn_scaled_mad_m": 0.025358789908614215,
+  "mean16nn_threshold_m": 0.2,
+  "voxel_observations_are_distinct_scan_counts": false,
+  "accuracy_verified": false,
+  "warning": "Sparse valid distant surfaces/edges may also be removed. Original remains default source; this is a review candidate.",
+  "source_unchanged": true
+}

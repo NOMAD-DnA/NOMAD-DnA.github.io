@@ -1,0 +1,15 @@
+{
+  "state": "completed",
+  "error": null,
+  "accepted_scans": 189,
+  "rejected_scans": 9,
+  "queue_dropped": 1,
+  "points": 100329,
+  "finite_points": true,
+  "trajectory_samples": 1132,
+  "duration_s": 37.6933015,
+  "estimated_path_m": 10.196135005117394,
+  "start_end_distance_m": 0.043219350333009054,
+  "rosbag_files": 0,
+  "accuracy_verified": false
+}
