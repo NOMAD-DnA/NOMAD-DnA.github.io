@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NOMAD · GNSS 소실과 위치 복구</title>
+  <link rel="stylesheet" href="style.css?v=imu-model-2">
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <div><div class="eyebrow"><span class="brand">NOMAD</span><span class="divider"></span>LOCALIZATION / FIELD TO FACTORY</div>
+    <h1>GNSS 소실과 위치 복구<span class="title-dot">.</span></h1>
+    <p class="subtitle">야지에서 공장으로, 다시 야지로. 동일 주행의 GT · 융합 · IMU를 함께 봅니다.</p></div>
+    <div class="head-actions"><span class="record-tag" id="recordTag"><i></i> 실제 기록 + IMU 오차 모델</span><button class="icon-btn" id="infoBtn" title="데이터와 표현 기준" aria-label="데이터와 표현 기준">ⓘ</button><button class="icon-btn" id="fullBtn" title="전체 화면" aria-label="전체 화면">⛶</button></div>
+  </header>
+  <nav class="phases" id="phases" aria-label="주행 구간"></nav>
+  <div class="statusline"><div class="phase-message" id="phaseMessage">야지에서 주행을 시작합니다.</div><div class="statuses"><span id="gnssStatus" class="status good"><i></i>GNSS 수신</span><span id="featureStatus" class="status"><i></i>특징점 —</span></div></div>
+  <main>
+    <section class="panel map-panel"><div class="panel-head"><div><span class="panel-no">01</span><h2>궤적과 위치 불확실성</h2></div><button id="cloudBtn" class="text-btn" aria-pressed="true">분포 표시</button></div>
+    <div class="map-toolbar"><div class="legend" id="legend"><button data-series="gt" aria-pressed="true"><i class="line gt"></i>GT</button><button data-series="ours" aria-pressed="true"><i class="line ours"></i>Ours <small>VIO + GNSS</small></button><button data-series="imu" aria-pressed="true"><i class="line imu"></i><span id="imuLegend">IMU · 오차 모델</span></button></div><span class="mini-label">WORLD · m</span></div>
+    <div class="model-controls"><label>IMU 입력 <select id="imuSource" aria-label="IMU 입력"><option value="model" selected>센서 오차 모델 적용</option><option value="original">원본 · 잡음 미설정</option></select></label><div class="segmented" role="group" aria-label="궤적 시점"><button data-map-view="xy" aria-pressed="true">탑뷰</button><button data-map-view="xyz" aria-pressed="false">3D 궤적</button></div></div>
+    <div class="canvas-wrap"><canvas id="map" aria-label="실제 맵 위의 GT, 융합, IMU 궤적과 불확실성 개념 분포"></canvas><div class="map-key"><span class="zone-key"></span>공장 내부 · GNSS 소실 영역</div><div class="map-tip">분포는 개념 표현 · 실제 공분산 아님</div></div>
+    <div class="map-bottom"><div class="error-readout"><div><span><i class="dot ours"></i>Ours · 3D 오차</span><strong id="oursError">—<small> m</small></strong></div><div><span><i class="dot imu"></i>IMU · 3D 오차</span><strong id="imuError">—<small> m</small></strong></div></div><div class="spark-wrap"><canvas id="errors" aria-label="재생 시점까지 누적되는 XYZ 전체 위치 오차"></canvas><span>3D 위치 오차 [m] · 시간 [s]</span></div></div></section>
+    <section class="panel scene-panel"><div class="panel-head"><div><span class="panel-no">02</span><h2>주행 환경</h2><span class="mini-label">동일 맵 · 3D 재현</span></div><div class="scene-controls"><div class="segmented" role="group" aria-label="3D 시점"><button data-mode="follow" aria-pressed="true">차량 추적</button><button data-mode="orbit" aria-pressed="false">자유 시점</button><button data-mode="camera" aria-pressed="false">전방 시점</button></div><button id="roofBtn" class="text-btn" aria-pressed="false">지붕 보기</button></div></div>
+      <div class="scene-container" id="scene"><div class="scene-help">드래그로 회전 · 휠로 확대 / 축소</div><div class="scene-fallback" id="sceneFallback" hidden>3D 화면을 준비하고 있습니다.</div>
+      <button class="camera-sample" id="sampleBtn" title="연속 특징점 영상 확대"><video id="featureVideo" muted playsinline preload="auto" aria-label="실제 녹화된 연속 카메라와 Basalt 특징점"></video><span><b><i class="video-dot"></i>실제 특징점 영상 · 15 fps</b><small id="sampleStamp">기록 영상 동기 재생</small><em>확대 ↗</em></span></button></div>
+    </section>
+  </main>
+  <footer class="transport"><div class="play-controls"><button id="resetBtn" class="icon-btn" aria-label="처음부터" title="처음부터">↺</button><button id="playBtn" class="play-btn" aria-label="재생"><span id="playIcon">▶</span><span id="playText">재생</span></button></div><div class="timeline-block"><div class="timeline-labels"><span id="timeLabel">00:00.0</span><span id="durationLabel">00:00.0</span></div><input type="range" id="timeline" min="0" max="100" step="0.01" value="0" aria-label="재생 시간"><div id="timelineEvents" class="timeline-events"></div></div><label class="speed-control">재생 속도<select id="speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option><option value="8" selected>8×</option><option value="16">16×</option></select></label></footer>
+  <div class="footnote"><span id="methodNote">GT·Ours: 실제 기록 · IMU: 가정한 센서 오차를 추가해 재적분</span><span>Space 재생 / 정지 · ← → 5초 이동</span></div>
+</div>
+<dialog id="infoDialog"><button class="dialog-close" data-close aria-label="닫기">×</button><div class="eyebrow">DATA & PRESENTATION</div><h2>무엇을 보고 있나요?</h2><div id="dataInfo"></div></dialog>
+<dialog id="sampleDialog" class="sample-dialog"><button class="dialog-close" data-close aria-label="닫기">×</button><div class="eyebrow">RECORDED CAMERA · BASALT FEATURES</div><h2 id="sampleTitle">실제 특징점 영상</h2><video id="featureVideoLarge" muted playsinline preload="metadata" aria-label="확대한 실제 특징점 연속 영상"></video><div class="video-dialog-controls"><button id="videoPlayBtn" class="play-btn">재생</button><input type="range" id="videoTimeline" min="0" step="0.01" value="0" aria-label="확대 영상 재생 시간"><span id="videoTimeLabel">00:00.0</span></div><p>원본 카메라와 동일 촬영 시각의 Basalt 추적점 · 탑뷰 및 3D와 동기 재생</p></dialog>
+<script src="vendor/three.min.js"></script><script src="data.js"></script><script src="imu-model.js"></script><script src="uncertainty-view.js?v=cumulative-2"></script><script src="trajectory-view.js?v=cumulative-1"></script><script src="scene-data.js"></script><script src="scene.js"></script><script src="video-meta.js"></script><script src="app.js?v=cumulative-1"></script>
+</body></html>

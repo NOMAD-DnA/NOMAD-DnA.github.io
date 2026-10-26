@@ -1,0 +1,207 @@
+{
+  "generatedBy": "presentation_work/20261026_gnss_vio/prepare_data.py",
+  "sourceRun": "factory_map_work/20261025/experiment/run_01",
+  "meta": {
+    "schemaVersion": 1,
+    "title": "GNSS 소실 구간 · VIO 융합",
+    "sourceDate": "2026-10-25",
+    "sourceRun": "factory_map_work/20261025/experiment/run_01",
+    "mapVersion": "9번 공장 v1 · 실제 기록",
+    "t0": 6.153331,
+    "durationS": 201.483253,
+    "sourceGTDurationS": 201.543253,
+    "displayEndsAtLastCommonPose": true,
+    "nominalSampleHz": 10,
+    "oursNativeHz": 30,
+    "frame": "ENU world · GNSS antenna",
+    "coordinateUnit": "m",
+    "timeUnit": "s",
+    "yawUnit": "rad",
+    "poseColumns": [
+      "t",
+      "x",
+      "y",
+      "z",
+      "yaw"
+    ],
+    "telemetryColumns": [
+      "t",
+      "leftTracks",
+      "rightTracks",
+      "featureAge",
+      "gnssValid",
+      "gnssAge",
+      "oursErrorXY",
+      "imuErrorXY",
+      "vioErrorXY",
+      "stateIndex",
+      "phaseIndex"
+    ],
+    "gnssColumns": [
+      "t",
+      "x",
+      "y",
+      "z",
+      "valid",
+      "sigmaE",
+      "sigmaN",
+      "sigmaU"
+    ],
+    "stateNames": [
+      "WAITING",
+      "ALIGNING",
+      "FUSED_GNSS_LOW_QUALITY",
+      "VIO_ONLY"
+    ],
+    "featureStaleS": 0.5,
+    "gnssStaleS": 0.5,
+    "uncertainty": {
+      "posteriorAvailable": false,
+      "label": "불확실성 개념 표현",
+      "reason": "Opti가 출력한 covariance는 보수적 placeholder이며 보정된 posterior가 아님. 데이터에는 추정 sigma나 확률 영역을 만들지 않음."
+    },
+    "firstOursT": 23.878324,
+    "gtBaseToAntennaM": [
+      0,
+      0,
+      0.45
+    ],
+    "imuToAntennaM": [
+      -0.46,
+      0,
+      0.16
+    ],
+    "alignment": {
+      "source": "first timestamp-matched raw_aligned / vio_input poses",
+      "alignment_time_s": 30.031655,
+      "raw_time_s": 30.031655,
+      "quaternion_xyzw": [
+        -0.0,
+        -0.0,
+        0.017507,
+        0.999847
+      ],
+      "translation_m": [
+        -29.613025,
+        -7.051589,
+        0.162816
+      ],
+      "frozen_after_initial_alignment": true,
+      "uses_GT_for_alignment": false
+    },
+    "posthocGTAlignment": false,
+    "imuNote": "실제 IMU 단순 적분. 최초 GT 위치·전체 자세와 정지 속도 0으로 초기화하고 최초 3초 gyro 평균 보정. 이후 위치 보정 없음.",
+    "phaseDefinition": "GNSS 소실·복귀는 실제 첫 invalid/valid 메시지. 내부 경계는 GT의 x=4 진입, x=14 곡선 시작, x=4 출구 통과.",
+    "limitations": [
+      "공장 v1 단일 실제 시뮬레이션 기록. 숲·경사를 추가한 v2 재주행 결과가 아님.",
+      "GNSS 소실 중에도 위치 오차가 증가했으며 특징점 회복만으로 전역 오차가 사라지지 않음.",
+      "원래 출력의 위치 점프를 보존. jump 경계에서 부드러운 보간으로 숨기지 말 것.",
+      "불확실성 구름은 확률값을 가진 추정 결과로 해석할 수 없음.",
+      "특징점 영상은 실제 rosbag 카메라·Basalt 추적점 15fps 재생. 3D는 같은 맵·기록 GT의 브라우저 재현."
+    ]
+  },
+  "sources": [
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/gt_base.tum",
+      "bytes": 944648
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/fused.tum",
+      "bytes": 541032
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/vio_input.tum",
+      "bytes": 610023
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/raw_aligned.tum",
+      "bytes": 543597
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/imu/imu_integrated.tum",
+      "bytes": 5221568
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/gnss.csv",
+      "bytes": 121657
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/features.csv",
+      "bytes": 161207
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/status.jsonl",
+      "bytes": 3010480
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/stage_frames.json",
+      "bytes": 1630
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/report/metrics.json",
+      "bytes": 21084
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/run.json",
+      "bytes": 4908
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage1_raw.png",
+      "bytes": 37306
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage1_tracks.png",
+      "bytes": 84984
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage2_raw.png",
+      "bytes": 7701
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage2_tracks.png",
+      "bytes": 16715
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage3_raw.png",
+      "bytes": 12989
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage3_tracks.png",
+      "bytes": 34470
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage4_raw.png",
+      "bytes": 12882
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage4_tracks.png",
+      "bytes": 35849
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage5_raw.png",
+      "bytes": 10977
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage5_tracks.png",
+      "bytes": 24841
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage6_raw.png",
+      "bytes": 46897
+    },
+    {
+      "path": "factory_map_work/20261025/experiment/run_01/frames/stage6_tracks.png",
+      "bytes": 107432
+    }
+  ],
+  "presentation": {
+    "original_estimates_preserved": true,
+    "imu_default": "가정한 센서 오차 추가 후 재적분. 원본 선택 가능. Ours에는 추가 오차 미적용.",
+    "cloud": "개념 표현. 실제 공분산·신뢰구간 아님.",
+    "cloud_radius_growth_per_second": 0.36,
+    "cloud_base_radius": 1.4,
+    "cloud_recovery_time_constant_s": 3.5,
+    "cloud_rule": "NO_FIX + poor 구간 시간에 따라 확대, rich에서 유지, GNSS 복귀 시 축소.",
+    "full_raw_recording_published": false
+  }
+}
