@@ -20,5 +20,6 @@ test('reject malformed or unbounded remote coordinates before rendering',()=>{
 test('offscreen pings remain at the visible map edge; fully hidden map is suppressed',()=>{
   assert.deepEqual(pointInRect(100,100,{left:0,top:0,right:800,bottom:500},1000,700),{x:100,y:100,outside:false});
   assert.deepEqual(pointInRect(10000,-100,{left:0,top:0,right:800,bottom:500},1000,700),{x:782,y:18,outside:true});
+  assert.deepEqual(pointInRect(200,110,{left:100,top:100,right:300,bottom:124},1000,700),{x:200,y:112,outside:true});
   assert.equal(pointInRect(1,1,{left:0,top:800,right:800,bottom:1000},1000,700),null);
 });

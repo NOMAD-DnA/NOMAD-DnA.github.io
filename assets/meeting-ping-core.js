@@ -19,7 +19,8 @@ export function selectorFor(el){
 }
 export function pointInRect(x,y,r,width,height){
   if(!Number.isFinite(x)||!Number.isFinite(y))return null;
-  const loX=Math.max(18,r.left+18), hiX=Math.min(width-18,r.right-18),loY=Math.max(18,r.top+18),hiY=Math.min(height-48,r.bottom-18);
+  const padX=Math.min(18,(r.right-r.left)/2),padY=Math.min(18,(r.bottom-r.top)/2);
+  const loX=Math.max(18,r.left+padX),hiX=Math.min(width-18,r.right-padX),loY=Math.max(18,r.top+padY),hiY=Math.min(height-48,r.bottom-padY);
   if(hiX<loX||hiY<loY)return null;
   return {x:Math.max(loX,Math.min(hiX,x)),y:Math.max(loY,Math.min(hiY,y)),outside:x<loX||x>hiX||y<loY||y>hiY};
 }
