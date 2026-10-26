@@ -1,0 +1,14 @@
+{
+  "updated": "2026-10-26",
+  "type": "illustrative_scenario",
+  "views_share": ["world_geometry", "vehicle_pose", "obstacle_pose", "timeline"],
+  "actual_model_inference": false,
+  "actual_optical_flow": false,
+  "actual_physics_simulation": false,
+  "tracking_and_costs": "scripted examples, not measured performance",
+  "real_asset": {
+    "path": "assets/real-motion-blur.jpg",
+    "source_filename": "20261019_144253_974600__segment_000007__f000151__t1792388669638439519.jpg",
+    "purpose": "actual input degradation example only"
+  }
+}
