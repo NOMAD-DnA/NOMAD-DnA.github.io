@@ -7,7 +7,7 @@ import re
 root = Path(__file__).resolve().parents[1]
 count = 0
 for page in sorted(root.rglob('*.html')):
-    if page.name.startswith('.'):
+    if page.name.startswith('.') or page.name.endswith('.template.html'):
         continue
     text = page.read_text()
     if re.search(r'<script\b[^>]*src=["\'][^"\']*assets/meeting-ping\.js', text):

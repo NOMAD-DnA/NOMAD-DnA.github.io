@@ -5,7 +5,7 @@ import re
 import json
 import hashlib
 root=Path(__file__).resolve().parents[1]
-pages=[p for p in root.rglob('*.html') if not p.name.startswith('.')]
+pages=[p for p in root.rglob('*.html') if not p.name.startswith('.') and not p.name.endswith('.template.html')]
 for page in pages:
     matches=re.findall(r'<script\b[^>]*src=["\']([^"\']*assets/meeting-ping\.js)["\']',page.read_text())
     assert len(matches)==1,(page,'expected one shared pointer script')
