@@ -1,4 +1,6 @@
 from pathlib import Path
+import hashlib
+import re
 root = Path(__file__).resolve().parent
 output = root.parent / 'index.html'
 library_source = output if output.exists() else root.parent / 'with_obstacles.html'
@@ -20,3 +22,14 @@ page = page.replace('/* SLOPE_EIGEN_INLINE */', eigen)
 page = page.replace('<script>' + lib, '<!-- Included library: Three.js r160.1\n' + (root / 'THREE-LICENSE.txt').read_text() + '\n-->\n<script>' + lib, 1)
 output.write_text(page)
 print('Built', output, len(page.encode()), 'bytes')
+
+# A new content URL prevents the library from reopening an older cached HTML.
+catalogue = root.parents[2] / 'scenarios' / 'index.html'
+if catalogue.exists():
+    version = hashlib.sha256(output.read_bytes()).hexdigest()[:12]
+    target = '../experiments/20261026_offroad_drive/'
+    pattern = r'href="' + re.escape(target) + r'(?:\?[^\"]*)?"'
+    updated, count = re.subn(pattern, 'href="' + target + '?v=' + version + '"', catalogue.read_text())
+    if count:
+        catalogue.write_text(updated)
+        print('Updated scenario library link to version', version)
