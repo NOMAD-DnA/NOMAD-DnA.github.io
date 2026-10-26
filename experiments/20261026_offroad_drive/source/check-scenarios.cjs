@@ -13,6 +13,7 @@ const app=vm.createContext({THREE:{...THREE,WebGLRenderer:renderer},document,con
 const scripts=[...raw.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)];const appScript=scripts.findLast(s=>s[2].includes('window.sim={'))?.[2];assert(appScript,'Inline simulation script missing');new vm.Script(appScript);const parameterNames=['THREE','document','console','devicePixelRatio','location','performance','Worker','Blob','URL','ResizeObserver','setTimeout','clearTimeout','requestAnimationFrame','window'];new Function(...parameterNames,appScript)(...parameterNames.map(k=>app[k]));
 async function waitFor(fn,limit=120000){const start=performance.now();while(!fn()){if(performance.now()-start>limit)throw Error('Timed out');await new Promise(r=>setTimeout(r,30));}}
 
+assert.equal(app.sim.scenarios.length,4);assert.equal(buttons.filter(b=>'scenario'in b.dataset).length,4);
 const outcomes=[];
 async function ready(){await waitFor(()=>app.sim?.state.ready||elements.get('error').textContent);assert(!elements.get('error').textContent,elements.get('error').textContent);}
 async function verifyScenario(id){
@@ -24,11 +25,22 @@ async function verifyScenario(id){
   assert.equal(elements.get('scenarioTitle').textContent,spec.title);
   assert(sim.route.points.length>2);assert(Math.abs(sim.route.points[0].x)<1e-9&&Math.abs(sim.route.points[0].z)<1e-9);assert(Math.abs(sim.route.points.at(-1).x-14)<1e-9&&Math.abs(sim.route.points.at(-1).z)<1e-9);
   const range=[Math.min(...sim.terrain.values),Math.max(...sim.terrain.values)];
-  if(id===1){assert.equal(range[0],0);assert.equal(range[1],0);for(let x=0;x<=14;x+=.2){const p=sim.pose(x);assert.equal(p.y,0);assert.equal(p.pitch,0);assert.equal(p.roll,0);}}
+  if(id===1||id===3){assert.equal(range[0],0);assert.equal(range[1],0);for(let x=0;x<=14;x+=.2){const p=sim.pose(x);assert.equal(p.y,0);assert.equal(p.pitch,0);assert.equal(p.roll,0);}}
   if(spec.slope===0){assert.equal(sim.baseHeight(18),0);assert(!elements.get('phase').textContent.includes('오르막'));assert.equal(elements.get('rampStartVal').textContent,'해당 없음');}
-  else assert(Math.abs(sim.baseHeight(10)-4*Math.tan(Math.PI/18))<1e-9);
+  else if(id===2){
+    assert.equal(sim.baseHeight(10,-1.1),0);assert(Math.abs(sim.baseHeight(10,1.1)-4*Math.tan(Math.PI/18))<1e-9);
+    const c=sim.route.laneChoice;assert(c.ready,'Both surfaces must be recognized in the same initial camera frame: '+JSON.stringify(c));assert.equal(c.chosen,'left');assert(c.left.fit.angle<.001);assert(Math.abs(c.right.fit.angle-10)<.001);
+    const replay=sim.compareLanePoints(sim.scan()[0][1]);assert(replay.ready);assert.equal(replay.chosen,c.chosen);assert(Math.abs(replay.right.fit.angle-c.right.fit.angle)<1e-8,'Decision must use the actual initial frame');
+    assert.equal(sim.compareLanePoints([]).ready,false);assert.equal(sim.compareLanePoints(sim.scan()[0][1].filter(p=>p.z<0)).chosen,null,'One visible side cannot trigger a choice');
+    // The comparison selects the measured minimum, not a hardcoded left-side preference.
+    const swapped=[];for(const [z0,z1,x0,x1,angle]of [[-1.8,-.5,3,8,10],[.85,2.15,6.3,8,0]])for(let x=x0;x<=x1;x+=.1)for(let z=z0;z<=z1;z+=.1)swapped.push({x,y:(x-6)*Math.tan(angle*Math.PI/180),z,semantic:0});
+    assert.equal(sim.compareLanePoints(swapped).chosen,'right');
+    for(let x=0;x<=14;x+=.1){const p=sim.pose(x);assert(Math.abs(p.y)<1e-8);assert(Math.abs(p.pitch)<1e-8);assert(Math.abs(p.roll)<1e-8);}
+    assert.equal(elements.get('laneChoicePanel').hidden,false);assert(elements.get('laneVerdict').textContent.includes('평지 선택'));
+    console.log('SIMULTANEOUS LANE OBSERVATION',JSON.stringify(c));
+  }
   const lateral=Math.max(...sim.route.points.map(p=>Math.abs(p.z)));
-  if(spec.obstacles==='none'){assert.equal(sem.obstacleMeshes.length,0);assert.equal(sim.route.obstacles.length,0);assert(Math.abs(sim.route.length-14)<1e-7);assert.equal(lateral,0);}
+  if(spec.obstacles==='none'){assert.equal(sem.obstacleMeshes.length,0);assert.equal(sim.route.obstacles.length,0);if(id===2){assert(sim.route.length>14);assert(lateral>1);assert(sim.route.points.every(p=>p.z<=1e-8));}else{assert(Math.abs(sim.route.length-14)<1e-7);assert.equal(lateral,0);}}
   else{assert(sem.obstacleMeshes.length>0);assert(lateral>.7);assert(sim.route.minimumClearance>=.65);}
   let min=Infinity;for(let i=0;i<=1400;i++){
     const p=sim.pose(i/100);min=Math.min(min,sim.routeClearance(p.x,p.z));
@@ -43,15 +55,21 @@ async function verifyScenario(id){
   if(spec.obstacles==='none')assert.equal(sem.occupancy.blocked.size,0);else assert(sem.occupancy.blocked.size>0);
   sim.update(true);await waitFor(()=>app.slopeMap.view.result&&Math.abs(app.slopeMap.view.result.x-sim.route.length)<1e-6);
   const r=app.slopeMap.view.result;assert(r.valid>100);let maxSlope=0;for(let i=0;i<r.rows.length;i+=10)if(r.rows[i+2]===0)maxSlope=Math.max(maxSlope,r.rows[i+3]);
-  if(id===1)assert(maxSlope<.01,'Flat map acquired nonzero slope');else assert(maxSlope>1,'Rough map lost local slopes');
-  const row={scenario:id,slope:sim.state.slope,rough:sim.state.rough,obstacles:sim.state.obstacles,heightRange:range,routeLength:sim.route.length,maxLateral:lateral,minCenterClearance:Number.isFinite(min)?min:null,blocked:sem.occupancy.blocked.size,validSlopeCells:r.valid,maxCellSlopeDeg:maxSlope};
+  if(id===1||id===3)assert(maxSlope<.01,'Flat ground map acquired nonzero slope');else{
+    let flatCells=0,rampCells=0;for(let i=0;i<r.rows.length;i+=10){const x=(r.rows[i]+.5)*r.res,z=(r.rows[i+1]+.5)*r.res;if(r.rows[i+2]!==0||x<6.5||x>12)continue;if(z<-.5&&z>-1.8&&r.rows[i+3]<.01)flatCells++;if(z>1&&z<2.1&&Math.abs(r.rows[i+3]-10)<.01)rampCells++;}
+    assert(flatCells>100,'Split map lost flat cells');assert(rampCells>10,'Split map lost 10 degree cells');
+    console.log('SPLIT MAP CELLS',JSON.stringify({flatCells,rampCells}));
+    for(const [key,z]of [['flat',-1.1],['edge',.6],['ramp',1.25]]){buttons.find(b=>b.dataset.slopeFocus===key).onclick();assert(Math.abs(app.slopeMap.view.selectedZ-z)<=r.res);}
+    const savedChoice=sim.route.laneChoice;sim.route.laneChoice=sim.compareLanePoints([]);sim.state.x=0;assert(!sem.advanceSemanticMotion(.1));assert.equal(sim.state.x,0);sim.route.laneChoice=savedChoice;sim.state.x=14;sim.update(true);
+  }
+  const row={scenario:id,slope:sim.state.slope,rough:sim.state.rough,obstacles:sim.state.obstacles,heightRange:range,routeLength:sim.route.length,maxLateral:lateral,minCenterClearance:Number.isFinite(min)?min:null,blocked:sem.occupancy.blocked.size,validSlopeCells:r.valid,maxCellSlopeDeg:maxSlope,...(id===2?{laneChoice:sim.route.laneChoice}: {})};
   outcomes.push(row);console.log('SCENARIO',JSON.stringify(row));
 }
 (async()=>{
   await verifyScenario(1);
-  for(const id of [2,3,4]){buttons.find(b=>Number(b.dataset.scenario)===id).onclick();assert.equal(app.sim.state.ready,false);await verifyScenario(id);}
-  // The fifth environment is obstacle-free, but measured grade must stop it.
-  buttons.find(b=>Number(b.dataset.scenario)===5).onclick();await ready();
+  for(const id of [2,3]){buttons.find(b=>Number(b.dataset.scenario)===id).onclick();assert.equal(app.sim.state.ready,false);await verifyScenario(id);}
+  // The fourth environment is obstacle-free, but measured grade must stop it.
+  buttons.find(b=>Number(b.dataset.scenario)===4).onclick();await ready();
   const {sim,semanticDemo:sem,gradeDemo:grade}=app;assert.equal(sim.state.slope,25);assert.equal(grade.limit,20);assert.equal(sim.state.obstacles,'none');assert.equal(sem.obstacleMeshes.length,0);
   const firstBlocked=grade.frames().find(r=>r.blocked);assert(firstBlocked,'No measured steep patch found');assert(firstBlocked.angle>20);assert(firstBlocked.n>=12);
   const plane=angle=>{const p=[];for(let x=.35;x<=1.5;x+=.04)for(let z=-.3;z<=.3;z+=.04)p.push({x,y:x*Math.tan(angle*Math.PI/180),z,semantic:0});return p;};
@@ -77,13 +95,13 @@ async function verifyScenario(id){
   elements.get('reset').onclick();sim.state.slope=0;buttons.find(b=>b.dataset.at==='14').onclick();assert(sim.state.gradeStopped);sim.state.slope=25;
   // Future frame points cannot alter the first frame's estimate.
   const originals=sim.scan();grade.build([[plane(0),[]]]);const baseline=JSON.stringify(grade.frames()[0]);grade.build([[plane(0),[]],[plane(25),[]]]);assert.equal(JSON.stringify(grade.frames()[0]),baseline);grade.build(originals);
-  const fifth={scenario:5,slope:25,rough:sim.state.rough,obstacles:'none',limit:grade.limit,firstMeasuredHazard:firstBlocked,stopOutcomes,shortcutsRespectStop:true};outcomes.push(fifth);console.log('STEEP STOP',JSON.stringify(fifth));
+  const fourth={scenario:4,slope:25,rough:sim.state.rough,obstacles:'none',limit:grade.limit,firstMeasuredHazard:firstBlocked,stopOutcomes,shortcutsRespectStop:true};outcomes.push(fourth);console.log('STEEP STOP',JSON.stringify(fourth));
   // Sensor installation remains shared while every environment preset stays exact.
   app.sim.selectScenario(1);await ready();elements.get('semanticStop').checked=true;
   elements.get('cameraHeight').value='33';elements.get('cameraHeight').listeners.change();await ready();assert.equal(app.sim.state.ch,.33);
   app.sim.selectScenario(1);await ready();assert.equal(app.sim.state.ch,.33);assert.equal(app.sim.state.slope,0);assert.equal(app.sim.state.rough,0);assert.equal(app.semanticDemo.obstacleMeshes.length,0);assert.equal(app.semanticDemo.occupancy.blocked.size,0);assert.equal(app.sim.state.x,0);
   app.sim.selectScenario(4);app.sim.selectScenario(1);await ready();assert.equal(app.sim.state.scenario,1);assert.equal(app.semanticDemo.obstacleMeshes.length,0);assert.equal(app.semanticDemo.occupancy.blocked.size,0);assert(app.location.search.includes('scenario=1'));
   const priorURL=app.location.href;app.location.protocol='file:';app.sim.selectScenario(2);await ready();assert.equal(app.sim.state.scenario,2);assert.equal(app.location.href,priorURL);
-  fs.writeFileSync(__dirname+'/verification.json',JSON.stringify({checks:'Four A-to-B routes and fifth obstacle-free 25 degree grade stop with 20 degree vehicle limit; exact 20 degree boundary; three playback speeds; no slider or shortcut bypass; display filters independent; no future observations; retained sensor settings',outcomes},null,2));
-  console.log('ALL FIVE SCENARIO CHECKS PASSED');
+  fs.writeFileSync(__dirname+'/verification.json',JSON.stringify({checks:'Three A-to-B routes including simultaneous same-frame camera recognition and measured flatter-lane selection, no bumps in scenarios 1-3, obstacle avoidance on level terrain; fourth obstacle-free 25 degree grade stop with 20 degree vehicle limit; exact 20 degree boundary; three playback speeds; no slider or shortcut bypass; display filters independent; no future observations; retained sensor settings',outcomes},null,2));
+  console.log('ALL FOUR SCENARIO CHECKS PASSED');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -19,7 +19,7 @@ function updateOccupancy(force=false){if(!semanticFrames.length)return;const k=M
   let free=0;for(const key of occupancy.free)if(!occupancy.blocked.has(key)&&!occupancy.inflated.has(key))free++;
   $('occupancyStats').textContent='통행 후보 '+free.toLocaleString()+'셀 / 장애물 '+occupancy.blocked.size.toLocaleString()+'셀 / 10cm 격자';
   $('occupancyTime').textContent=(state.mode==='current'?'현재 관측 / ':'출발부터 누적 / ')+routeDistance(state.x).toFixed(1)+'m 이동';
-  const danger=semanticPathBlocked(state.x,Math.min(END,state.x+routeProgressForDistance(1.2)));$('semanticDecision').textContent=danger?'제공된 경로에 예상 밖 장애물: 정지':(state.obstacles==='none'?'장애물 없는 직선 경로 추종 / 미관측은 판단 보류':'안전 여유를 둔 우회 경로 추종 / 미관측은 판단 보류');$('semanticDecision').classList.toggle('warning',danger);drawOccupancy();
+  const danger=semanticPathBlocked(state.x,Math.min(END,state.x+routeProgressForDistance(1.2)));$('semanticDecision').textContent=danger?'제공된 경로에 예상 밖 장애물: 정지':(isSplitTerrain()?(route.laneChoice?.ready?'평지 선택 경로 추종 / 미관측은 판단 보류':'두 노면 관측 부족 / 출발 보류'):state.obstacles==='none'?'장애물 없는 직선 경로 추종 / 미관측은 판단 보류':'안전 여유를 둔 우회 경로 추종 / 미관측은 판단 보류');$('semanticDecision').classList.toggle('warning',danger);drawOccupancy();
 }
 function advanceSemanticMotion(next){if(!advanceGradeMotion(next))return false;if($('semanticStop').checked&&semanticPathBlocked(state.x,next)){state.playing=false;$('play').textContent='■ 장애물 앞 정지';$('semanticDecision').textContent='제공된 경로에서 예상 밖 장애물로 재생 정지';return false;}state.x=next;return true;}
 function semanticPathBlocked(from,to){for(let s=from;s<=to+.001;s+=.015){const p=routeAt(s),c=cellOccupancy(p.x,p.z);if(c==='blocked'||c==='inflated')return true;}return false;}

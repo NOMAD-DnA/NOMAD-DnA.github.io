@@ -38,6 +38,7 @@ function buildGradeFrames(frames=scanFrames){
 }
 function gradeReading(progress=state.x){return gradeFrames[clamp(Math.floor(progress/STEP+1e-8),0,gradeFrames.length-1)]||{angle:null,n:0,blocked:false};}
 function advanceGradeMotion(next){
+  if(isSplitTerrain()&&!route.laneChoice?.ready&&next>0){state.playing=false;$('play').textContent='■ 두 노면 관측 대기';return false;}
   if(next<state.x-1e-8){state.gradeStopped=false;return true;}
   const first=Math.floor(state.x/STEP+1e-8),last=Math.floor(next/STEP+1e-8);
   for(let k=first;k<=last;k++)if(gradeFrames[k]?.blocked){

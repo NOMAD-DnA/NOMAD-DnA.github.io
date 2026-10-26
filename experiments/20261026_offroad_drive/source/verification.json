@@ -1,5 +1,5 @@
 {
-  "checks": "Four A-to-B routes and fifth obstacle-free 25 degree grade stop with 20 degree vehicle limit; exact 20 degree boundary; three playback speeds; no slider or shortcut bypass; display filters independent; no future observations; retained sensor settings",
+  "checks": "Three A-to-B routes including simultaneous same-frame camera recognition and measured flatter-lane selection, no bumps in scenarios 1-3, obstacle avoidance on level terrain; fourth obstacle-free 25 degree grade stop with 20 degree vehicle limit; exact 20 degree boundary; three playback speeds; no slider or shortcut bypass; display filters independent; no future observations; retained sensor settings",
   "outcomes": [
     {
       "scenario": 1,
@@ -20,53 +20,68 @@
     {
       "scenario": 2,
       "slope": 10,
-      "rough": 0.04,
+      "rough": 0,
       "obstacles": "none",
       "heightRange": [
-        -0.03769127279520035,
-        2.8503453731536865
+        0,
+        2.8212316036224365
       ],
-      "routeLength": 14,
-      "maxLateral": 0,
+      "routeLength": 14.395570888502132,
+      "maxLateral": 1.1,
       "minCenterClearance": null,
       "blocked": 0,
-      "validSlopeCells": 36463,
-      "maxCellSlopeDeg": 15.425200352401465
+      "validSlopeCells": 31810,
+      "maxCellSlopeDeg": 81.83264653070839,
+      "laneChoice": {
+        "left": {
+          "key": "left",
+          "z0": -1.8,
+          "z1": -0.5,
+          "x0": 3,
+          "x1": 8,
+          "fit": {
+            "angle": 0,
+            "n": 38,
+            "rms": 0
+          },
+          "count": 38
+        },
+        "right": {
+          "key": "right",
+          "z0": 0.85,
+          "z1": 2.15,
+          "x0": 6.3,
+          "x1": 8,
+          "fit": {
+            "angle": 10.000000085060531,
+            "n": 17,
+            "rms": 0
+          },
+          "count": 17
+        },
+        "ready": true,
+        "chosen": "left",
+        "observationX": 0
+      }
     },
     {
       "scenario": 3,
       "slope": 0,
-      "rough": 0.04,
+      "rough": 0,
       "obstacles": "mixed",
       "heightRange": [
-        -0.04425664618611336,
-        0.20934879779815674
+        0,
+        0
       ],
-      "routeLength": 16.459804504418393,
-      "maxLateral": 2.2842572126684777,
-      "minCenterClearance": 0.6932339189668469,
-      "blocked": 508,
-      "validSlopeCells": 31685,
-      "maxCellSlopeDeg": 25.65117609024036
+      "routeLength": 15.911935409088782,
+      "maxLateral": 2.5,
+      "minCenterClearance": 0.7229556099213286,
+      "blocked": 278,
+      "validSlopeCells": 34423,
+      "maxCellSlopeDeg": 0
     },
     {
       "scenario": 4,
-      "slope": 10,
-      "rough": 0.04,
-      "obstacles": "mixed",
-      "heightRange": [
-        -0.03769127279520035,
-        2.8503453731536865
-      ],
-      "routeLength": 16.459804504418393,
-      "maxLateral": 2.2842572126684777,
-      "minCenterClearance": 0.6932339189668469,
-      "blocked": 503,
-      "validSlopeCells": 33254,
-      "maxCellSlopeDeg": 27.21925404040388
-    },
-    {
-      "scenario": 5,
       "slope": 25,
       "rough": 0.04,
       "obstacles": "none",

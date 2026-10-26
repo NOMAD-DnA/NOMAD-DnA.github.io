@@ -48,7 +48,7 @@ $('slopeDetail').addEventListener('click',e=>{const b=slopeView.detailBox;if(!b)
 for(const id of ['slopeOverview','slopeDetail'])$(id).addEventListener('keydown',e=>{const dirs={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,1],ArrowDown:[0,-1]};if(!dirs[e.key])return;e.preventDefault();const d=dirs[e.key];selectSlopePoint(slopeView.selectedX+d[0]*slopeView.res,slopeView.selectedZ+d[1]*slopeView.res);});
 for(const [id,key] of [['slopeSource','source'],['slopeGrid','res'],['slopeRadius','radius']])$(id).onchange=e=>{slopeView[key]=key==='source'?e.target.value:Number(e.target.value);requestSlope(true);};
 $('slopeComplete').onclick=()=>{seekProgress(END);requestSlope(true);};
-for(const b of document.querySelectorAll('[data-slope-focus]'))b.onclick=()=>{const kind=b.dataset.slopeFocus;selectSlopePoint(state.start+(kind==='flat'?-1:kind==='edge'?-.025:.5),.025);};
+for(const b of document.querySelectorAll('[data-slope-focus]'))b.onclick=()=>{const kind=b.dataset.slopeFocus;if(isSplitTerrain()){selectSlopePoint(7,kind==='flat'?-1.1:kind==='edge'?.6:1.25);return;}selectSlopePoint(state.start+(kind==='flat'?-1:kind==='edge'?-.025:.5),.025);};
 const slopeRO=new ResizeObserver(drawSlopeMaps);slopeRO.observe($('slopeOverview'));slopeRO.observe($('slopeDetail'));
 window.slopeMap={view:slopeView,request:requestSlope,select:selectSlopePoint,worker:slopeWorker};
 
