@@ -47,7 +47,7 @@ $('slopeOverview').addEventListener('click',e=>{const b=slopeView.overviewBox;if
 $('slopeDetail').addEventListener('click',e=>{const b=slopeView.detailBox;if(!b)return;const rect=e.target.getBoundingClientRect(),i=Math.floor((e.clientX-rect.left-b.left)/b.sz),j=Math.floor((b.bottom-(e.clientY-rect.top))/b.sz);if(i<0||i>=9||j<0||j>=9)return;selectSlopePoint((b.firstX+i+.5)*slopeView.res,(b.firstZ+j+.5)*slopeView.res,false);});
 for(const id of ['slopeOverview','slopeDetail'])$(id).addEventListener('keydown',e=>{const dirs={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,1],ArrowDown:[0,-1]};if(!dirs[e.key])return;e.preventDefault();const d=dirs[e.key];selectSlopePoint(slopeView.selectedX+d[0]*slopeView.res,slopeView.selectedZ+d[1]*slopeView.res);});
 for(const [id,key] of [['slopeSource','source'],['slopeGrid','res'],['slopeRadius','radius']])$(id).onchange=e=>{slopeView[key]=key==='source'?e.target.value:Number(e.target.value);requestSlope(true);};
-$('slopeComplete').onclick=()=>{state.x=END;state.playing=false;$('play').textContent='▶ 다시 주행';update();requestSlope(true);};
+$('slopeComplete').onclick=()=>{seekProgress(END);requestSlope(true);};
 for(const b of document.querySelectorAll('[data-slope-focus]'))b.onclick=()=>{const kind=b.dataset.slopeFocus;selectSlopePoint(state.start+(kind==='flat'?-1:kind==='edge'?-.025:.5),.025);};
 const slopeRO=new ResizeObserver(drawSlopeMaps);slopeRO.observe($('slopeOverview'));slopeRO.observe($('slopeDetail'));
 window.slopeMap={view:slopeView,request:requestSlope,select:selectSlopePoint,worker:slopeWorker};

@@ -1,5 +1,5 @@
 {
-  "checks": "Four full A-to-B routes; 1401 clearance samples each; flat height/pitch/roll and fitted slopes; no-obstacle semantic maps; preset switch resets; retained sensor settings; latest switch wins",
+  "checks": "Four A-to-B routes and fifth obstacle-free 25 degree grade stop with 20 degree vehicle limit; exact 20 degree boundary; three playback speeds; no slider or shortcut bypass; display filters independent; no future observations; retained sensor settings",
   "outcomes": [
     {
       "scenario": 1,
@@ -64,6 +64,41 @@
       "blocked": 503,
       "validSlopeCells": 33254,
       "maxCellSlopeDeg": 27.21925404040388
+    },
+    {
+      "scenario": 5,
+      "slope": 25,
+      "rough": 0.04,
+      "obstacles": "none",
+      "limit": 20,
+      "firstMeasuredHazard": {
+        "angle": 21.339559882553147,
+        "n": 177,
+        "rms": 0.008004560126639613,
+        "x": 6.1000000000000005,
+        "z": 0,
+        "ahead": 1.2,
+        "blocked": true,
+        "progress": 4.9
+      },
+      "stopOutcomes": [
+        {
+          "speed": 0.3,
+          "stoppedAt": 4.9,
+          "measuredGrade": 21.339559882553147
+        },
+        {
+          "speed": 0.6,
+          "stoppedAt": 4.9,
+          "measuredGrade": 21.339559882553147
+        },
+        {
+          "speed": 1.2,
+          "stoppedAt": 4.9,
+          "measuredGrade": 21.339559882553147
+        }
+      ],
+      "shortcutsRespectStop": true
     }
   ]
 }

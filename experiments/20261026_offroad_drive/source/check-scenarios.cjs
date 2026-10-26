@@ -50,11 +50,40 @@ async function verifyScenario(id){
 (async()=>{
   await verifyScenario(1);
   for(const id of [2,3,4]){buttons.find(b=>Number(b.dataset.scenario)===id).onclick();assert.equal(app.sim.state.ready,false);await verifyScenario(id);}
+  // The fifth environment is obstacle-free, but measured grade must stop it.
+  buttons.find(b=>Number(b.dataset.scenario)===5).onclick();await ready();
+  const {sim,semanticDemo:sem,gradeDemo:grade}=app;assert.equal(sim.state.slope,25);assert.equal(grade.limit,20);assert.equal(sim.state.obstacles,'none');assert.equal(sem.obstacleMeshes.length,0);
+  const firstBlocked=grade.frames().find(r=>r.blocked);assert(firstBlocked,'No measured steep patch found');assert(firstBlocked.angle>20);assert(firstBlocked.n>=12);
+  const plane=angle=>{const p=[];for(let x=.35;x<=1.5;x+=.04)for(let z=-.3;z<=.3;z+=.04)p.push({x,y:x*Math.tan(angle*Math.PI/180),z,semantic:0});return p;};
+  for(const degrees of [0,10,20,25]){const fit=grade.fit(plane(degrees));assert(fit);assert(Math.abs(fit.angle-degrees)<1e-6);assert.equal(grade.exceeds(fit.angle),degrees>20);}
+  const stopOutcomes=[];
+  for(const speed of [.3,.6,1.2]){
+    elements.get('reset').onclick();elements.get('semanticStop').checked=false;sim.state.playing=true;
+    for(let t=0;t<1000;t++){const next=Math.min(14,sim.state.x+sim.route.length/14*speed*.1);if(!sem.advanceSemanticMotion(next)){sim.update(true);break;}sim.update();}
+    assert(sim.state.gradeStopped);assert(!sim.state.playing);assert(sim.state.x>3&&sim.state.x+.24<6,'Must stop before front wheel reaches ramp');assert.equal(sem.occupancy.blocked.size,0);assert(elements.get('gradeVerdict').textContent.includes('정지'));assert(elements.get('phase').textContent.includes('20°'));
+    const stoppedAt=sim.state.x;assert(!sem.advanceSemanticMotion(stoppedAt+.1));assert.equal(sim.state.x,stoppedAt);
+    stopOutcomes.push({speed,stoppedAt,measuredGrade:grade.reading().angle});
+  }
+  for(const method of ['button','slider','slope-map']){
+    elements.get('reset').onclick();
+    if(method==='button')buttons.find(b=>b.dataset.at==='14').onclick();
+    if(method==='slider')elements.get('travel').listeners.input({target:{value:'14'}});
+    if(method==='slope-map')elements.get('slopeComplete').onclick();
+    assert(sim.state.gradeStopped);assert(sim.state.x+.24<6,'Position controls bypassed grade limit');
+  }
+  // View-only filters cannot bypass the independent ground-based guard.
+  elements.get('reset').onclick();sim.state.cut=true;sim.state.mode='current';app.slopeMap.view.source='lidar';buttons.find(b=>b.dataset.at==='14').onclick();assert(sim.state.gradeStopped);assert.equal(sem.occupancy.blocked.size,0);sim.state.cut=false;sim.state.mode='accum';app.slopeMap.view.source='fused';
+  // Changing the displayed grade value without rebuilding cannot change the measured decision.
+  elements.get('reset').onclick();sim.state.slope=0;buttons.find(b=>b.dataset.at==='14').onclick();assert(sim.state.gradeStopped);sim.state.slope=25;
+  // Future frame points cannot alter the first frame's estimate.
+  const originals=sim.scan();grade.build([[plane(0),[]]]);const baseline=JSON.stringify(grade.frames()[0]);grade.build([[plane(0),[]],[plane(25),[]]]);assert.equal(JSON.stringify(grade.frames()[0]),baseline);grade.build(originals);
+  const fifth={scenario:5,slope:25,rough:sim.state.rough,obstacles:'none',limit:grade.limit,firstMeasuredHazard:firstBlocked,stopOutcomes,shortcutsRespectStop:true};outcomes.push(fifth);console.log('STEEP STOP',JSON.stringify(fifth));
   // Sensor installation remains shared while every environment preset stays exact.
+  app.sim.selectScenario(1);await ready();elements.get('semanticStop').checked=true;
   elements.get('cameraHeight').value='33';elements.get('cameraHeight').listeners.change();await ready();assert.equal(app.sim.state.ch,.33);
   app.sim.selectScenario(1);await ready();assert.equal(app.sim.state.ch,.33);assert.equal(app.sim.state.slope,0);assert.equal(app.sim.state.rough,0);assert.equal(app.semanticDemo.obstacleMeshes.length,0);assert.equal(app.semanticDemo.occupancy.blocked.size,0);assert.equal(app.sim.state.x,0);
   app.sim.selectScenario(4);app.sim.selectScenario(1);await ready();assert.equal(app.sim.state.scenario,1);assert.equal(app.semanticDemo.obstacleMeshes.length,0);assert.equal(app.semanticDemo.occupancy.blocked.size,0);assert(app.location.search.includes('scenario=1'));
   const priorURL=app.location.href;app.location.protocol='file:';app.sim.selectScenario(2);await ready();assert.equal(app.sim.state.scenario,2);assert.equal(app.location.href,priorURL);
-  fs.writeFileSync(__dirname+'/verification.json',JSON.stringify({checks:'Four full A-to-B routes; 1401 clearance samples each; flat height/pitch/roll and fitted slopes; no-obstacle semantic maps; preset switch resets; retained sensor settings; latest switch wins',outcomes},null,2));
-  console.log('ALL FOUR SCENARIO CHECKS PASSED');
+  fs.writeFileSync(__dirname+'/verification.json',JSON.stringify({checks:'Four A-to-B routes and fifth obstacle-free 25 degree grade stop with 20 degree vehicle limit; exact 20 degree boundary; three playback speeds; no slider or shortcut bypass; display filters independent; no future observations; retained sensor settings',outcomes},null,2));
+  console.log('ALL FIVE SCENARIO CHECKS PASSED');
 })().catch(e=>{console.error(e);process.exitCode=1;});
