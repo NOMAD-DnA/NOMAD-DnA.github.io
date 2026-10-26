@@ -1,0 +1,69 @@
+{
+  "checks": "Four full A-to-B routes; 1401 clearance samples each; flat height/pitch/roll and fitted slopes; no-obstacle semantic maps; preset switch resets; retained sensor settings; latest switch wins",
+  "outcomes": [
+    {
+      "scenario": 1,
+      "slope": 0,
+      "rough": 0,
+      "obstacles": "none",
+      "heightRange": [
+        0,
+        0
+      ],
+      "routeLength": 14,
+      "maxLateral": 0,
+      "minCenterClearance": null,
+      "blocked": 0,
+      "validSlopeCells": 36778,
+      "maxCellSlopeDeg": 0
+    },
+    {
+      "scenario": 2,
+      "slope": 10,
+      "rough": 0.04,
+      "obstacles": "none",
+      "heightRange": [
+        -0.03769127279520035,
+        2.8503453731536865
+      ],
+      "routeLength": 14,
+      "maxLateral": 0,
+      "minCenterClearance": null,
+      "blocked": 0,
+      "validSlopeCells": 36463,
+      "maxCellSlopeDeg": 15.425200352401465
+    },
+    {
+      "scenario": 3,
+      "slope": 0,
+      "rough": 0.04,
+      "obstacles": "mixed",
+      "heightRange": [
+        -0.04425664618611336,
+        0.20934879779815674
+      ],
+      "routeLength": 16.459804504418393,
+      "maxLateral": 2.2842572126684777,
+      "minCenterClearance": 0.6932339189668469,
+      "blocked": 508,
+      "validSlopeCells": 31685,
+      "maxCellSlopeDeg": 25.65117609024036
+    },
+    {
+      "scenario": 4,
+      "slope": 10,
+      "rough": 0.04,
+      "obstacles": "mixed",
+      "heightRange": [
+        -0.03769127279520035,
+        2.8503453731536865
+      ],
+      "routeLength": 16.459804504418393,
+      "maxLateral": 2.2842572126684777,
+      "minCenterClearance": 0.6932339189668469,
+      "blocked": 503,
+      "validSlopeCells": 33254,
+      "maxCellSlopeDeg": 27.21925404040388
+    }
+  ]
+}
