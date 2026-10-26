@@ -56,4 +56,12 @@ $('fit').onclick=fit;$('auto').onchange=()=>{if($('auto').checked)fit();};$('lab
 function accept(value){data=value;lookup={};$('synthetic').hidden=!data.synthetic;let cf=data.camera_filter;$('camera-filter').textContent=cf?.enabled?`경사 입력: 카메라 실시간 ${Math.round(cf.settings.voxel_m*100)}cm 복셀 필터 / 촬영 ${cf.frames}프레임 / 최근 프레임 통과 ${cf.latest_output_points}점 / 서로 다른 ${cf.settings.min_frames}프레임 이상 확인`:'경사 입력: 필터 전 점군으로 생성된 기록';for(let e of document.querySelectorAll('[data-downloads]'))e.hidden=!data.saved;for(let mode of modes){let m=data.modes?.[mode]||{};lookup[mode]=new Map((m.cells||[]).map(c=>[c.slice(0,2).join(','),c]));$('count-'+mode).textContent=`유효 ${m.valid_cells||0}셀 / 관측 ${m.observed_cells||0}셀`;}$('state').textContent=(data.saved?'저장된 경사 지도':'실시간 경사 지도')+' / 세 방식의 경사각과 비용을 독립 계산';$('saved-link').hidden=!data.saved||!!savedData;$('fault').textContent=data.error||'';if(!initialized||$('auto').checked)fit();else draw();initialized=true;if(selected)select(selected);}
 async function refresh(){try{let response=await fetch('/terrain.json');if(response.status===404){$('state').textContent='경사 지도 모드가 아닙니다. new_ground_map.sh로 새 수집을 시작하세요.';return;}if(!response.ok)throw Error('HTTP '+response.status);accept(await response.json());let s=await fetch('/status');if(s.ok){let status=await s.json();$('fault').textContent=status.terrain?.error||status.error||'';$('state').textContent+=' / '+(status.message||status.phase);}}catch(e){$('state').textContent='서버 연결 대기: '+e.message;}setTimeout(refresh,1500);}
 if(savedData){$('cloud-link').href='map_viewer.html';accept(savedData);}else refresh();
-</script></html>
+
+// Preserve a meeting pointer's grid coordinate across local pan, zoom, and rotation.
+window.NomadPingAdapters=()=>canvases.map(({canvas,mode,kind})=>({id:mode+'-'+kind,canvas,
+ pick:(x,y)=>{const r=canvas.getBoundingClientRect();return world(canvas,[x-r.left,y-r.top]);},
+ project:point=>{const r=canvas.getBoundingClientRect(),v=viewVector([point[0]-center[0],point[1]-center[1]]);return {x:r.left+canvas.clientWidth/2+v[0]*scale,y:r.top+canvas.clientHeight/2+v[1]*scale};}
+}));
+</script>
+<script type="module" src="../../../../assets/meeting-ping.js"></script>
+</html>

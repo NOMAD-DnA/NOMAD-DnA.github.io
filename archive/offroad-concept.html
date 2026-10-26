@@ -70,4 +70,6 @@ const cases={baseline:['전체 연결','지정 목적지 도착 / 막힌 코스 
 function showCase(){let c=cases[$('#oc-case').value],labels=['문제','재현','영향 모듈','학습','검증'];$('#oc-case-detail').replaceChildren(...c.map((v,i)=>{let d=document.createElement('div');d.className='oc-case-line';d.textContent=labels[i]+' — '+v;return d;}));}$('#oc-case').onchange=showCase;walls=scene(0);draw();showCase();
 })();
 </script>
+
+<script type="module" src="../assets/meeting-ping.js"></script>
 </body></html>

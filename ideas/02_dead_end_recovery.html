@@ -256,4 +256,6 @@ function reset(){running=false;acc=0;last=performance.now();sim=new Simulation({
 $('start').onclick=()=>{if(sim.state!=='READY')reset();sim.startRun();running=true;last=performance.now();ui();};$('pause').onclick=()=>{if(['READY','ARRIVED','HOLD'].includes(sim.state))return;running=!running;last=performance.now();ui();};$('reset').onclick=reset;for(let id of ['scenario','range','unknown'])$(id).onchange=reset;for(let id of ['truth','frontier','showPath'])$(id).onchange=render;$('view').onclick=()=>{flat=!flat;$('view').textContent=flat?'입체 시점':'평면 시점';render();};window.addEventListener('resize',render);
 function frame(now){let dt=Math.max(0,Math.min(.08,(now-last)/1000)),wasRunning=running;last=now;if(running){acc+=dt*Number($('rate').value);while(acc>=.05){sim.step(.05);acc-=.05;if(['HOLD','ARRIVED'].includes(sim.state)){running=false;acc=0;break;}}}if(wasRunning&&(now-lastUI>50||!running)){render();lastUI=now;}requestAnimationFrame(frame);}reset();window.UGVStandalone.ready();requestAnimationFrame(frame);
 
-</script></body></html>
+</script>
+<script type="module" src="../assets/meeting-ping.js"></script>
+</body></html>

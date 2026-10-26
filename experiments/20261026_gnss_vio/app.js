@@ -97,4 +97,10 @@ try{if(!window.THREE||!window.createNomadScene)throw new Error('3D 모듈을 찾
 new ResizeObserver(()=>{renderRequired=true;scene?.resize();}).observe(document.querySelector('main'));
 function animate(now){const dt=lastTime?Math.min((now-lastTime)/1000,.1):0;lastTime=now;if(scene?.getMode&&scene.getMode()!==state.mode){state.mode=scene.getMode();document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===state.mode));}if(state.playing){state.t=Math.min(duration,state.t+dt*state.speed);renderRequired=true;if(state.t>=duration)setPlaying(false);}if(renderRequired){updateUI();renderRequired=false;}if(now-lastVideoSync>250){syncVideos();lastVideoSync=now;}requestAnimationFrame(animate);}requestAnimationFrame(animate);
 window.NOMAD_DEMO={setTime,play:()=>setPlaying(true),pause:()=>setPlaying(false),getState:()=>({...state}),data:D,render:()=>{updateUI();}};
+// Meeting pointers use map coordinates, independently of the receiver's viewport size.
+window.NomadPingAdapters=()=>[{id:'trajectory-map',canvas:$('map'),
+  pick:(x,y)=>{if(state.mapView==='xyz')return null;const r=$('map').getBoundingClientRect();return fitBounds(r.width,r.height,mapBounds,30).inv(x-r.left,y-r.top);},
+  project:point=>{const r=$('map').getBoundingClientRect(),p=fitBounds(r.width,r.height,mapBounds,30).xy(...point);return {x:r.left+p[0],y:r.top+p[1]};}
+}];
+
 })();

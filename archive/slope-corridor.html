@@ -175,4 +175,6 @@ $('modelrows').innerHTML=[-20,-10,0,5,10,15,20].map(a=>'<tr><td>'+a+'°</td>'+[0
 new ResizeObserver(draw).observe(cvs);
 window.simTest={plan:gridPlan,rasterPlan,corridorPlan,cells,neighbors,predicted,snapshot:()=>({load,mode,reverse,planSpace,turnDelay,running,paused,auto,stage,process:!!process,position:[...position],history:history.map(r=>({...r})),currentTime:run?.t??0,selected:selectedPlan(),fast:gridPlan(),short:gridPlan('distance')}),advance:n=>{if(process)processTick(10);update(n);renderUI();draw()}};
 renderRecords();renderUI();status(summary());draw();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script type="module" src="../assets/meeting-ping.js"></script>
+</body></html>

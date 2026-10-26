@@ -432,4 +432,6 @@ historyUI();planNow(!history.some(r=>r.model===MODEL_ID));savedKey=[MODEL_ID,sta
 if(!$('error').textContent)$('bootNote').hidden=true;
 window.simTest={snapshot:()=>({start,goal,load,elapsed,running,plans:plans.map(p=>({reachable:p.reachable,time:p.time,distance:p.distance,maxGrade:p.maxGrade,nodes:p.nodes.length})),history:history.length,webgl:!!view.gl,renderer:view.mode,canvas:{width:view.canvas.width,height:view.canvas.height},cars:view.cars.map(c=>c?c.point:null)}),advance:t=>{elapsed=t;updateFrame();},project:index=>view.project(view.world(planner.point(index))),planner,dem:DEM};
 </script>
+
+<script type="module" src="../assets/meeting-ping.js"></script>
 </body></html>

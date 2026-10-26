@@ -360,4 +360,6 @@ function loop(now){if(running){const dt=Math.min(.10,(now-lastFrame)/1000),max=M
 historyUI();planNow(history.length===0);savedKey=[start,goal,load].join(':');view.reset();requestAnimationFrame(loop);
 window.simTest={snapshot:()=>({start,goal,load,elapsed,running,plans:plans.map(p=>({reachable:p.reachable,time:p.time,distance:p.distance,maxGrade:p.maxGrade,nodes:p.nodes.length})),history:history.length,webgl:!!view.gl}),advance:t=>{elapsed=t;updateFrame();},planner,dem:DEM};
 </script>
+
+<script type="module" src="../assets/meeting-ping.js"></script>
 </body></html>

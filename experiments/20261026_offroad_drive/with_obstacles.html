@@ -399,7 +399,9 @@ window.slopeMap={view:slopeView,request:requestSlope,select:selectSlopePoint,wor
 
 $('slopeGroundOnly').onchange=()=>requestSlope(true);
 
-window.sim={route,routeAt,routeDistance,routeClearance,progressForWorldX,state,pose,sensor,sensorDir,ray,height,terrain,terrainRaw,baseHeight,buildTerrain,update,rebuild,sample,sensorCam,worldCam,mapCams,scan:()=>scanFrames,renderers:[world.r,view.r,lm.r,cm.r],getStats:()=>({x:state.x,pitch:pose(state.x).pitch/D,lidar:$('lidarCount').textContent,camera:$('cameraCount').textContent})};
+window.sim={pingViews:[{id:'world',canvas:world.r.domElement,scene,camera:worldCam},{id:'camera',canvas:view.r.domElement,scene,camera:sensorCam},...mapScenes.map((scene,i)=>({id:i?'cameraMap':'lidarMap',canvas:[lm.r,cm.r][i].domElement,scene,camera:mapCams[i]}))],route,routeAt,routeDistance,routeClearance,progressForWorldX,state,pose,sensor,sensorDir,ray,height,terrain,terrainRaw,baseHeight,buildTerrain,update,rebuild,sample,sensorCam,worldCam,mapCams,scan:()=>scanFrames,renderers:[world.r,view.r,lm.r,cm.r],getStats:()=>({x:state.x,pitch:pose(state.x).pitch/D,lidar:$('lidarCount').textContent,camera:$('cameraCount').textContent})};
 setTimeout(()=>{try{rebuild();resize();requestAnimationFrame(animate);}catch(e){$('loading').style.display='none';$('error').style.display='block';$('error').textContent='3D 초기화 오류: '+e.message;console.error(e);}},50);
 })();
-</script></body></html>
+</script>
+<script type="module" src="../../assets/meeting-ping.js"></script>
+</body></html>

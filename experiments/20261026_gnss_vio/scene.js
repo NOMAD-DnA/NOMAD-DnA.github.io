@@ -182,6 +182,7 @@
       renderer.domElement.removeEventListener('pointerdown',onDown);renderer.domElement.removeEventListener('pointermove',onMove);renderer.domElement.removeEventListener('pointerup',onUp);renderer.domElement.removeEventListener('pointercancel',onUp);renderer.domElement.removeEventListener('wheel',onWheel);
       resources.forEach(r=>r.dispose());looseTextures.forEach(r=>r.dispose());renderer.dispose();renderer.domElement.remove();
     }
-    return {update,setMode,setRoof,resize,dispose,getMode:()=>mode};
+    return {update,setMode,setRoof,resize,dispose,getMode:()=>mode,
+      getPingView:()=>({id:"factory-scene",canvas:renderer.domElement,scene,camera})};
   };
 })();

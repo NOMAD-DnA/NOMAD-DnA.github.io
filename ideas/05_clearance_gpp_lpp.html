@@ -619,6 +619,8 @@ function changeConditions(){playing=false;E.C.maxSteer=Number($('steeringLimit')
 $('steeringLimit').addEventListener('change',changeConditions);$('clearanceWeight').addEventListener('change',changeConditions);new ResizeObserver(()=>update()).observe(document.querySelector('.comparison'));reset();requestAnimationFrame(tick);
 })();
 </script>
+
+<script type="module" src="../assets/meeting-ping.js"></script>
 </body>
 </html>
 

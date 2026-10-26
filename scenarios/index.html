@@ -3,21 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AI 환경 인식·위치추정·주행가능성·경로계획과 추종 시나리오를 엽니다.">
+  <meta name="description" content="위치추정·AI 인식·주행가능성·플래닝 시나리오를 엽니다.">
   <title>NOMAD · 시나리오 HTML 시뮬레이션</title>
   <link rel="stylesheet" href="../assets/library.css">
 </head>
 <body><main>
   <header><a class="back" href="../">← NOMAD 자료함</a>
-    <div class="label">NOMAD / LIBRARY</div><h1>시나리오 HTML 시뮬레이션</h1><p>AI 환경 인식·위치추정·주행가능성·경로계획과 추종 시나리오를 엽니다.</p>
+    <div class="label">NOMAD / LIBRARY</div><h1>시나리오 HTML 시뮬레이션</h1><p>위치추정·AI 인식·주행가능성·플래닝 시나리오를 엽니다.</p>
   </header>
-  <section><h2>AI 환경 인식</h2><div class="files">
+  <section><h2>위치추정</h2><div class="files"><a class="file" href="../experiments/20261026_gnss_vio/"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">GNSS 소실과 위치 복구 · 야지–공장 주행</span><span class="desc">GT·VIO/GNSS 융합·IMU 궤적, 3D 환경과 실제 특징점 영상 · IMU 오차 모델·개념 분포 포함</span></span><span class="open">열기 ↗</span></a></div><p class="note">기존 시뮬레이션 기록을 재생합니다. IMU 오차 모델과 개념 분포가 포함되어 있습니다.</p></section>
+  <section><h2>AI 인식</h2><div class="files">
     <a class="file" href="ai-perception/static.html"><span class="icon" aria-hidden="true">AI 01</span><span><span class="name">정적 장애물 · 바위와 분할 오류</span><span class="desc">정상 인식·노면 오분류·점유 영역 축소에 따른 주행 비교</span></span><span class="open">열기 ↗</span></a>
     <a class="file" href="ai-perception/dynamic.html"><span class="icon" aria-hidden="true">AI 02</span><span><span class="name">동적 장애물 · 사람 추적과 인식 이력</span><span class="desc">걷는 사람의 부분 분할, 특징점·ID 연결, 최근 관측 큐와 불확실성 비용</span></span><span class="open">열기 ↗</span></a>
     <a class="file" href="ai-perception/rough.html"><span class="icon" aria-hidden="true">AI 03</span><span><span class="name">거친 노면 · 입력 흔들림과 인식 안정화</span><span class="desc">흙길 진동·분류 경계 붕괴, 시간적 보정 목표와 정지·재인식·저속 재출발</span></span><span class="open">열기 ↗</span></a>
   </div><p class="note">카메라·분할·3인칭이 연결된 설명용 가상 장면입니다. 실제 모델 추론·추적·물리 시뮬레이션 결과가 아닙니다. 실제 촬영 블러 사진은 별도로 표시합니다. <a href="ai-perception/">전체 보기 ↗</a></p></section>
-  <section><h2>위치추정</h2><div class="files"><a class="file" href="../experiments/20261026_gnss_vio/"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">GNSS 소실과 위치 복구 · 야지–공장 주행</span><span class="desc">GT·VIO/GNSS 융합·IMU 궤적, 3D 환경과 실제 특징점 영상 · IMU 오차 모델·개념 분포 포함</span></span><span class="open">열기 ↗</span></a></div><p class="note">기존 시뮬레이션 기록을 재생합니다. IMU 오차 모델과 개념 분포가 포함되어 있습니다.</p></section><section><h2>주행가능성</h2><div class="files"><a class="file" href="../experiments/20261026_offroad_drive/before_obstacles.html"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">야지 주행과 점군 경사 지도 / 장애물 추가 전</span><span class="desc">울퉁불퉁한 평지와 10도 경사로의 직선 주행, 카메라 시점과 라이다 및 카메라 점군, 셀별 경사각</span></span><span class="open">열기 ↗</span></a>
+  <section><h2>주행가능성</h2><div class="files"><a class="file" href="../experiments/20261026_offroad_drive/before_obstacles.html"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">야지 주행과 점군 경사 지도 / 장애물 추가 전</span><span class="desc">울퉁불퉁한 평지와 10도 경사로의 직선 주행, 카메라 시점과 라이다 및 카메라 점군, 셀별 경사각</span></span><span class="open">열기 ↗</span></a>
 <a class="file" href="../experiments/20261026_offroad_drive/with_obstacles.html"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">야지 장애물 우회와 의미분할 지도 / 장애물 추가 후</span><span class="desc">나무와 돌을 우회하는 주행, 가상 의미분할과 주행 가능 지도, 점군 및 셀별 경사각</span></span><span class="open">열기 ↗</span></a></div><p class="note">합성 환경 예시입니다. 의미분할은 가상 정답 라벨이며, 외부 경로계획기가 장애물을 회피한다고 가정합니다.</p></section>
-  <section><h2>경로계획·추종</h2><div class="files"><a class="file" href="20261026_gpp_lpp/"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">Hybrid A* · RPP 경로 생성과 추종 / 6개 시나리오</span><span class="desc">기본 추종·단일 장애물·경사 갈림길·S자 통로·막다른길·후진 한계 · 관측 지도와 중간 목표, 전역 경로 재발행, RPP 추종점, 1인칭 HUD와 발행 로그</span></span><span class="open">열기 ↗</span></a></div><p class="note">실제 프로젝트의 계산 코드를 참고한 브라우저 시뮬레이션입니다. 경로를 실시간 계산하며 지도·관측·차량 운동은 모사합니다. 화면 로그는 실제 ROS 통신 기록이 아닙니다.</p></section>
+  <section><h2>플래닝</h2><div class="files"><a class="file" href="20261026_gpp_lpp/"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">Hybrid A* · RPP 경로 생성과 추종 / 6개 시나리오</span><span class="desc">기본 추종·단일 장애물·경사 갈림길·S자 통로·막다른길·후진 한계 · 관측 지도와 중간 목표, 전역 경로 재발행, RPP 추종점, 1인칭 HUD와 발행 로그</span></span><span class="open">열기 ↗</span></a></div><p class="note">실제 프로젝트의 계산 코드를 참고한 브라우저 시뮬레이션입니다. 경로를 실시간 계산하며 지도·관측·차량 운동은 모사합니다. 화면 로그는 실제 ROS 통신 기록이 아닙니다.</p></section>
   <footer>NOMAD</footer>
-</main></body></html>
+</main>
+<script type="module" src="../assets/meeting-ping.js"></script>
+</body></html>
