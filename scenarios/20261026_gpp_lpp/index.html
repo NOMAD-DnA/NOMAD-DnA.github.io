@@ -10,13 +10,13 @@
 <div class="stagebar" aria-label="현재 계산 단계"><div class="stage" id="stage0"><span>GPP</span>① 탐색</div><div class="stage" id="stage1"><span>GLOBAL PATH</span>② 발행 / 재발행</div><div class="stage local" id="stage2"><span>RPP</span>③ 추종 계산</div><div class="stage control" id="stage3"><span>PLANNING → CONTROL</span>④ 명령 전달</div></div>
 <div class="canvas-wrap"><canvas id="map" role="img" aria-label="그리드맵의 실시간 탐색 후보, GPP 전역 경로, RPP 추종점과 예측 궤적"></canvas><div class="map-tip" id="mapTip">0.3 m / cell · +X 동쪽 · +Y 북쪽</div></div>
 <div class="legend"><label class="b"><input id="showPath" type="checkbox" checked> ● GPP 경로·점</label><label class="o"><input id="showTarget" type="checkbox" checked> ◇ RPP 추종점·곡선</label><span style="color:#8a61c9">◎ GPP 진행 목표</span><label class="g"><input id="showTrail" type="checkbox" checked> ━ 차량 궤적</label><label><input id="showSearch" type="checkbox" checked> 탐색 후보</label><span>회색 사선: 미관측</span></div></section>
-<section class="panel"><div class="panel-title"><h3>02 &nbsp; 운전자 시점</h3><small>합성 전방 화면 · 실제 센서 영상 아님</small></div><div class="driver-banner"><b id="driveLabel">명령 대기</b><span>WINDSHIELD HUD</span></div><canvas id="driver" role="img" aria-label="같은 차량 자세의 전방 풍경과 반투명 속도, 방향, 조향 HUD"></canvas><div class="telemetry"><span>차량 방향<b id="yaw">0.0°</b></span><span>추종 오차<b id="error">—</b></span><span>목표 거리<b id="distance">—</b></span></div></section>
+<section class="panel"><div class="panel-title"><h3>02 &nbsp; 운전자 시점</h3><small>합성 전방 화면 · 실제 센서 영상 아님</small></div><div class="driver-banner"><b id="driveLabel">명령 대기</b><span>GPP 경로 투영 · WINDSHIELD HUD</span></div><canvas id="driver" role="img" aria-label="같은 차량 자세에서 투영한 파란 GPP 경로와 경로점, 주황 RPP 추종점, 보라 진행 목표 및 속도·방향 HUD"></canvas><div class="telemetry"><span>차량 방향<b id="yaw">0.0°</b></span><span>추종 오차<b id="error">—</b></span><span>목표 거리<b id="distance">—</b></span></div></section>
 </div>
 <div class="explain"><div><b id="stageTitle">준비 완료</b><p id="stageDescription">시작을 누르면 경로를 계산합니다.</p></div><div><b>이 시나리오에서 볼 것</b><p id="explanation"></p></div></div>
 <div class="transport"><button id="play" class="btn primary">▶ 시작</button><button id="step" class="btn">계산 한 단계</button><button id="reset" class="btn">처음부터</button><span class="separator"></span><label>진행 속도 <select id="rate"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option><option value="8">8×</option></select></label><button id="replan" class="btn">현재 위치에서 재계획</button><label><input type="checkbox" id="edit"> 차단물 추가</label><button id="undo" class="btn" disabled>추가 취소</button><div class="status"><span class="status-dot"></span><span id="status" aria-live="polite">대기</span><span id="time">주행 0.0 s</span></div></div>
 <section class="panel logs"><div class="log-title"><div><h3>계산 · 발행 로그 <small>코드의 토픽 구조를 따른 데모 이벤트 · 실제 ROS 로그 아님</small></h3></div><div class="filters"><select id="filter" aria-label="로그 주체 선택"><option value="all">모든 주체</option><option value="GPP">GPP</option><option value="RPP">RPP</option><option value="명령 선택">명령 선택</option><option value="인지 모사">인지 모사</option></select><label><input type="checkbox" id="allLogs"> 모든 제어 주기</label><button class="btn" id="logFreeze">로그 고정</button><button class="btn" id="export">JSON 저장</button></div></div>
 <div class="log-body"><div class="log-list" id="logList" aria-label="이벤트 목록"></div><div class="payload"><div><b id="payloadTitle">이벤트 데이터</b><span id="payloadVersion"></span></div><pre id="payload">로그를 선택하면 메시지의 핵심 값을 볼 수 있습니다.</pre></div></div><div class="log-footer">RPP 추종점은 내부 계산값입니다. 발행 대상은 /nomad/local_path · /nomad/planning/local_motion이며, 명령 선택기가 /nomad/planning/drive_command를 전달합니다. 주행 시 기본 표시는 1초마다 요약합니다.</div></section>
-<details><summary>계산 출처 · 시각화 범위</summary><p>관측 중간 목표 선정 → 경로 생성 → 주행 중 남은 경로 재검증·재발행 → 다음 목표 전환을 수행합니다. 최종 목적지까지 관측된 통행 영역이 연결되면 최종 목표로 전환합니다. 경로 버전은 새 경로 생성 시, 발행 번호는 재발행 때도 증가합니다.</p><p>실제 프로젝트 <code id="commit"></code>의 <code>hybrid_astar.py</code>, <code>base.py</code>, <code>rpp.py</code>, <code>rollout.py</code>, <code>route_guard.py</code>를 참고한 JavaScript 구현입니다. 경로를 미리 저장해서 재생하지 않습니다. GPP의 후보 노드 확장을 나누어 표시하고, 성공하면 전역 경로를 발행하는 단계를 거칩니다. RPP 내부 계산 → PlannedMotion → DriveCommand의 순서를 단계별로 관찰할 수 있습니다.</p><p>검증용 공통 설정: 지도 0.3 m, 축간거리 0.72 m, GPP 최대 조향 0.35 rad / RPP 0.4 rad, 최대 속도 0.5 m/s, 적응형 lookahead. 실제 통합 프로파일의 모든 파라미터를 재현하지는 않습니다. 비용 휴리스틱은 미리 계산하므로 Python의 지연 계산 구현과 탐색 순서가 다를 수 있습니다. 추종점은 후륜 기준 변환 경로 위의 점입니다. 초록 궤적은 이상적 차량 운동 모델의 결과입니다.</p><p>지도·경사 비용은 합성 입력입니다. 반경 관측과 직선 가림 검사를 통해 지도를 누적합니다(실제 카메라 인지가 아님). 5번 벽도 이 관측으로 드러납니다. 6번은 후진 제약만 분리해 보기 위해 과거 후방 관측을 초기 지도에 포함합니다. CorridorSelector의 관측 영역·중간 목표·안전한 경로 유지 흐름을 옮겼으며 후보 점수의 위험도는 합성 비용을 사용합니다. 관측 지원·경사 증가·후방 복구 gate 등 전체 ROS 계약은 이식하지 않았습니다. ROS 통신·인지·차량 물리·명령 선택기의 안전 계약 전체는 실행하지 않습니다. HUD 안내선은 차선 인지 결과가 아닙니다. 화면의 탐색 속도는 설명을 위한 표시 속도이며 실제 연산 소요시간과 구분합니다.</p></details>
+<details><summary>계산 출처 · 시각화 범위</summary><p>관측 중간 목표 선정 → 경로 생성 → 주행 중 남은 경로 재검증·재발행 → 다음 목표 전환을 수행합니다. 최종 목적지까지 관측된 통행 영역이 연결되면 최종 목표로 전환합니다. 경로 버전은 새 경로 생성 시, 발행 번호는 재발행 때도 증가합니다.</p><p>실제 프로젝트 <code id="commit"></code>의 <code>hybrid_astar.py</code>, <code>base.py</code>, <code>rpp.py</code>, <code>rollout.py</code>, <code>route_guard.py</code>를 참고한 JavaScript 구현입니다. 경로를 미리 저장해서 재생하지 않습니다. GPP의 후보 노드 확장을 나누어 표시하고, 성공하면 전역 경로를 발행하는 단계를 거칩니다. RPP 내부 계산 → PlannedMotion → DriveCommand의 순서를 단계별로 관찰할 수 있습니다.</p><p>검증용 공통 설정: 지도 0.3 m, 축간거리 0.72 m, GPP 최대 조향 0.35 rad / RPP 0.4 rad, 최대 속도 0.5 m/s, 적응형 lookahead. 실제 통합 프로파일의 모든 파라미터를 재현하지는 않습니다. 비용 휴리스틱은 미리 계산하므로 Python의 지연 계산 구현과 탐색 순서가 다를 수 있습니다. 추종점은 후륜 기준 변환 경로 위의 점입니다. 초록 궤적은 이상적 차량 운동 모델의 결과입니다.</p><p>지도·경사 비용은 합성 입력입니다. 반경 관측과 직선 가림 검사를 통해 지도를 누적합니다(실제 카메라 인지가 아님). 5번 벽도 이 관측으로 드러납니다. 6번은 후진 제약만 분리해 보기 위해 과거 후방 관측을 초기 지도에 포함합니다. CorridorSelector의 관측 영역·중간 목표·안전한 경로 유지 흐름을 옮겼으며 후보 점수의 위험도는 합성 비용을 사용합니다. 관측 지원·경사 증가·후방 복구 gate 등 전체 ROS 계약은 이식하지 않았습니다. ROS 통신·인지·차량 물리·명령 선택기의 안전 계약 전체는 실행하지 않습니다. 오른쪽 파란 선·점은 발행된 GPP 경로를 차량 시점에 투영한 표시이며, 주황색은 RPP 계산 결과입니다. 화면 밖의 근접 추종점은 가장자리 안내로 구분합니다. HUD 안내선은 차선 인지 결과가 아닙니다. 화면의 탐색 속도는 설명을 위한 표시 속도이며 실제 연산 소요시간과 구분합니다.</p></details>
 <footer><span>NOMAD · HYBRID A* / REGULATED PURE PURSUIT</span><span>로컬 단일 HTML · 외부 통신 없음</span></footer>
 </main><script>/* Browser port of gpp/hybrid_astar.py, gpp/base.py, lpp/rpp.py,
    lpp/rollout.py and route_guard.py. ROS supervisor / perception are not ported.
@@ -156,20 +156,48 @@ function drawDriver(c,w,h,s,opt={}){
  if(v>=80){let height=s.spec.id>=5?1.3:.18;for(const [di,dj,aa,bb]of [[1,0,[x+.3,y],[x+.3,y+.3]],[-1,0,[x,y+.3],[x,y]],[0,1,[x+.3,y+.3],[x,y+.3]],[0,-1,[x,y],[x+.3,y]]]){let ni=i+di,nj=j+dj;if(ni<0||ni>=80||nj<0||nj>=54||truth[nj*80+ni]>=80)continue;if(s.spec.id===2&&Engine.dist([x,y],[12,8])<2.2)continue;walls.push({p:[cam(aa,0),cam(bb,0),cam(bb,height),cam(aa,height)],f:p.f,color:s.spec.id===5&&x>13.8&&x<15.1?'#968575':s.spec.id>=5?'#687968':'#b7bb9e'})}}
  }
  tiles.sort((a,b)=>b.f-a.f);for(const t of tiles)polygon(t.p.map(p=>cam(p)),t.color);
+ // Published path only: ground projection is drawn before scene obstacles for occlusion.
+ function groundLine(points,color,width,dash=[]){
+  for(let i=1;i<points.length;i++){
+   let a=cam(points[i-1],.045),b=cam(points[i],.045),lo=0,hi=1,df=b.f-a.f;
+   if(Math.abs(df)<1e-9){if(a.f<.3||a.f>24)continue}
+   else{let t0=(.3-a.f)/df,t1=(24-a.f)/df;lo=Math.max(0,Math.min(t0,t1));hi=Math.min(1,Math.max(t0,t1));if(lo>hi)continue}
+   const at=t=>proj({f:a.f+df*t,side:a.side+(b.side-a.side)*t,z:a.z});
+   line(c,[at(lo),at(hi)],color,width,dash);
+  }
+ }
+ if(opt.path!==false&&s.path.length){
+  groundLine(s.path,'#123754a6',12);groundLine(s.path,'#b9e2ff',7);groundLine(s.path,blue,4);
+  s.path.forEach((p,i)=>{let a=cam(p,.055);if(i%4===0&&a.f>1&&a.f<24){let q=proj(a);dot(c,q,clamp(13/a.f,2,5),'#e9f7ff');dot(c,q,clamp(8/a.f,1,3),blue)}});
+ }
+ if(opt.target!==false&&s.shownCommand){groundLine(s.shownCommand.arc,'#512c1c99',10);groundLine(s.shownCommand.arc,orange,5)}
  // Muted road-edge stripes are geometry hints, not detected lane lines.
  walls.sort((a,b)=>b.f-a.f);for(const wall of walls)polygon(wall.p,wall.color);
  // Large rock in scenario 2: draw a coherent object instead of grid-cell cubes.
  let objects=s.edits.map(e=>({x:e.x,y:e.y,type:'barrier',r:.7}));if(s.spec.id===2)objects.push({x:12,y:8,type:'rock',r:1.28});
  objects.sort((a,b)=>cam([b.x,b.y]).f-cam([a.x,a.y]).f);for(const o of objects){let at=cam([o.x,o.y]);if(at.f<.4)continue;const center=proj(cam([o.x,o.y],.05)),r=focal*o.r/at.f,top=proj(cam([o.x,o.y],o.type==='rock'?1.12:1));if(o.type==='rock'){c.save();c.globalAlpha=.22;c.fillStyle='#233d30';c.beginPath();c.ellipse(center[0]+r*.2,center[1]+r*.08,r*1.1,r*.2,0,0,Math.PI*2);c.fill();c.restore();poly(c,[[center[0]-r,center[1]],[center[0]-r*.8,top[1]+r*.35],[center[0]-r*.3,top[1]],[center[0]+r*.5,top[1]+r*.15],[center[0]+r,center[1]-r*.2],[center[0]+r*.6,center[1]+r*.06]],'#68716c');poly(c,[[center[0]-r*.3,top[1]],[center[0]+r*.5,top[1]+r*.15],[center[0]+r*.65,center[1]-r*.1],[center[0]-r*.25,center[1]-r*.2]],'#8c9487')}else{roundbox(c,center[0]-r,top[1],r*2,center[1]-top[1],2,'#b09063');for(let a=0;a<3;a++)line(c,[[center[0]-r+a*r*.65,top[1]+5],[center[0]-r+a*r*.65+r*.4,center[1]-4]],'#e8d3a5',4)}}
- // Depth-correct guidance projected on the actual computed path.
- if(opt.guide!==false&&s.path.length){let seg=[];for(let p of s.path){let a=cam(p,.04);if(a.f>.5&&a.f<16){seg.push(proj(a))}else{line(c,seg,'#a9fbd177',3);seg=[]}}line(c,seg,'#a9fbd177',3)}
  // Roadside markers anchor motion without placing obstacles in the driveable grid.
  let marks=[];for(let j=3;j<51;j+=5)for(let i=3;i<77;i+=5){let idx=j*80+i,x=(i+.5)*.3,y=(j+.5)*.3;if(truth[idx]<80||hash(i,j)<.56||(s.spec.id===2&&Engine.dist([x,y],[12,8])<2.3)||(s.spec.id===5&&x>14&&x<15.2))continue;let a=cam([x,y]);if(a.f<2||a.f>23||Math.abs(a.side)>a.f*.7)continue;marks.push({x,y,f:a.f})}marks.sort((a,b)=>b.f-a.f);for(let m of marks){let p=proj(cam([m.x,m.y],0)),top=proj(cam([m.x,m.y],1.9)),r=Math.min(48,focal*.48/m.f);line(c,[[p[0],p[1]],[top[0],top[1]+r]],'#62745b',Math.max(1,r*.16));poly(c,[[top[0],top[1]],[top[0]-r,top[1]+r*2],[top[0]+r,top[1]+r*2]],'#597c62');poly(c,[[top[0],top[1]+r*.8],[top[0]-r*1.05,top[1]+r*2.6],[top[0]+r*1.05,top[1]+r*2.6]],'#65876a')}
+ // AR markers label their ownership; near targets below view use an explicit edge cue.
+ if(s.acceptedTarget&&s.path.length&&opt.path!==false){
+  let a=cam(s.activeGoal,.06);if(a.f>.3){let q=proj(a);if(q[0]>24&&q[0]<w-24&&q[1]>70&&q[1]<h-52){
+   c.beginPath();c.ellipse(q[0],q[1],10,5,0,0,Math.PI*2);c.strokeStyle='#c8aaff';c.lineWidth=3;c.stroke();
+   line(c,[q,[q[0],q[1]-32]],'#eadcff',1.5);roundbox(c,clamp(q[0]-60,8,w-128),q[1]-54,120,22,5,'#243348d9');
+   text(c,`${s.finalLocked?'최종':'중간'} 목표 T${s.targetVersion}`,clamp(q[0],68,w-68),q[1]-39,'#eadcff',11,'center');
+  }}
+ }
+ if(s.shownCommand&&opt.target!==false){let a=cam(s.shownCommand.target,.07);if(a.f>.1){let q=proj(a),visible=q[0]>12&&q[0]<w-12&&q[1]<h-62&&q[1]>65;
+  let x=clamp(q[0],65,w-65),y=clamp(q[1],85,h-62);poly(c,[[x,y-7],[x+7,y],[x,y+7],[x-7,y]],'#fff4df',orange,2);
+  roundbox(c,x-62,y-31,124,20,4,'#3d3025de');text(c,visible?'RPP 추종점':'RPP 추종점 · 화면 밖',x,y-17,'#ffe0ad',10,'center');
+ }}
+ roundbox(c,12,61,Math.min(w-24,326),s.path.length?40:24,5,'#172e3bcb');
+ text(c,s.path.length?`GPP 경로 v${s.routeVersion} · 발행 #${s.publishedVersion}`:'GPP 발행 경로 대기',22,78,'#b9dfff',11);
+ if(s.path.length)text(c,'파랑: GPP 경로·점   주황: RPP   보라: 진행 목표',22,94,'#e0edf1',w<400?9:10);
  // Cockpit silhouette; windshield HUD stays unboxed over the scene.
  let dash=c.createLinearGradient(0,h-40,0,h);dash.addColorStop(0,'#243f48');dash.addColorStop(1,'#0b222d');c.beginPath();c.moveTo(0,h);c.lineTo(0,h-12);c.bezierCurveTo(w*.2,h-62,w*.8,h-62,w,h-12);c.lineTo(w,h);c.fillStyle=dash;c.fill();c.beginPath();c.moveTo(0,h-12);c.bezierCurveTo(w*.2,h-62,w*.8,h-62,w,h-12);c.strokeStyle='#70939a66';c.lineWidth=2;c.stroke();
  drawHud(c,w,h,s,opt);
 }
-function drawHud(c,w,h,s,opt){const mint='#d3ffe9',dim='#c2ffdfb0',cx=w*.51,cy=h*.60,k=Math.min(1.2,w/580);c.save();c.translate(cx,cy);c.scale(k,k);c.shadowColor='#74ffd887';c.shadowBlur=5;c.globalAlpha=.86;
+function drawHud(c,w,h,s,opt){const mint='#d3ffe9',dim='#c2ffdfb0',cx=w*.24,cy=h*.54,k=Math.min(.95,w/700);c.save();c.translate(cx,cy);c.scale(k,k);c.shadowColor='#74ffd887';c.shadowBlur=5;c.globalAlpha=.86;
  text(c,'NOMAD  ·  FORWARD ASSIST',0,-88,mint,10,'center');
  // Perspective lane guide + vehicle, as in a windshield projection HUD.
  line(c,[[-78,0],[-60,-28],[-50,-58]],dim,1.5);line(c,[[5,0],[-12,-28],[-20,-58]],dim,1.5);
