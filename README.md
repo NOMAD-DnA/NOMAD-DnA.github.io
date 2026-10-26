@@ -1,4 +1,8 @@
-# NOMAD-DnA.github.io
-NOMAD 야지 자율주행 발표용 개념 HTML
+# NOMAD 자료함
 
-- [GNSS 소실과 위치 복구 · 시나리오 재생](experiments/20261026_gnss_vio/)
+- [시나리오 HTML 시뮬레이션](scenarios/): 위치추정·주행가능성 시나리오
+- [기존 실험 자료](experiments/): 저장된 실험 지도·센서·캘리브레이션 결과
+- [나머지 이전 자료](archive/): 초기 아이디어·검토안·이전 버전
+
+새 자료는 해당 분류의 `index.html`에 연결합니다. 메인에는 위 세 분류만 유지합니다.
+기존 개별 HTML·데이터 경로는 유지합니다.

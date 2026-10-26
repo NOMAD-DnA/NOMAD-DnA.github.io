@@ -3,72 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="NOMAD 프로젝트에서 작성한 아이디어별 HTML 예시 자료함">
-  <title>NOMAD · HTML 아이디어 자료함</title>
-  <style>
-    :root{color-scheme:light;--paper:#f5f6f7;--card:#fff;--ink:#21303f;--muted:#64727f;--line:#dde3e8;--accent:#315e7e}
-    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif}
-    main{max-width:980px;margin:auto;padding:40px 24px}header{margin-bottom:24px}.label{color:var(--accent);font-size:12px;font-weight:750;letter-spacing:.13em}h1{font-size:30px;letter-spacing:-.04em;margin:7px 0}p{margin:0;color:var(--muted)}.intro{font-size:15px}.section-title{display:flex;justify-content:space-between;align-items:center;margin:25px 0 10px}h2{font-size:17px;margin:0}.section-title span{font-size:12px;color:var(--muted)}
-    .files{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}.file{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:18px 20px;color:inherit;text-decoration:none}.file+.file{border-top:1px solid var(--line)}.file:hover{background:#f0f5f8}.file:focus-visible,summary:focus-visible{outline:3px solid #5186ab;outline-offset:-3px}.icon{display:grid;place-items:center;height:40px;background:#eaf0f5;color:var(--accent);border-radius:7px;font-size:11px;font-weight:750}.name{display:block;font-weight:700;font-size:17px;letter-spacing:-.025em}.desc{display:block;color:var(--muted);font-size:13px;margin-top:3px}.open{font-size:14px;color:var(--accent);white-space:nowrap}.tag{font-size:11px;font-weight:550;background:#eef1f4;color:#677481;border-radius:4px;padding:3px 6px;margin-right:6px}.note{font-size:13px;border-left:3px solid #b2bfc9;padding:8px 12px;margin-top:17px}.archive{margin-top:25px}summary{cursor:pointer;color:var(--ink);font-weight:650;font-size:15px;padding:12px 0}details .files{margin-top:4px}footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:28px;padding-top:13px}
-    @media(max-width:600px){main{padding:25px 15px}h1{font-size:25px}.file{grid-template-columns:35px 1fr;gap:11px;padding:15px}.icon{height:35px}.name{font-size:16px}.open{grid-column:2;font-size:12px;margin-top:-5px}.section-title span{display:none}}
-  </style>
+  <meta name="description" content="자료 종류를 선택하세요.">
+  <title>NOMAD · 자료함</title>
+  <link rel="stylesheet" href="assets/library.css">
 </head>
-<body>
-<main>
+<body><main>
   <header>
-    <div class="label">NOMAD / HTML LIBRARY</div>
-    <h1>HTML 아이디어 자료함</h1>
-    <p class="intro">이름을 누르면 해당 HTML이 열립니다. 이전에 만든 안을 한곳에서 찾아보기 위한 자료함입니다.</p>
+    <div class="label">NOMAD / LIBRARY</div><h1>자료함</h1><p>자료 종류를 선택하세요.</p>
   </header>
-  <section aria-labelledby="ideas-heading">
-    <div class="section-title"><h2 id="ideas-heading">아이디어별 예시</h2><span>개별 HTML 페이지로 바로 이동</span></div>
-    <div class="files">
-      <a class="file" href="ideas/01_adaptive_traversal.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name">1안 · 주행경험 기반 통과비용 갱신 및 경로 재계획</span><span class="desc">주행 중 얻은 경험을 비용에 반영하는 아이디어 예시</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="ideas/02_dead_end_recovery.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name">2안 · 막다른 길 복귀 및 대안 경로 선택</span><span class="desc">미관측 환경 탐색과 막다른 길 대응의 이전 검토안</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="ideas/03_slope_payload_routing.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name">3안 · 경사·적재량 기반 최소 예상시간 경로계획</span><span class="desc">관악산 DEM과 예시 속도 모델을 이용한 거리·시간 경로 비교</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="ideas/04_integrated_concept.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name">통합 시나리오 · 관측·회피·재계획</span><span class="desc">9월 28일 멘토 검토자료의 원본 · 사전 구성된 동작 흐름 예시</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="ideas/05_clearance_gpp_lpp.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name">5안 · 장애물 여유거리 기반 GPP–LPP 연계 회피</span><span class="desc">지도 관측 → 장애물 감지·정지 → GPP 재계획·LPP 회피 비교</span></span><span class="open">열기 ↗</span></a>
-    </div>
-    <p class="note">모두 기존에 작성한 개념·시연 자료입니다. 실제 알고리즘 구현이나 성능 검증 결과, 최종 선정안으로 보지 않습니다.</p>
-  </section>
-  <section aria-labelledby="localization-heading">
-    <div class="section-title"><h2 id="localization-heading">위치추정 시나리오</h2><span>시뮬레이션 기록 재생</span></div>
-    <div class="files">
-      <a class="file" href="experiments/20261026_gnss_vio/"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">GNSS 소실과 위치 복구 · 야지–공장 주행</span><span class="desc">GT·VIO/GNSS 융합·IMU 궤적, 3D 환경과 실제 특징점 영상 · IMU 오차 모델·개념 분포 포함</span></span><span class="open">열기 ↗</span></a>
-    </div>
-  </section>
-  <section aria-labelledby="traversability-heading">
-    <div class="section-title"><h2 id="traversability-heading">주행가능성 시나리오</h2><span>장애물 추가 전후와 저장 지도 모음</span></div>
-    <div class="files">
-      <a class="file" href="experiments/20261026_offroad_drive/before_obstacles.html"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">야지 주행과 점군 경사 지도 / 장애물 추가 전</span><span class="desc">울퉁불퉁한 평지와 10도 경사로의 직선 주행, 카메라 시점과 라이다 및 카메라 점군, 셀별 경사각</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="experiments/20261026_offroad_drive/with_obstacles.html"><span class="icon" aria-hidden="true">SIM</span><span><span class="name">야지 장애물 우회와 의미분할 지도 / 장애물 추가 후</span><span class="desc">나무와 돌을 우회하는 주행, 가상 의미분할과 주행 가능 지도, 점군 및 셀별 경사각</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="experiments/20261026_saved_library/"><span class="icon" aria-hidden="true">MAP</span><span><span class="name">저장된 실험 지도 모음 / 2026.10.26</span><span class="desc">8892 자료함의 실험 15개, 점군 지도 15개와 경사 지도 6개를 목록에서 바로 열기</span></span><span class="open">모음 보기 ↗</span></a>
-    </div>
-    <p class="note">앞의 두 주행 예시는 합성 환경 시뮬레이션입니다. 의미분할은 가상 정답 라벨이며, 경로는 환경 정보를 아는 외부 계획기가 장애물을 모두 피한다고 가정합니다. 저장된 실험 지도 모음은 별도의 실제 관측 기록입니다.</p>
-  </section>
-  <section aria-labelledby="experiments-heading">
-    <div class="section-title"><h2 id="experiments-heading">실물 관측·지도 실험</h2><span>저장된 관측 데이터의 인터랙티브 뷰어</span></div>
-    <div class="files">
-      <a class="file" href="experiments/20261019_lidar_calibration.html"><span class="icon" aria-hidden="true">3D</span><span><span class="name">OAK–G2B 외부 캘리브레이션 · 라이다 맵 전후 비교</span><span class="desc">2026.10.19 · 정지 타깃10자세·0ms 가정 지도·이상점2.30% 제거 후보 비교</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="experiments/20261019_oak_terrain_v2.html"><span class="icon" aria-hidden="true">3D</span><span><span class="name">OAK VIO · RGB 점군과 반투명 경사면</span><span class="desc">2026.10.19 실내 관측 · RGB 점군·대표 경사면·궤적 · 회전·확대·투명도 조절</span></span><span class="open">열기 ↗</span></a>
-    </div>
-    <p class="note">각 페이지에 실험 조건·관측 개수·검증 범위를 기록했습니다. OAK RGB 경사면 실험은 실제 관측 152개의 저장 데이터로 생성했습니다. 원본 약 44만 복셀 중 15만 점을 표시하고 V2 대표 경사면 13,659셀을 겹쳤습니다. 야지 적용·실측 정확도·주행 가능 여부는 검증 전입니다.</p>
-  </section>
-  <details class="archive">
-    <summary>이전 예시·검토 과정 보기</summary>
-    <div class="files" id="archive-list">
-      <a class="file" href="archive/experience-exploration.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>경험 기반 야지 탐색 · 초기 예시</span><span class="desc">미관측 영역을 밝히며 주행하는 이전 버전</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/experience-replanning.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>주행경험 기반 경로 재계획 · 초기 예시</span><span class="desc">경사별 주행속도와 경험에 따른 경로 변경 비교</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/adaptive-simulation-preview.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>적응형 통과비용 · 초기 비교 예시</span><span class="desc">초기 경로계획과 경험 갱신의 비교 버전</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/adaptive-simulation.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>적응형 통과비용 · 기본 시나리오</span><span class="desc">주행경험에 따른 우회 경로 선택 예시</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/slope-trig-model.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>산악 경로 비교 · 삼각함수 속도 모델 버전</span><span class="desc">속도 예시 모델 변경 전 보관본</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/slope-corridor.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>경사·우회 경로 비교 · 초기 지형 버전</span><span class="desc">급경사 지름길과 완만한 우회로 비교</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/contour-time-gpp.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>등고선 기반 최소시간 GPP · 2D 초기 예시</span><span class="desc">등고선·차량 성능·시간 비용의 연결 예시</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/offroad-concept.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">이전</span>야지 자율주행 전체 구성 · 초기 도식</span><span class="desc">멘토링 이후 정리한 전체 구성의 이전 예시</span></span><span class="open">열기 ↗</span></a>
-      <a class="file" href="archive/slope-path-unfolding.html"><span class="icon" aria-hidden="true">HTML</span><span><span class="name"><span class="tag">검토 예시</span>경사별 예상거리 유도 · 기하 시각화</span><span class="desc">거리 유도 방식을 살펴보기 위해 만든 이전 검토 자료</span></span><span class="open">열기 ↗</span></a>
-    </div>
-  </details>
-  <footer>NOMAD · 기존 HTML 보관 · 2026.10.02 정리</footer>
-</main>
-</body>
-</html>
+  <div class="files home"><a class="file" href="scenarios/"><span class="icon" aria-hidden="true">01</span><span><span class="name">시나리오 HTML 시뮬레이션</span><span class="desc">위치추정·주행가능성 시나리오</span></span><span class="open">열기 ↗</span></a>
+<a class="file" href="experiments/"><span class="icon" aria-hidden="true">02</span><span><span class="name">기존 실험 자료</span><span class="desc">점군·경사 지도·캘리브레이션</span></span><span class="open">열기 ↗</span></a>
+<a class="file" href="archive/"><span class="icon" aria-hidden="true">03</span><span><span class="name">나머지 이전 자료</span><span class="desc">초기 아이디어·검토안·이전 버전</span></span><span class="open">열기 ↗</span></a></div>
+  <footer>NOMAD</footer>
+</main></body></html>
