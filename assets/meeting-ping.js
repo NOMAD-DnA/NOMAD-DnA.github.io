@@ -105,7 +105,8 @@ function start() {
     host.dataset.lastKind=packet.kind;
     const item={packet,until:performance.now()+TTL};active.push(item);
     {item.el=document.createElement('div');item.el.className='marker';item.el.dataset.kind=packet.kind;item.el.dataset.point=JSON.stringify(packet.point);item.el.innerHTML='<span class="tag">핑</span>';markers.append(item.el);}
-    if(!raf)raf=requestAnimationFrame(draw);
+    if(raf)cancelAnimationFrame(raf);
+    draw(performance.now());
   }
   function remove(item){const i=active.indexOf(item);if(i>=0)active.splice(i,1);item.el?.remove();}
   function position(packet){
@@ -170,7 +171,7 @@ function start() {
   async function connect(){
     if(!window.isSecureContext){connection('HTTPS로 열어야 공유 가능');return;}
     try{
-      room=await connectMeeting(canonicalPath(location.pathname),{
+      room=await connectMeeting(location.host+canonicalPath(location.pathname),{
         onPeers:next=>{peers.clear();for(const id of next)peers.add(id);connection();},
         onMessage:receive,onStatus:connection
       });action=room;connection();
