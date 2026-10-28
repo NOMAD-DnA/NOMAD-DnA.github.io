@@ -1,7 +1,10 @@
 # NOMAD 자료함
 
 - [시나리오 HTML 시뮬레이션](scenarios/): 위치추정·AI 인식·주행가능성·플래닝 시나리오
-- [기존 실험 자료](experiments/): 저장된 실험 지도·센서·캘리브레이션 결과
+- [비용 지도](experiments/): 기존 실험 자료와 경사 지도
+  - [기존 실험 자료](experiments/legacy/)
+  - [경사 지도](experiments/slope/)
+    - [10.28 우면사, 대성사 실측](experiments/slope/20261028-umyeonsa-daeseongsa/)
 - [나머지 이전 자료](archive/): 초기 아이디어·검토안·이전 버전
 
 새 자료는 해당 분류의 `index.html`에 연결합니다. 메인에는 위 세 분류만 유지합니다.

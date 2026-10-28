@@ -1,0 +1,101 @@
+{
+  "schema": "nomad-slope-angle-v1",
+  "representative_mode": "sensor_separate",
+  "cross_sensor_representative_conflict_check": false,
+  "candidate_settings": {
+    "geometry_only": true,
+    "resolution_m": 0.07,
+    "radius_m": 0.105,
+    "slope_input": "raw_points",
+    "height_method": "median",
+    "plane_method": "tls",
+    "fusion_method": "weighted",
+    "semantic_weight": 0.3,
+    "geometry_weight": 0.7,
+    "semantic_confidence_alpha": 1.0,
+    "geometry_confidence_alpha": 1.0,
+    "semantic_min_points": 20,
+    "height_min_ground_points": 10,
+    "semantic_reference_points": 20,
+    "raw_reference_points": 30,
+    "cell_reference_count": 6,
+    "raw_window_s": 10.0,
+    "per_cell_max_points": 512,
+    "global_max_points": 1000000,
+    "near_tie_share_difference": 0.1,
+    "space_reference_fraction": 0.1,
+    "xy_rank_ratio": 1e-06,
+    "tls_gap_ratio": 1e-08,
+    "slope_limit_deg": 20.0,
+    "sampling_seed": 20261008
+  },
+  "plane_quality": {
+    "bin_size_m": 0.03,
+    "min_raw_points": 12,
+    "min_xy_bins": 6,
+    "min_minor_std_m": 0.01,
+    "min_xy_variance_ratio": 0.02,
+    "refit_radii_m": [
+      0.105
+    ],
+    "min_height_cells": 6,
+    "max_refit_rms_m": 0.01,
+    "max_target_error_m": 0.02,
+    "max_connected_height_jump_m": 0.12,
+    "min_conflict_points": 3,
+    "diagnostic_max_cases": 256,
+    "diagnostic_max_points": 128
+  },
+  "core_counters": {
+    "source_0_frames": 199,
+    "source_0_points": 59778,
+    "height_refit_attempts": 19999,
+    "calculated_cells": 47310,
+    "source_1_frames": 79,
+    "source_1_points": 76679,
+    "direct_tls_success": 11841,
+    "height_refit_success": 6545,
+    "previous_slope_reused": 1900,
+    "stage3_within_sensor_conflicts": 15470,
+    "expired_captures": 53116
+  },
+  "timing": {
+    "samples": 94,
+    "mean_ms": 582.3623634042788,
+    "last_ms": 74.16211500003556,
+    "scope": "target selection, representative preparation, TLS, height storage/refit, persistence and angle layers; excludes raw ingestion/rendering/IO"
+  },
+  "ground_segmentation": false,
+  "accuracy_verified": false,
+  "height_selection": {
+    "enabled": false,
+    "operator": null,
+    "start_z_m": 0.0,
+    "start_stamp_ns": 1793153479068374985,
+    "reference": "first accepted Basalt VIO pose; recorded only, no height cutoff"
+  },
+  "camera_preprocessing": {
+    "settings": {
+      "min_z_m": 0.3,
+      "max_z_m": 4.0,
+      "voxel_m": 0.03,
+      "sor_neighbors": 80,
+      "sor_std_ratio": 1.0
+    },
+    "repeated_frame_filter": false,
+    "radius_support_filter": false,
+    "frames": 79
+  },
+  "input_points": [
+    59778,
+    137036
+  ],
+  "selected_points": [
+    59778,
+    76679
+  ],
+  "session_id": "20261028_111109_d84508",
+  "observed_cells": 5787,
+  "valid_cells": 2320,
+  "last_queue_wait_s": 30.893500483000025
+}
