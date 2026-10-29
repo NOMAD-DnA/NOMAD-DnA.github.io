@@ -1,0 +1,425 @@
+{
+  "cell_7cm_window_10s": {
+    "name": "cell_7cm_window_10s",
+    "submitted": 304,
+    "max_queue": 67,
+    "max_submission_late_ms": 0.4983910002920311,
+    "drain_s": 29.096497385000475,
+    "snapshot": {
+      "n": 88,
+      "mean_ms": 589.5795757841039,
+      "p95_ms": 1152.8339912502815,
+      "max_ms": 1406.0063870001613,
+      "over_500ms": 47
+    },
+    "output_path": {
+      "n": 88,
+      "mean_ms": 699.6139186476388,
+      "p95_ms": 1318.0373020502884,
+      "max_ms": 1565.4722899998887,
+      "over_500ms": 49
+    },
+    "queue_wait": {
+      "n": 88,
+      "mean_ms": 8180.691441954578,
+      "p95_ms": 24578.05372959978,
+      "max_ms": 27288.752262000344,
+      "over_500ms": 74
+    },
+    "input_age": {
+      "n": 88,
+      "mean_ms": 9558.249145746231,
+      "p95_ms": 25808.863127231594,
+      "max_ms": 28531.800031661987,
+      "over_500ms": 88
+    },
+    "pose_age": {
+      "n": 88,
+      "mean_ms": 9426.023719318182,
+      "p95_ms": 25755.732171699998,
+      "max_ms": 28256.322023,
+      "over_500ms": 88
+    },
+    "vio_xy_gap_m": {
+      "mean": 1.1855426578541115,
+      "max": 2.5131866661416145
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_7cm_window_5s": {
+    "name": "cell_7cm_window_5s",
+    "submitted": 304,
+    "max_queue": 52,
+    "max_submission_late_ms": 6.346464999296586,
+    "drain_s": 23.34069739499955,
+    "snapshot": {
+      "n": 76,
+      "mean_ms": 667.7348036185107,
+      "p95_ms": 1222.8436609996152,
+      "max_ms": 1249.43828799951,
+      "over_500ms": 40
+    },
+    "output_path": {
+      "n": 76,
+      "mean_ms": 786.1417944868663,
+      "p95_ms": 1387.0124099998975,
+      "max_ms": 1488.3072749998973,
+      "over_500ms": 44
+    },
+    "queue_wait": {
+      "n": 76,
+      "mean_ms": 5872.4279058553275,
+      "p95_ms": 19461.086631000624,
+      "max_ms": 20958.985252000275,
+      "over_500ms": 63
+    },
+    "input_age": {
+      "n": 76,
+      "mean_ms": 7322.658523132926,
+      "p95_ms": 20998.624086380005,
+      "max_ms": 22770.350694656372,
+      "over_500ms": 76
+    },
+    "pose_age": {
+      "n": 76,
+      "mean_ms": 7197.235647236843,
+      "p95_ms": 20850.5048465,
+      "max_ms": 22738.879264,
+      "over_500ms": 76
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.8629420759078659,
+      "max": 2.1263511904269663
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_7cm_window_3s": {
+    "name": "cell_7cm_window_3s",
+    "submitted": 304,
+    "max_queue": 37,
+    "max_submission_late_ms": 2.2530490005010506,
+    "drain_s": 8.199046602000635,
+    "snapshot": {
+      "n": 66,
+      "mean_ms": 567.7812323181597,
+      "p95_ms": 1010.997914499967,
+      "max_ms": 1141.4106419997552,
+      "over_500ms": 35
+    },
+    "output_path": {
+      "n": 66,
+      "mean_ms": 670.8940063939956,
+      "p95_ms": 1163.49556199998,
+      "max_ms": 1334.841962999235,
+      "over_500ms": 37
+    },
+    "queue_wait": {
+      "n": 66,
+      "mean_ms": 1766.918978727228,
+      "p95_ms": 6132.935200750126,
+      "max_ms": 7324.000825999974,
+      "over_500ms": 46
+    },
+    "input_age": {
+      "n": 66,
+      "mean_ms": 3097.2003972891607,
+      "p95_ms": 7764.752149581909,
+      "max_ms": 8356.977462768555,
+      "over_500ms": 66
+    },
+    "pose_age": {
+      "n": 66,
+      "mean_ms": 2969.78299019697,
+      "p95_ms": 7724.95069075,
+      "max_ms": 8158.870496,
+      "over_500ms": 66
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.6096974110371888,
+      "max": 1.3659748073053364
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_12cm_window_10s": {
+    "name": "cell_12cm_window_10s",
+    "submitted": 304,
+    "max_queue": 8,
+    "max_submission_late_ms": 1.5297699992515845,
+    "drain_s": 1.387747612999192,
+    "snapshot": {
+      "n": 84,
+      "mean_ms": 353.6040020356896,
+      "p95_ms": 568.3079254999028,
+      "max_ms": 703.4599309999976,
+      "over_500ms": 9
+    },
+    "output_path": {
+      "n": 84,
+      "mean_ms": 394.6722051785703,
+      "p95_ms": 639.92111870034,
+      "max_ms": 737.5475870003356,
+      "over_500ms": 24
+    },
+    "queue_wait": {
+      "n": 84,
+      "mean_ms": 214.7569461905429,
+      "p95_ms": 631.9461355996735,
+      "max_ms": 967.5917110007504,
+      "over_500ms": 14
+    },
+    "input_age": {
+      "n": 84,
+      "mean_ms": 1306.0143419674464,
+      "p95_ms": 1614.61421251297,
+      "max_ms": 1915.66801071167,
+      "over_500ms": 84
+    },
+    "pose_age": {
+      "n": 84,
+      "mean_ms": 1164.3720096428572,
+      "p95_ms": 1510.7220746499997,
+      "max_ms": 1717.614827,
+      "over_500ms": 84
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.21628289633453754,
+      "max": 0.4420859238141642
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_12cm_window_5s": {
+    "name": "cell_12cm_window_5s",
+    "submitted": 304,
+    "max_queue": 15,
+    "max_submission_late_ms": 2.049007999630703,
+    "drain_s": 1.600560659000621,
+    "snapshot": {
+      "n": 83,
+      "mean_ms": 362.33159027707813,
+      "p95_ms": 616.3474537003822,
+      "max_ms": 681.958049000059,
+      "over_500ms": 32
+    },
+    "output_path": {
+      "n": 83,
+      "mean_ms": 404.631729373513,
+      "p95_ms": 683.2576661994608,
+      "max_ms": 771.1444670003402,
+      "over_500ms": 36
+    },
+    "queue_wait": {
+      "n": 83,
+      "mean_ms": 350.38424991566296,
+      "p95_ms": 1323.2346200000368,
+      "max_ms": 2054.161703000318,
+      "over_500ms": 28
+    },
+    "input_age": {
+      "n": 83,
+      "mean_ms": 1461.172083774245,
+      "p95_ms": 2353.8563489913927,
+      "max_ms": 2967.6477909088135,
+      "over_500ms": 83
+    },
+    "pose_age": {
+      "n": 83,
+      "mean_ms": 1310.327024987952,
+      "p95_ms": 2130.8437689999996,
+      "max_ms": 2836.348776,
+      "over_500ms": 83
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.2578982610036089,
+      "max": 0.7959796321199728
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_12cm_window_3s": {
+    "name": "cell_12cm_window_3s",
+    "submitted": 304,
+    "max_queue": 7,
+    "max_submission_late_ms": 1.7350049993183347,
+    "drain_s": 1.3832909100001416,
+    "snapshot": {
+      "n": 88,
+      "mean_ms": 363.5140716590864,
+      "p95_ms": 459.9767286002134,
+      "max_ms": 529.6233790004408,
+      "over_500ms": 1
+    },
+    "output_path": {
+      "n": 88,
+      "mean_ms": 403.61287390908274,
+      "p95_ms": 507.69452095028095,
+      "max_ms": 553.3006240002578,
+      "over_500ms": 11
+    },
+    "queue_wait": {
+      "n": 88,
+      "mean_ms": 162.35501142039703,
+      "p95_ms": 488.07850689981916,
+      "max_ms": 995.9245960008047,
+      "over_500ms": 4
+    },
+    "input_age": {
+      "n": 88,
+      "mean_ms": 1236.158847808838,
+      "p95_ms": 1532.423484325409,
+      "max_ms": 1721.4460372924805,
+      "over_500ms": 88
+    },
+    "pose_age": {
+      "n": 88,
+      "mean_ms": 1117.9151031704546,
+      "p95_ms": 1501.1916380999999,
+      "max_ms": 1623.309993,
+      "over_500ms": 88
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.19861640229452054,
+      "max": 0.4336405912601463
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_15cm_window_10s": {
+    "name": "cell_15cm_window_10s",
+    "submitted": 304,
+    "max_queue": 4,
+    "max_submission_late_ms": 3.560480000487587,
+    "drain_s": 1.0923187500002314,
+    "snapshot": {
+      "n": 88,
+      "mean_ms": 300.06440907950287,
+      "p95_ms": 372.3078369994709,
+      "max_ms": 445.7201549994352,
+      "over_500ms": 0
+    },
+    "output_path": {
+      "n": 88,
+      "mean_ms": 325.91712177269403,
+      "p95_ms": 412.5406841497351,
+      "max_ms": 469.3208059998142,
+      "over_500ms": 0
+    },
+    "queue_wait": {
+      "n": 88,
+      "mean_ms": 16.754055840899376,
+      "p95_ms": 102.47927239979614,
+      "max_ms": 286.2531279997711,
+      "over_500ms": 0
+    },
+    "input_age": {
+      "n": 88,
+      "mean_ms": 1063.012873584574,
+      "p95_ms": 1256.0871481895447,
+      "max_ms": 1300.248146057129,
+      "over_500ms": 88
+    },
+    "pose_age": {
+      "n": 88,
+      "mean_ms": 914.5352755795454,
+      "p95_ms": 1077.6914680999998,
+      "max_ms": 1222.789121,
+      "over_500ms": 88
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.12965488573098505,
+      "max": 0.29561278684418113
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_15cm_window_5s": {
+    "name": "cell_15cm_window_5s",
+    "submitted": 304,
+    "max_queue": 5,
+    "max_submission_late_ms": 0.5734629994549323,
+    "drain_s": 1.0844204019995232,
+    "snapshot": {
+      "n": 88,
+      "mean_ms": 317.0949275682295,
+      "p95_ms": 389.9625817499327,
+      "max_ms": 426.9368940003915,
+      "over_500ms": 0
+    },
+    "output_path": {
+      "n": 88,
+      "mean_ms": 343.0026523409114,
+      "p95_ms": 407.4505595505797,
+      "max_ms": 444.9967470000047,
+      "over_500ms": 0
+    },
+    "queue_wait": {
+      "n": 88,
+      "mean_ms": 19.595524727223662,
+      "p95_ms": 83.91776065031988,
+      "max_ms": 311.5664580000157,
+      "over_500ms": 0
+    },
+    "input_age": {
+      "n": 88,
+      "mean_ms": 1089.0743651173332,
+      "p95_ms": 1276.8256545066833,
+      "max_ms": 1347.3622798919678,
+      "over_500ms": 88
+    },
+    "pose_age": {
+      "n": 88,
+      "mean_ms": 939.3611214772728,
+      "p95_ms": 1105.0368132499998,
+      "max_ms": 1315.892055,
+      "over_500ms": 88
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.13910415430167186,
+      "max": 0.28394988714511105
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  },
+  "cell_15cm_window_3s": {
+    "name": "cell_15cm_window_3s",
+    "submitted": 304,
+    "max_queue": 6,
+    "max_submission_late_ms": 3.930543000024045,
+    "drain_s": 0.8622825479997118,
+    "snapshot": {
+      "n": 88,
+      "mean_ms": 295.5471146931566,
+      "p95_ms": 353.88862494960443,
+      "max_ms": 429.25780699988536,
+      "over_500ms": 0
+    },
+    "output_path": {
+      "n": 88,
+      "mean_ms": 323.1853515795303,
+      "p95_ms": 391.6567793000013,
+      "max_ms": 509.42529999974795,
+      "over_500ms": 1
+    },
+    "queue_wait": {
+      "n": 88,
+      "mean_ms": 15.051234193141351,
+      "p95_ms": 64.27687645013962,
+      "max_ms": 368.95703699974547,
+      "over_500ms": 0
+    },
+    "input_age": {
+      "n": 88,
+      "mean_ms": 1074.9894705685701,
+      "p95_ms": 1259.590971469879,
+      "max_ms": 1583.2886695861816,
+      "over_500ms": 88
+    },
+    "pose_age": {
+      "n": 88,
+      "mean_ms": 916.671423693182,
+      "p95_ms": 1072.2237046,
+      "max_ms": 1304.908852,
+      "over_500ms": 88
+    },
+    "vio_xy_gap_m": {
+      "mean": 0.130045409517994,
+      "max": 0.26043407859629103
+    },
+    "method": "Actual 1x paced replay of recorded sensor/VIO arrivals into original FIFO worker; recorded transforms precomputed; VIO/depth hardware generation not recomputed. Original checkpoint/live JSON writes included. Final save excluded from streaming metrics."
+  }
+}

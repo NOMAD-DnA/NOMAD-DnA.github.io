@@ -1,0 +1,18 @@
+{
+  "work/report_slope_12cm_optimization_20261029.py": "a4f560fef74c917add0c2aca7ecf5f756c00a45228215e49fac0bcfd21929fc7",
+  "work/optimize_slope_12cm_20261029.py": "9129d05e57be98bc009a11c790405320970ed4196acfe6f855e0963947597c79",
+  "work/test_slope_12cm_optimization_20261029.py": "206f1d22b55c3a8b1509e9fe291efe498df38829e0ca1db051815ec14eeb3350",
+  "mapping_ws_no_start_z_optimized/python/ground_reference/slope_optimized_core.py": "d185f3c3def4b511c92baa4b8d02cce67c454935c60d736903c9b302cb6cba63",
+  "mapping_ws_no_start_z_optimized/python/ground_slope_live.py": "545f2151c0413dce07db74f25644014c647f4f842cfddbef35e62e041c93af02",
+  "work/verify_slope_12cm_optimization_20261029.py": "ad0024a89fdeec1b3641b8dad4c630042239af00051bfd454f93f2d9514be655",
+  "mapping_ws_no_start_z_optimized/web/ground_slope.html": "b86525ef33872fbedd831fc813b84c3c6083815360bcd54661c6da633d5830b2",
+  "mapping_ws_no_start_z_optimized/new_ground_map.sh": "7f4179e392647cc58e23f3defc2d7b629adbe76aa5df7e58203daf1b918f7502",
+  "mapping_ws_no_start_z_optimized/new_ground_map_12cm_3s.sh": "3cb45286e5fd64d53ab3fcc0f2d3e40d12602b75d835f8045f80371e7be1c337",
+  "mapping_ws_no_start_z_optimized/python/session.py": "974007bc1853f6f7b2c34d0e9b1d344a3483b44e6eee911d44bd518a0502f4b1",
+  "mapping_ws_no_start_z_optimized/benchmarks/compare_last_bag.py": "d65d2035a2d3dfed7f10cb0b36c1f537417d2dc9a2d9f066842cf00e61aa1123",
+  "mapping_ws_no_start_z_optimized/python/ground_reference/settings.yaml": "7b9146dc10adee476045ee100a6e4948f1c73b77b070464a7e4054a951e5b9f1",
+  "mapping_ws_no_start_z_optimized/python/depth_filter.py": "25803bf9c1d820ab40342f044fefe9103fe38abcc39445d89e1c5e93a42fd6a0",
+  "mapping_ws_no_start_z_optimized/README_시작Z제한없음.txt": "dd246c9a38f432cb6356e2b8c65c414f3a82327192dc7a152185fedcc6cdff2e",
+  "outputs/bag_nine_first_comparison_20261029/extracted_events.pkl": "927366d8616a924d1925459d56f9e897b3f18fb9a69e839f61a8b6cb539135ed",
+  "outputs/bag_nine_comparison_20261029/extracted_events.pkl": "9bf59ff3ce8d38cfecce442ba158a942bb9b661a4736fd71a5659a33ae2a6646"
+}

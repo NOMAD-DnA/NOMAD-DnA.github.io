@@ -1,0 +1,830 @@
+{
+  "probe_spacing_m": 0.03,
+  "method": "Same fixed world 3cm probe centers inside strict physical ROI and with parent cells included in each grid ROI table. All grids must have ever observed the parent cell. Each probe inherits its parent cell result; probes are correlated and not independent measurements. Radius remains 1.5 times output cell size.",
+  "ticks": [
+    {
+      "t_s": 10.0,
+      "common_probes": 4850,
+      "full_roi_probes": 7236
+    },
+    {
+      "t_s": 10.5,
+      "common_probes": 5053,
+      "full_roi_probes": 7239
+    },
+    {
+      "t_s": 11.0,
+      "common_probes": 5162,
+      "full_roi_probes": 7253
+    },
+    {
+      "t_s": 11.5,
+      "common_probes": 5345,
+      "full_roi_probes": 7253
+    },
+    {
+      "t_s": 12.0,
+      "common_probes": 5380,
+      "full_roi_probes": 7238
+    },
+    {
+      "t_s": 12.5,
+      "common_probes": 5384,
+      "full_roi_probes": 7247
+    },
+    {
+      "t_s": 13.0,
+      "common_probes": 5314,
+      "full_roi_probes": 7261
+    },
+    {
+      "t_s": 13.5,
+      "common_probes": 5234,
+      "full_roi_probes": 7240
+    },
+    {
+      "t_s": 14.0,
+      "common_probes": 5173,
+      "full_roi_probes": 7237
+    },
+    {
+      "t_s": 14.5,
+      "common_probes": 5169,
+      "full_roi_probes": 7228
+    },
+    {
+      "t_s": 15.0,
+      "common_probes": 5211,
+      "full_roi_probes": 7242
+    },
+    {
+      "t_s": 15.5,
+      "common_probes": 5194,
+      "full_roi_probes": 7248
+    },
+    {
+      "t_s": 16.0,
+      "common_probes": 5249,
+      "full_roi_probes": 7244
+    },
+    {
+      "t_s": 16.5,
+      "common_probes": 5224,
+      "full_roi_probes": 7233
+    },
+    {
+      "t_s": 17.0,
+      "common_probes": 5184,
+      "full_roi_probes": 7238
+    },
+    {
+      "t_s": 17.5,
+      "common_probes": 5207,
+      "full_roi_probes": 7245
+    },
+    {
+      "t_s": 18.0,
+      "common_probes": 5153,
+      "full_roi_probes": 7229
+    },
+    {
+      "t_s": 18.5,
+      "common_probes": 5160,
+      "full_roi_probes": 7223
+    },
+    {
+      "t_s": 19.0,
+      "common_probes": 5237,
+      "full_roi_probes": 7224
+    },
+    {
+      "t_s": 19.5,
+      "common_probes": 5150,
+      "full_roi_probes": 7219
+    },
+    {
+      "t_s": 20.0,
+      "common_probes": 5172,
+      "full_roi_probes": 7221
+    },
+    {
+      "t_s": 20.5,
+      "common_probes": 5331,
+      "full_roi_probes": 7223
+    },
+    {
+      "t_s": 21.0,
+      "common_probes": 5407,
+      "full_roi_probes": 7225
+    },
+    {
+      "t_s": 21.5,
+      "common_probes": 5442,
+      "full_roi_probes": 7212
+    },
+    {
+      "t_s": 22.0,
+      "common_probes": 5605,
+      "full_roi_probes": 7228
+    },
+    {
+      "t_s": 22.5,
+      "common_probes": 5850,
+      "full_roi_probes": 7230
+    },
+    {
+      "t_s": 23.0,
+      "common_probes": 5908,
+      "full_roi_probes": 7231
+    },
+    {
+      "t_s": 23.5,
+      "common_probes": 6054,
+      "full_roi_probes": 7226
+    },
+    {
+      "t_s": 24.0,
+      "common_probes": 6124,
+      "full_roi_probes": 7226
+    },
+    {
+      "t_s": 24.5,
+      "common_probes": 6376,
+      "full_roi_probes": 7239
+    },
+    {
+      "t_s": 25.0,
+      "common_probes": 6559,
+      "full_roi_probes": 7243
+    },
+    {
+      "t_s": 25.5,
+      "common_probes": 6568,
+      "full_roi_probes": 7234
+    },
+    {
+      "t_s": 26.0,
+      "common_probes": 6574,
+      "full_roi_probes": 7242
+    },
+    {
+      "t_s": 26.5,
+      "common_probes": 6541,
+      "full_roi_probes": 7256
+    },
+    {
+      "t_s": 27.0,
+      "common_probes": 6517,
+      "full_roi_probes": 7245
+    },
+    {
+      "t_s": 27.5,
+      "common_probes": 6471,
+      "full_roi_probes": 7246
+    },
+    {
+      "t_s": 28.0,
+      "common_probes": 6611,
+      "full_roi_probes": 7255
+    },
+    {
+      "t_s": 28.5,
+      "common_probes": 6684,
+      "full_roi_probes": 7267
+    },
+    {
+      "t_s": 29.0,
+      "common_probes": 6712,
+      "full_roi_probes": 7254
+    },
+    {
+      "t_s": 29.5,
+      "common_probes": 6717,
+      "full_roi_probes": 7261
+    },
+    {
+      "t_s": 30.0,
+      "common_probes": 6725,
+      "full_roi_probes": 7255
+    },
+    {
+      "t_s": 30.5,
+      "common_probes": 6788,
+      "full_roi_probes": 7263
+    },
+    {
+      "t_s": 31.0,
+      "common_probes": 6746,
+      "full_roi_probes": 7253
+    },
+    {
+      "t_s": 31.5,
+      "common_probes": 6738,
+      "full_roi_probes": 7254
+    },
+    {
+      "t_s": 32.0,
+      "common_probes": 6609,
+      "full_roi_probes": 7251
+    },
+    {
+      "t_s": 32.5,
+      "common_probes": 6515,
+      "full_roi_probes": 7260
+    },
+    {
+      "t_s": 33.0,
+      "common_probes": 6378,
+      "full_roi_probes": 7243
+    },
+    {
+      "t_s": 33.5,
+      "common_probes": 6298,
+      "full_roi_probes": 7257
+    },
+    {
+      "t_s": 34.0,
+      "common_probes": 6207,
+      "full_roi_probes": 7256
+    },
+    {
+      "t_s": 34.5,
+      "common_probes": 6140,
+      "full_roi_probes": 7253
+    },
+    {
+      "t_s": 35.0,
+      "common_probes": 6177,
+      "full_roi_probes": 7259
+    },
+    {
+      "t_s": 35.5,
+      "common_probes": 6220,
+      "full_roi_probes": 7271
+    },
+    {
+      "t_s": 36.0,
+      "common_probes": 6223,
+      "full_roi_probes": 7273
+    },
+    {
+      "t_s": 36.5,
+      "common_probes": 6200,
+      "full_roi_probes": 7274
+    },
+    {
+      "t_s": 37.0,
+      "common_probes": 6248,
+      "full_roi_probes": 7280
+    },
+    {
+      "t_s": 37.5,
+      "common_probes": 6254,
+      "full_roi_probes": 7266
+    },
+    {
+      "t_s": 38.0,
+      "common_probes": 6203,
+      "full_roi_probes": 7270
+    },
+    {
+      "t_s": 38.5,
+      "common_probes": 6131,
+      "full_roi_probes": 7259
+    },
+    {
+      "t_s": 39.0,
+      "common_probes": 6113,
+      "full_roi_probes": 7255
+    },
+    {
+      "t_s": 39.5,
+      "common_probes": 6155,
+      "full_roi_probes": 7268
+    },
+    {
+      "t_s": 40.0,
+      "common_probes": 6168,
+      "full_roi_probes": 7275
+    },
+    {
+      "t_s": 40.5,
+      "common_probes": 6183,
+      "full_roi_probes": 7276
+    },
+    {
+      "t_s": 41.0,
+      "common_probes": 6093,
+      "full_roi_probes": 7263
+    },
+    {
+      "t_s": 41.5,
+      "common_probes": 6063,
+      "full_roi_probes": 7274
+    },
+    {
+      "t_s": 42.0,
+      "common_probes": 6113,
+      "full_roi_probes": 7266
+    },
+    {
+      "t_s": 42.5,
+      "common_probes": 6126,
+      "full_roi_probes": 7270
+    },
+    {
+      "t_s": 43.0,
+      "common_probes": 6246,
+      "full_roi_probes": 7252
+    },
+    {
+      "t_s": 43.5,
+      "common_probes": 6258,
+      "full_roi_probes": 7270
+    },
+    {
+      "t_s": 44.0,
+      "common_probes": 6370,
+      "full_roi_probes": 7257
+    },
+    {
+      "t_s": 44.5,
+      "common_probes": 6417,
+      "full_roi_probes": 7265
+    },
+    {
+      "t_s": 45.0,
+      "common_probes": 6557,
+      "full_roi_probes": 7261
+    },
+    {
+      "t_s": 45.5,
+      "common_probes": 6638,
+      "full_roi_probes": 7268
+    },
+    {
+      "t_s": 46.0,
+      "common_probes": 6616,
+      "full_roi_probes": 7267
+    },
+    {
+      "t_s": 46.5,
+      "common_probes": 6574,
+      "full_roi_probes": 7268
+    },
+    {
+      "t_s": 47.0,
+      "common_probes": 6548,
+      "full_roi_probes": 7253
+    },
+    {
+      "t_s": 47.5,
+      "common_probes": 6572,
+      "full_roi_probes": 7256
+    },
+    {
+      "t_s": 48.0,
+      "common_probes": 6560,
+      "full_roi_probes": 7251
+    },
+    {
+      "t_s": 48.5,
+      "common_probes": 6514,
+      "full_roi_probes": 7260
+    },
+    {
+      "t_s": 49.0,
+      "common_probes": 6466,
+      "full_roi_probes": 7266
+    },
+    {
+      "t_s": 49.5,
+      "common_probes": 6225,
+      "full_roi_probes": 7268
+    },
+    {
+      "t_s": 50.0,
+      "common_probes": 5994,
+      "full_roi_probes": 7254
+    },
+    {
+      "t_s": 50.5,
+      "common_probes": 6010,
+      "full_roi_probes": 7251
+    },
+    {
+      "t_s": 51.0,
+      "common_probes": 5831,
+      "full_roi_probes": 7262
+    },
+    {
+      "t_s": 51.5,
+      "common_probes": 5803,
+      "full_roi_probes": 7253
+    },
+    {
+      "t_s": 52.0,
+      "common_probes": 5657,
+      "full_roi_probes": 7257
+    },
+    {
+      "t_s": 52.5,
+      "common_probes": 5606,
+      "full_roi_probes": 7254
+    },
+    {
+      "t_s": 53.0,
+      "common_probes": 5418,
+      "full_roi_probes": 7264
+    },
+    {
+      "t_s": 53.5,
+      "common_probes": 5419,
+      "full_roi_probes": 7262
+    },
+    {
+      "t_s": 54.0,
+      "common_probes": 5332,
+      "full_roi_probes": 7259
+    },
+    {
+      "t_s": 54.5,
+      "common_probes": 5159,
+      "full_roi_probes": 7245
+    },
+    {
+      "t_s": 55.0,
+      "common_probes": 5208,
+      "full_roi_probes": 7256
+    },
+    {
+      "t_s": 55.5,
+      "common_probes": 5142,
+      "full_roi_probes": 7267
+    }
+  ],
+  "aggregate": {
+    "cell_7cm_window_10s": {
+      "conflict": 149773,
+      "single_capture_conflict": 38585,
+      "multi_capture_only": 111188,
+      "lidar_conflict": 31315,
+      "oak_conflict": 129971,
+      "raw_below_12": 99316,
+      "xy_bins_below_6": 45298,
+      "no_support": 9297,
+      "valid": 113522,
+      "unknown": 434688,
+      "direct_now": 18303,
+      "height_refit_now": 44271,
+      "reused_now": 10185,
+      "held_valid": 40763,
+      "calculated_now": 344710,
+      "probes": 548210,
+      "supported_valid": 113129,
+      "current_direct_pass": 29400
+    },
+    "cell_7cm_window_5s": {
+      "conflict": 61817,
+      "single_capture_conflict": 19146,
+      "multi_capture_only": 42671,
+      "lidar_conflict": 10057,
+      "oak_conflict": 53651,
+      "raw_below_12": 222938,
+      "xy_bins_below_6": 154146,
+      "no_support": 67144,
+      "valid": 171609,
+      "unknown": 376601,
+      "direct_now": 51377,
+      "height_refit_now": 70522,
+      "reused_now": 29496,
+      "held_valid": 20214,
+      "calculated_now": 449270,
+      "probes": 548210,
+      "supported_valid": 168077,
+      "current_direct_pass": 58293
+    },
+    "cell_7cm_window_3s": {
+      "conflict": 24519,
+      "single_capture_conflict": 9751,
+      "multi_capture_only": 14768,
+      "lidar_conflict": 3672,
+      "oak_conflict": 21221,
+      "raw_below_12": 321735,
+      "xy_bins_below_6": 260644,
+      "no_support": 159407,
+      "valid": 183638,
+      "unknown": 364572,
+      "direct_now": 63172,
+      "height_refit_now": 59908,
+      "reused_now": 35735,
+      "held_valid": 24823,
+      "calculated_now": 414661,
+      "probes": 548210,
+      "supported_valid": 163163,
+      "current_direct_pass": 69705
+    },
+    "cell_12cm_window_10s": {
+      "conflict": 267049,
+      "single_capture_conflict": 82943,
+      "multi_capture_only": 184106,
+      "lidar_conflict": 57756,
+      "oak_conflict": 238610,
+      "raw_below_12": 19018,
+      "xy_bins_below_6": 11209,
+      "no_support": 3283,
+      "valid": 79616,
+      "unknown": 468594,
+      "direct_now": 5566,
+      "height_refit_now": 46138,
+      "reused_now": 8028,
+      "held_valid": 19884,
+      "calculated_now": 437042,
+      "probes": 548210,
+      "supported_valid": 79387,
+      "current_direct_pass": 7810
+    },
+    "cell_12cm_window_5s": {
+      "conflict": 128437,
+      "single_capture_conflict": 41431,
+      "multi_capture_only": 87006,
+      "lidar_conflict": 22586,
+      "oak_conflict": 111902,
+      "raw_below_12": 96637,
+      "xy_bins_below_6": 70948,
+      "no_support": 34883,
+      "valid": 163886,
+      "unknown": 384324,
+      "direct_now": 22077,
+      "height_refit_now": 102293,
+      "reused_now": 27023,
+      "held_valid": 12493,
+      "calculated_now": 503843,
+      "probes": 548210,
+      "supported_valid": 161783,
+      "current_direct_pass": 24074
+    },
+    "cell_12cm_window_3s": {
+      "conflict": 54423,
+      "single_capture_conflict": 20699,
+      "multi_capture_only": 33724,
+      "lidar_conflict": 9151,
+      "oak_conflict": 46689,
+      "raw_below_12": 198485,
+      "xy_bins_below_6": 164811,
+      "no_support": 103761,
+      "valid": 204783,
+      "unknown": 343427,
+      "direct_now": 42846,
+      "height_refit_now": 101952,
+      "reused_now": 41247,
+      "held_valid": 18738,
+      "calculated_now": 480351,
+      "probes": 548210,
+      "supported_valid": 186699,
+      "current_direct_pass": 46402
+    },
+    "cell_15cm_window_10s": {
+      "conflict": 323790,
+      "single_capture_conflict": 110757,
+      "multi_capture_only": 213033,
+      "lidar_conflict": 72999,
+      "oak_conflict": 292917,
+      "raw_below_12": 10296,
+      "xy_bins_below_6": 6797,
+      "no_support": 1891,
+      "valid": 56420,
+      "unknown": 491790,
+      "direct_now": 2571,
+      "height_refit_now": 36089,
+      "reused_now": 7064,
+      "held_valid": 10696,
+      "calculated_now": 475956,
+      "probes": 548210,
+      "supported_valid": 56256,
+      "current_direct_pass": 3665
+    },
+    "cell_15cm_window_5s": {
+      "conflict": 168298,
+      "single_capture_conflict": 56436,
+      "multi_capture_only": 111862,
+      "lidar_conflict": 31018,
+      "oak_conflict": 146507,
+      "raw_below_12": 67672,
+      "xy_bins_below_6": 51218,
+      "no_support": 23341,
+      "valid": 141407,
+      "unknown": 406803,
+      "direct_now": 13437,
+      "height_refit_now": 94412,
+      "reused_now": 25210,
+      "held_valid": 8348,
+      "calculated_now": 519940,
+      "probes": 548210,
+      "supported_valid": 139990,
+      "current_direct_pass": 14317
+    },
+    "cell_15cm_window_3s": {
+      "conflict": 73785,
+      "single_capture_conflict": 28381,
+      "multi_capture_only": 45404,
+      "lidar_conflict": 13317,
+      "oak_conflict": 62923,
+      "raw_below_12": 157521,
+      "xy_bins_below_6": 132395,
+      "no_support": 80506,
+      "valid": 195808,
+      "unknown": 352402,
+      "direct_now": 35396,
+      "height_refit_now": 105168,
+      "reused_now": 41402,
+      "held_valid": 13842,
+      "calculated_now": 503733,
+      "probes": 548210,
+      "supported_valid": 181124,
+      "current_direct_pass": 37926
+    }
+  },
+  "all_nine_sufficient": {
+    "cell_7cm_window_10s": {
+      "conflict": 77233,
+      "single_capture_conflict": 19615,
+      "multi_capture_only": 57618,
+      "lidar_conflict": 15199,
+      "oak_conflict": 67929,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 70704,
+      "unknown": 155068,
+      "direct_now": 13192,
+      "height_refit_now": 30609,
+      "reused_now": 5910,
+      "held_valid": 20993,
+      "calculated_now": 170365,
+      "probes": 225772,
+      "supported_valid": 70704,
+      "current_direct_pass": 18535
+    },
+    "cell_7cm_window_5s": {
+      "conflict": 45794,
+      "single_capture_conflict": 14004,
+      "multi_capture_only": 31790,
+      "lidar_conflict": 7168,
+      "oak_conflict": 40125,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 110970,
+      "unknown": 114802,
+      "direct_now": 37457,
+      "height_refit_now": 52273,
+      "reused_now": 11898,
+      "held_valid": 9342,
+      "calculated_now": 208378,
+      "probes": 225772,
+      "supported_valid": 110970,
+      "current_direct_pass": 41481
+    },
+    "cell_7cm_window_3s": {
+      "conflict": 22957,
+      "single_capture_conflict": 9423,
+      "multi_capture_only": 13534,
+      "lidar_conflict": 3216,
+      "oak_conflict": 20115,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 131739,
+      "unknown": 94033,
+      "direct_now": 63149,
+      "height_refit_now": 42902,
+      "reused_now": 14808,
+      "held_valid": 10880,
+      "calculated_now": 209271,
+      "probes": 225772,
+      "supported_valid": 131739,
+      "current_direct_pass": 69667
+    },
+    "cell_12cm_window_10s": {
+      "conflict": 128206,
+      "single_capture_conflict": 39687,
+      "multi_capture_only": 88519,
+      "lidar_conflict": 21160,
+      "oak_conflict": 118770,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 40255,
+      "unknown": 185517,
+      "direct_now": 2752,
+      "height_refit_now": 26742,
+      "reused_now": 3769,
+      "held_valid": 6992,
+      "calculated_now": 195058,
+      "probes": 225772,
+      "supported_valid": 40255,
+      "current_direct_pass": 3411
+    },
+    "cell_12cm_window_5s": {
+      "conflict": 83201,
+      "single_capture_conflict": 27732,
+      "multi_capture_only": 55469,
+      "lidar_conflict": 10895,
+      "oak_conflict": 75997,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 89911,
+      "unknown": 135861,
+      "direct_now": 10880,
+      "height_refit_now": 66375,
+      "reused_now": 8489,
+      "held_valid": 4167,
+      "calculated_now": 217536,
+      "probes": 225772,
+      "supported_valid": 89911,
+      "current_direct_pass": 11773
+    },
+    "cell_12cm_window_3s": {
+      "conflict": 44378,
+      "single_capture_conflict": 18013,
+      "multi_capture_only": 26365,
+      "lidar_conflict": 5717,
+      "oak_conflict": 39985,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 122444,
+      "unknown": 103328,
+      "direct_now": 25016,
+      "height_refit_now": 77373,
+      "reused_now": 13285,
+      "held_valid": 6770,
+      "calculated_now": 215398,
+      "probes": 225772,
+      "supported_valid": 122444,
+      "current_direct_pass": 26457
+    },
+    "cell_15cm_window_10s": {
+      "conflict": 150968,
+      "single_capture_conflict": 51220,
+      "multi_capture_only": 99748,
+      "lidar_conflict": 23823,
+      "oak_conflict": 141716,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 26495,
+      "unknown": 199277,
+      "direct_now": 1056,
+      "height_refit_now": 19179,
+      "reused_now": 2906,
+      "held_valid": 3354,
+      "calculated_now": 204484,
+      "probes": 225772,
+      "supported_valid": 26495,
+      "current_direct_pass": 1168
+    },
+    "cell_15cm_window_5s": {
+      "conflict": 103433,
+      "single_capture_conflict": 36300,
+      "multi_capture_only": 67133,
+      "lidar_conflict": 12917,
+      "oak_conflict": 95483,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 72013,
+      "unknown": 153759,
+      "direct_now": 6417,
+      "height_refit_now": 55616,
+      "reused_now": 7595,
+      "held_valid": 2385,
+      "calculated_now": 219721,
+      "probes": 225772,
+      "supported_valid": 72013,
+      "current_direct_pass": 6793
+    },
+    "cell_15cm_window_3s": {
+      "conflict": 56903,
+      "single_capture_conflict": 23224,
+      "multi_capture_only": 33679,
+      "lidar_conflict": 7465,
+      "oak_conflict": 51640,
+      "raw_below_12": 0,
+      "xy_bins_below_6": 0,
+      "no_support": 0,
+      "valid": 110961,
+      "unknown": 114811,
+      "direct_now": 16277,
+      "height_refit_now": 77214,
+      "reused_now": 12334,
+      "held_valid": 5136,
+      "calculated_now": 217227,
+      "probes": 225772,
+      "supported_valid": 110961,
+      "current_direct_pass": 16972
+    }
+  }
+}

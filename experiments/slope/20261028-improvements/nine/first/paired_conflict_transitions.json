@@ -1,0 +1,56 @@
+{
+  "cell_7cm_window_5s": {
+    "insufficient_points_or_bins": 1832,
+    "still_conflict": 7016,
+    "other_unknown": 1572,
+    "valid_held_or_reused": 457,
+    "no_support": 667,
+    "height_refit_now": 613,
+    "direct_now": 558
+  },
+  "cell_7cm_window_3s": {
+    "no_support": 2292,
+    "still_conflict": 3044,
+    "direct_now": 1258,
+    "insufficient_points_or_bins": 2900,
+    "height_refit_now": 785,
+    "valid_held_or_reused": 912,
+    "other_unknown": 1524
+  },
+  "cell_12cm_window_5s": {
+    "direct_now": 255,
+    "still_conflict": 5620,
+    "other_unknown": 1344,
+    "insufficient_points_or_bins": 564,
+    "no_support": 229,
+    "height_refit_now": 547,
+    "valid_held_or_reused": 361
+  },
+  "cell_12cm_window_3s": {
+    "valid_held_or_reused": 678,
+    "still_conflict": 2594,
+    "direct_now": 802,
+    "no_support": 1010,
+    "insufficient_points_or_bins": 1308,
+    "other_unknown": 1625,
+    "height_refit_now": 903
+  },
+  "cell_15cm_window_5s": {
+    "still_conflict": 4895,
+    "direct_now": 138,
+    "other_unknown": 1205,
+    "no_support": 124,
+    "insufficient_points_or_bins": 351,
+    "height_refit_now": 466,
+    "valid_held_or_reused": 229
+  },
+  "cell_15cm_window_3s": {
+    "still_conflict": 2392,
+    "valid_held_or_reused": 574,
+    "other_unknown": 1517,
+    "direct_now": 583,
+    "no_support": 618,
+    "height_refit_now": 810,
+    "insufficient_points_or_bins": 914
+  }
+}

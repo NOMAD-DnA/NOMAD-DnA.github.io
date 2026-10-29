@@ -1,0 +1,133 @@
+{
+  "bags": {
+    "first": {
+      "ticks": 93,
+      "arrays_per_tick": 10,
+      "every_profiled_tick_exact": true,
+      "every_profiled_hidden_state_exact": true,
+      "final_uninstrumented_maps_exact": true,
+      "timed_runs": [
+        {
+          "variant": "baseline",
+          "repeat": 1,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "baseline",
+          "repeat": 2,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "baseline",
+          "repeat": 3,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "optimized",
+          "repeat": 1,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "optimized",
+          "repeat": 2,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "optimized",
+          "repeat": 3,
+          "settings_points_and_counters_equal": true
+        }
+      ]
+    },
+    "last": {
+      "ticks": 112,
+      "arrays_per_tick": 10,
+      "every_profiled_tick_exact": true,
+      "every_profiled_hidden_state_exact": true,
+      "final_uninstrumented_maps_exact": true,
+      "timed_runs": [
+        {
+          "variant": "baseline",
+          "repeat": 1,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "baseline",
+          "repeat": 2,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "baseline",
+          "repeat": 3,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "optimized",
+          "repeat": 1,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "optimized",
+          "repeat": 2,
+          "settings_points_and_counters_equal": true
+        },
+        {
+          "variant": "optimized",
+          "repeat": 3,
+          "settings_points_and_counters_equal": true
+        }
+      ]
+    }
+  },
+  "pinned_sources_unchanged": {
+    "session.py": true,
+    "fusion_core.py": true,
+    "costmap_core.py": true,
+    "slope_output.py": true,
+    "fusion_mapper.py": true,
+    "settings.yaml": true,
+    "slope_comparison_core.py": true,
+    "viewer.py": true,
+    "core.py": true,
+    "mapper.py": true,
+    "messages.py": true,
+    "__init__.py": true,
+    "scenario_start.py": true,
+    "costmap.py": true,
+    "selected_preprocessing.py": true,
+    "slope_comparison.py": true,
+    "calibration.py": true,
+    "runtime.py": true,
+    "_geometry/cost_policy.py": true,
+    "_geometry/traversability_core.py": true,
+    "_geometry/__init__.py": true,
+    "_geometry/stage1_geometry_layers.py": true,
+    "_geometry/quality_mapping_core.py": true
+  },
+  "behavior_tests": {
+    "passed": true,
+    "checks": 567,
+    "scopes": [
+      "empty map",
+      "7/12/15cm",
+      "both representative modes",
+      "raw expiry",
+      "per-source and global caps",
+      "within-source conflict",
+      "moving ROI",
+      "resume support reset",
+      "circle boundary/source weights",
+      "all 256 height-neighbor masks, changing Z with fixed XY"
+    ]
+  },
+  "runtime_smoke": {
+    "passed": true,
+    "profile": "12cm_3s_optimized",
+    "resolution_m": 0.12,
+    "radius_m": 0.18,
+    "window_s": 3.0,
+    "known_plane_deg": 10.0,
+    "viewer": "workspace/outputs/slope_12cm_optimization_20261029/runtime_smoke/terrain_viewer.html"
+  },
+  "accuracy_ground_truth_available": false
+}

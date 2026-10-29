@@ -1,0 +1,56 @@
+{
+  "cell_7cm_window_5s": {
+    "other_unknown": 4989,
+    "insufficient_points_or_bins": 5009,
+    "still_conflict": 11769,
+    "valid_held_or_reused": 1143,
+    "height_refit_now": 2181,
+    "direct_now": 1850,
+    "no_support": 1785
+  },
+  "cell_7cm_window_3s": {
+    "other_unknown": 4418,
+    "insufficient_points_or_bins": 6646,
+    "still_conflict": 4631,
+    "direct_now": 2839,
+    "height_refit_now": 2554,
+    "valid_held_or_reused": 2384,
+    "no_support": 5254
+  },
+  "cell_12cm_window_5s": {
+    "other_unknown": 4470,
+    "still_conflict": 8660,
+    "height_refit_now": 1884,
+    "valid_held_or_reused": 642,
+    "insufficient_points_or_bins": 1429,
+    "direct_now": 495,
+    "no_support": 581
+  },
+  "cell_12cm_window_3s": {
+    "insufficient_points_or_bins": 2543,
+    "other_unknown": 4399,
+    "still_conflict": 3663,
+    "height_refit_now": 2751,
+    "direct_now": 1210,
+    "valid_held_or_reused": 1477,
+    "no_support": 2118
+  },
+  "cell_15cm_window_5s": {
+    "other_unknown": 3667,
+    "height_refit_now": 1450,
+    "still_conflict": 7318,
+    "valid_held_or_reused": 457,
+    "direct_now": 259,
+    "no_support": 267,
+    "insufficient_points_or_bins": 804
+  },
+  "cell_15cm_window_3s": {
+    "other_unknown": 3930,
+    "valid_held_or_reused": 1120,
+    "still_conflict": 3196,
+    "height_refit_now": 2226,
+    "direct_now": 844,
+    "insufficient_points_or_bins": 1642,
+    "no_support": 1264
+  }
+}
