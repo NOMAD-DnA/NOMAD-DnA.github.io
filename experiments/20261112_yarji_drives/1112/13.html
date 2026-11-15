@@ -1,0 +1,22 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>11/12 #13 11:43</title><style>:root{--bg:#f6f7f9;--fg:#1d2024;--card:#fff;--muted:#626a75;--line:#e1e4e8;--accent:#2563eb;--ok:#15803d;--warn:#b45309;--bad:#c2410c;--chip:#eef1f5}
+@media (prefers-color-scheme:dark){:root{--bg:#15171b;--fg:#e8eaed;--card:#1f2228;--muted:#9aa0a6;--line:#30343b;--accent:#7aa2ff;--ok:#4ade80;--warn:#fbbf24;--bad:#fb923c;--chip:#2a2e35}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,"Noto Sans KR",sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}a{color:var(--accent)}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:6px}.crumb a{text-decoration:none}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:26px 0 8px}p.sub{color:var(--muted);margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}.card b{display:block;font-size:15.5px}.card span{display:block;color:var(--muted);font-size:13.5px}
+.card img{width:100%;border-radius:6px;margin-top:8px;border:1px solid var(--line);display:block}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.chip{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.chip.v{background:#2563eb;color:#fff}.chip.s{background:#c2410c;color:#fff}
+.muted{color:var(--muted)}.dim{opacity:.72}
+video{width:100%;background:#000;border-radius:8px;display:block}
+.vtabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.vtabs button{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.vtabs button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--card);border-radius:8px;overflow:hidden}th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left}th{color:var(--muted);font-weight:600;font-size:13px}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:14px}
+img.full{width:100%;border-radius:8px;border:1px solid var(--line)}</style></head><body><main><div class="crumb"><a href="../index.html">주행 실험 영상</a> › <a href="index.html">11/12 야지</a> › #13 11:43</div><h1>11/12 야지 #13 · 11:43 · 6 m 전진 후 정지, 끝에 사람이 옮김 (추정)</h1><p class="sub">19.0 m 중 자율 약 6 m · 목표 10.4 m → 최근접 4.0 m · 134~141초에 5 m 빠른 이동(사람 보임)</p><div class="vtabs" role="group"><button data-k="all" aria-pressed="true">종합: 3D + 실제 영상 + 코스트맵 · 1분 14초</button><button data-k="slide" aria-pressed="false">3D 밀림 표시 (빠른 재생) · 44초</button></div><video id="v" controls playsinline preload="metadata"></video><p class="muted" id="vd" style="font-size:13.5px;margin:6px 0 0"></p><p class="muted" style="font-size:12.5px;margin:4px 0 0">화면이 좁으면 가벼운 720p로 자동 재생 · <a href="#" id="hq">원본 화질로 보기</a></p><script>const V=[{"key": "all", "name": "종합: 3D + 실제 영상 + 코스트맵", "desc": "실시간 1배속 · 큰 화면 3D 지형 위 차량, 오른쪽 위 휴대폰 실제 영상, 오른쪽 로봇 코스트맵·계획 경로, 아래 앞뒤 속도·플래너 상태", "src": "../v/맵5_1143_3D_실영상_코스트맵.mp4", "small": "../v/맵5_1143_3D_실영상_코스트맵.mp4", "dur": 74.833333}, {"key": "slide", "name": "3D 밀림 표시 (빠른 재생)", "desc": "멈춤 8배·주행 3배·밀림 근처 1배 · 차 방향 = VIO 자세, 빨간 궤적 = 뒤로 밀린 구간", "src": "../v/맵5_1143_밀림표시.mp4", "small": "../v/맵5_1143_밀림표시.mp4", "dur": 44.133333}];const v=document.getElementById('v'),vd=document.getElementById('vd');let hq=!matchMedia('(max-width: 900px)').matches,cur=V[0];
+function show(x){cur=x;const t=v.currentTime;v.src=hq?x.src:x.small;vd.textContent=x.desc;document.querySelectorAll('.vtabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===x.key));}
+document.querySelectorAll('.vtabs button').forEach(b=>b.onclick=()=>show(V.find(x=>x.key===b.dataset.k)));
+document.getElementById('hq').onclick=ev=>{ev.preventDefault();hq=true;show(cur);};show(V[0]);</script><h2>주행 카드</h2><img class="full" src="../cards1112/13.png" alt="11:43 · 6 m 전진 후 정지, 끝에 사람이 옮김 (추정) 주행 카드" loading="lazy"><p class="muted" style="font-size:12.5px">기록 파일: 20261112_114350_130484.nomad</p></main></body></html>
