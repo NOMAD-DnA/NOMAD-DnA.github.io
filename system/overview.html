@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOMAD 전체 시스템 구조</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 설계도 시트: 위 = 보드·센서·데이터 선 전체도, 블록을 누르면 아래 상세 시트. 기존 매퍼 구조 페이지와 같은 색 체계 */
+:root{
+  --paper:#f3f5f8; --sheet:#ffffff; --ink:#152033; --muted:#5b6678; --line:#c9d1dd;
+  --accent:#1f5fd1; --accent-soft:#e3ecfb; --wire:#7a8aa3;
+  --ok:#1d7a4f; --ok-soft:#e1f2e9; --todo:#a35c00; --todo-soft:#fbeedb; --keep:#5b4bb7; --keep-soft:#ece9fb;
+  --bad:#b4232b; --bad-soft:#fbe5e6;
+  --jet:#1f5fd1; --pi5:#1d7a4f; --pi4:#a35c00; --lap:#5b4bb7;
+  --shadow:0 1px 2px rgba(21,32,51,.06),0 6px 18px rgba(21,32,51,.06);
+  --f-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f1520; --sheet:#151d2b; --ink:#e6ebf3; --muted:#9aa6b8; --line:#2b3648;
+  --accent:#6f9cff; --accent-soft:#1d2a44; --wire:#6b7a92;
+  --ok:#5fd09a; --ok-soft:#163327; --todo:#f0ad55; --todo-soft:#3a2a14; --keep:#a99cff; --keep-soft:#262148;
+  --bad:#ff7b82; --bad-soft:#3a1a1d; --jet:#6f9cff; --pi5:#5fd09a; --pi4:#f0ad55; --lap:#a99cff;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1520; --sheet:#151d2b; --ink:#e6ebf3; --muted:#9aa6b8; --line:#2b3648;
+  --accent:#6f9cff; --accent-soft:#1d2a44; --wire:#6b7a92;
+  --ok:#5fd09a; --ok-soft:#163327; --todo:#f0ad55; --todo-soft:#3a2a14; --keep:#a99cff; --keep-soft:#262148;
+  --bad:#ff7b82; --bad-soft:#3a1a1d; --jet:#6f9cff; --pi5:#5fd09a; --pi4:#f0ad55; --lap:#a99cff;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.25); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;
+  padding:24px max(16px,env(safe-area-inset-right,0px)) 56px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font-size:1.65rem;font-weight:900;margin:0;letter-spacing:-.01em}
+h2{font-size:1.2rem;margin:0}
+h3{font-size:1rem;margin:18px 0 6px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:80ch}
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;font-size:.78rem;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-weight:500;white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.todo{background:var(--todo-soft);color:var(--todo)}
+.chip.keep{background:var(--keep-soft);color:var(--keep)} .chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.drill{background:var(--accent-soft);color:var(--accent)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+nav.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);
+  display:flex;flex-wrap:wrap;gap:6px;padding:8px 0;border-bottom:1px solid var(--line)}
+nav.top button{font:inherit;font-size:.86rem;border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+nav.top button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700;background:var(--accent-soft)}
+.diagram{width:100%;overflow-x:auto}
+.diagram svg{min-width:900px;width:100%;height:auto;display:block}
+.blk{cursor:pointer} .blk rect{transition:stroke-width .15s} .blk:hover rect,.blk:focus rect{stroke-width:3}
+.blk:focus{outline:none}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:10px 0}
+.step{flex:1 1 180px;min-width:160px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;position:relative;margin:4px 14px 4px 0}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--wire);font-weight:700}
+.step b{display:block;font-size:.9rem} .step span{font-size:.82rem;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:.86rem;margin:6px 0}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:.8rem}
+code{font-family:var(--f-mono);font-size:.82em;background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:5px;word-break:break-all}
+details{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0;background:var(--paper)}
+details summary{cursor:pointer;font-weight:700;font-size:.92rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+ul{margin:4px 0;padding-left:20px} li{margin:2px 0}
+.tl{border-left:2px solid var(--line);margin:6px 0 6px 6px;padding-left:14px}
+.tl div{position:relative;margin:6px 0;font-size:.88rem}
+.tl div::before{content:"";position:absolute;left:-20px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl b{font-family:var(--f-mono);font-size:.8rem;color:var(--accent);margin-right:6px}
+.iss{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:.88rem}
+.iss .chip{flex:none}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:.88rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+.note{font-size:.82rem;color:var(--muted)}
+.part{display:none} .part.on{display:block}
+.tag{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+footer{font-size:.8rem;color:var(--muted)}
+@media (max-width:640px){body{font-size:14px}.step::after{display:none}.step{margin-right:0}}
+</style>
+</head>
+<body>
+<div class="wrap"><p style="margin:0;font-size:.85rem"><a href="../index.html">홈</a> › <a href="index.html">시스템 구조</a> › 전체 구조</p>
+<header>
+  <h1>NOMAD 전체 시스템 구조</h1>
+  <p class="sub">센서 → 위치추정(VIO + 융합기) → 인지 → 매퍼(개선 매퍼) → 플래닝(Jetson) → 제어(Pi4 VESC), 그리고 노트북 GUI·기록까지 한 장에 정리했다. 2026-11-16 기준, 작업 기록·공유폴더 코드·설정 사본에서 확인한 내용이며, 확인하지 못한 것은 <span class="chip todo">미확인</span>, 짐작은 <span class="chip keep">추정</span>으로 표시했다.</p>
+  <div class="chips">
+    <span class="chip drill"><span class="dot" style="background:var(--jet)"></span>Jetson</span>
+    <span class="chip ok"><span class="dot" style="background:var(--pi5)"></span>Pi5</span>
+    <span class="chip todo"><span class="dot" style="background:var(--pi4)"></span>Pi4</span>
+    <span class="chip keep"><span class="dot" style="background:var(--lap)"></span>노트북</span>
+    <span class="chip bad">위험·문제</span>
+  </div>
+</header>
+
+<nav class="top" id="nav" aria-label="파트 고르기"></nav>
+
+<section class="sheet" aria-labelledby="d-title">
+  <h2 id="d-title">전체 흐름 — 블록을 누르면 아래에 자세한 설명</h2>
+  <p class="note">선 굵기·글자는 실제 데이터 경로와 주기. 점선 = 무선(Wi-Fi/핫스팟), 실선 = 유선 또는 같은 보드 안.</p>
+  <div class="diagram">
+  <svg viewBox="0 0 1120 560" role="img" aria-label="NOMAD 보드와 데이터 흐름도">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--wire)"/></marker></defs>
+    <!-- 보드 영역 -->
+    <rect x="10" y="10" width="520" height="420" rx="14" fill="none" stroke="var(--jet)" stroke-dasharray="2 4"/>
+    <text x="24" y="34" fill="var(--jet)" font-weight="700" font-size="15">Jetson Xavier NX — 센서·인지·매퍼·플래너</text>
+    <rect x="560" y="10" width="300" height="300" rx="14" fill="none" stroke="var(--pi5)" stroke-dasharray="2 4"/>
+    <text x="574" y="34" fill="var(--pi5)" font-weight="700" font-size="15">Pi5 — 위치추정</text>
+    <rect x="560" y="330" width="300" height="200" rx="14" fill="none" stroke="var(--pi4)" stroke-dasharray="2 4"/>
+    <text x="574" y="354" fill="var(--pi4)" font-weight="700" font-size="15">Pi4 — 제어</text>
+    <rect x="890" y="10" width="220" height="520" rx="14" fill="none" stroke="var(--lap)" stroke-dasharray="2 4"/>
+    <text x="904" y="34" fill="var(--lap)" font-weight="700" font-size="15">노트북 — 운영</text>
+
+    <!-- 블록 -->
+    <g class="blk" data-part="sensor" tabindex="0" role="button" aria-label="센서"><rect x="30" y="52" width="230" height="96" rx="10" fill="var(--sheet)" stroke="var(--jet)" stroke-width="1.5"/>
+      <text x="44" y="76" font-weight="700" fill="var(--ink)">센서</text><text x="44" y="98" font-size="12.5" fill="var(--muted)">OAK-D 흑백·IMU·깊이</text><text x="44" y="116" font-size="12.5" fill="var(--muted)">ZED2 컬러 · YDLIDAR G2</text><text x="44" y="134" font-size="12.5" fill="var(--muted)">(GNSS F9P는 Pi5)</text></g>
+    <g class="blk" data-part="perc" tabindex="0" role="button" aria-label="인지"><rect x="290" y="52" width="220" height="96" rx="10" fill="var(--sheet)" stroke="var(--jet)" stroke-width="1.5"/>
+      <text x="304" y="76" font-weight="700" fill="var(--ink)">인지</text><text x="304" y="98" font-size="12.5" fill="var(--muted)">ZED → SegFormer 야지(field12)</text><text x="304" y="116" font-size="12.5" fill="var(--muted)">12클래스 라벨 1 Hz</text><text x="304" y="134" font-size="12.5" fill="var(--muted)">OAK 스테레오 점군 1~5 Hz</text></g>
+    <g class="blk" data-part="map" tabindex="0" role="button" aria-label="매퍼"><rect x="30" y="190" width="480" height="96" rx="10" fill="var(--sheet)" stroke="var(--jet)" stroke-width="2.5"/>
+      <text x="44" y="214" font-weight="700" fill="var(--ink)">매퍼 — 개선 매퍼 (nomad_terrain_ws, 단일 프로세스)</text><text x="44" y="236" font-size="12.5" fill="var(--muted)">LiDAR + OAK 점 → 라벨 투영 → 경사(중력 기준, TLS 평면) + 의미 비용</text><text x="44" y="256" font-size="12.5" fill="var(--muted)">→ navigation_costmap · local_costmap · planning_cost_layers · perception/status</text><text x="44" y="276" font-size="12.5" fill="var(--muted)">지도 나이 약 0.9 s</text></g>
+    <g class="blk" data-part="plan" tabindex="0" role="button" aria-label="플래닝"><rect x="30" y="320" width="480" height="96" rx="10" fill="var(--sheet)" stroke="var(--jet)" stroke-width="2.5"/>
+      <text x="44" y="344" font-weight="700" fill="var(--ink)">플래닝 — planner_node (Jetson으로 이전)</text><text x="44" y="366" font-size="12.5" fill="var(--muted)">경유점(corridor) → GPP Hybrid A* (5 Hz) → LPP RPP</text><text x="44" y="386" font-size="12.5" fill="var(--muted)">min_clearance 0.15 고정 · 명목 0.25 m/s · 조향 ±35°</text><text x="44" y="406" font-size="12.5" fill="var(--muted)">DriveCommand 20 Hz (유효 0.15 s)</text></g>
+    <g class="blk" data-part="loc" tabindex="0" role="button" aria-label="위치추정"><rect x="580" y="52" width="260" height="240" rx="10" fill="var(--sheet)" stroke="var(--pi5)" stroke-width="2.5"/>
+      <text x="594" y="76" font-weight="700" fill="var(--ink)">위치추정</text><text x="594" y="100" font-size="12.5" fill="var(--muted)">Basalt VIO (C++) odom 10 Hz</text><text x="594" y="120" font-size="12.5" fill="var(--muted)">VIO 감시기: 실패 2 s → 재시작</text><text x="594" y="140" font-size="12.5" fill="var(--muted)">GNSS F9P (C++) 1 Hz</text><text x="594" y="160" font-size="12.5" fill="var(--muted)">Ceres 융합기: 발행 20 Hz</text><text x="594" y="180" font-size="12.5" fill="var(--muted)">  최적화 2 Hz, 창 10 s</text><text x="594" y="200" font-size="12.5" fill="var(--muted)">GNSS = drift_correction</text><text x="594" y="220" font-size="12.5" fill="var(--muted)">  (x·y·yaw만, 1 m당 2 cm)</text><text x="594" y="244" font-size="12.5" fill="var(--muted)">→ /nomad/localization/odometry</text><text x="594" y="262" font-size="12.5" fill="var(--muted)">   + status, TF odom→base_link</text><text x="594" y="282" font-size="12.5" fill="var(--bad)">노트북 검증 pitch +2.49° 보정 미반영</text></g>
+    <g class="blk" data-part="ctrl" tabindex="0" role="button" aria-label="제어"><rect x="580" y="370" width="260" height="140" rx="10" fill="var(--sheet)" stroke="var(--pi4)" stroke-width="2.5"/>
+      <text x="594" y="394" font-weight="700" fill="var(--ink)">제어 — controller_node 50 Hz</text><text x="594" y="416" font-size="12.5" fill="var(--muted)">m/s → ERPM (최소 1000)</text><text x="594" y="436" font-size="12.5" fill="var(--muted)">조향 ±35°, 서보 1.0/s</text><text x="594" y="456" font-size="12.5" fill="var(--muted)">만료 → 0.3 s 감속 → 핸드브레이크</text><text x="594" y="476" font-size="12.5" fill="var(--muted)">VESC FW 5.03 (HFI, 내부 PID)</text><text x="594" y="496" font-size="12.5" fill="var(--bad)">후진 없음 · 바퀴각 피드백 없음</text></g>
+    <g class="blk" data-part="ops" tabindex="0" role="button" aria-label="운영"><rect x="905" y="52" width="190" height="460" rx="10" fill="var(--sheet)" stroke="var(--lap)" stroke-width="2.5"/>
+      <text x="919" y="76" font-weight="700" fill="var(--ink)">운영 GUI</text><text x="919" y="100" font-size="12.5" fill="var(--muted)">실물시험앱 (Python)</text><text x="919" y="124" font-size="12.5" fill="var(--muted)">SSH로 보드 시작·종료</text><text x="919" y="146" font-size="12.5" fill="var(--muted)">플래너: stdin/stdout JSON</text><text x="919" y="168" font-size="12.5" fill="var(--muted)">출력 허용 → .nomad 기록</text><text x="919" y="190" font-size="12.5" fill="var(--muted)">종료 때 필수 메모</text><text x="919" y="212" font-size="12.5" fill="var(--muted)">설정 64개 → Jetson 저장</text><text x="919" y="234" font-size="12.5" fill="var(--muted)">보드 주소 자동 추적</text><text x="919" y="256" font-size="12.5" fill="var(--muted)">관전 PC 중계 (읽기 전용)</text><text x="919" y="290" font-size="12.5" fill="var(--muted)">녹화</text><text x="919" y="312" font-size="12.5" fill="var(--muted)">· .nomad (SQLite)</text><text x="919" y="334" font-size="12.5" fill="var(--muted)">· Pi5 전방 영상 MJPEG</text><text x="919" y="356" font-size="12.5" fill="var(--muted)">· Jetson SSD rosbag2</text><text x="919" y="392" font-size="12.5" fill="var(--muted)">시간: Pi5 기준 chrony</text><text x="919" y="414" font-size="12.5" fill="var(--muted)">보드 간 5 ms 넘으면</text><text x="919" y="434" font-size="12.5" fill="var(--muted)">출발 안 함</text></g>
+
+    <!-- 데이터 선 -->
+    <path d="M260,90 C420,90 440,60 580,80" stroke="var(--wire)" stroke-width="2.5" fill="none" marker-end="url(#ar)"/>
+    <text x="300" y="44" font-size="11.5" fill="var(--muted)" font-family="var(--f-mono)">OAK 흑백 10 Hz + IMU 200 Hz (유선 100 Mbps)</text>
+    <path d="M145,148 L145,190" stroke="var(--wire)" stroke-width="2" fill="none" marker-end="url(#ar)"/><text x="152" y="174" font-size="11.5" fill="var(--muted)" font-family="var(--f-mono)">/scan 5 Hz · 점군</text>
+    <path d="M400,148 L400,190" stroke="var(--wire)" stroke-width="2" fill="none" marker-end="url(#ar)"/><text x="407" y="174" font-size="11.5" fill="var(--muted)" font-family="var(--f-mono)">class_ids 1 Hz</text>
+    <path d="M580,240 C540,240 540,250 510,250" stroke="var(--wire)" stroke-width="2.5" fill="none" marker-end="url(#ar)"/><text x="512" y="232" font-size="11.5" fill="var(--muted)" font-family="var(--f-mono)">위치 20 Hz</text>
+    <path d="M270,286 L270,320" stroke="var(--wire)" stroke-width="2.5" fill="none" marker-end="url(#ar)"/><text x="277" y="308" font-size="11.5" fill="var(--muted)" font-family="var(--f-mono)">costmap · cost_layers</text>
+    <path d="M580,270 C545,300 545,350 510,350" stroke="var(--wire)" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+    <path d="M510,395 C540,420 550,440 580,440" stroke="var(--wire)" stroke-width="2.5" stroke-dasharray="6 5" fill="none" marker-end="url(#ar)"/><text x="470" y="458" font-size="11.5" fill="var(--bad)" font-family="var(--f-mono)">DriveCommand 20 Hz (무선)</text>
+    <path d="M905,150 C870,150 870,380 510,380" stroke="var(--lap)" stroke-width="1.5" stroke-dasharray="3 4" fill="none" marker-end="url(#ar)"/>
+    <text x="700" y="548" font-size="11.5" fill="var(--muted)">노트북 ↔ 각 보드: SSH(Wi-Fi/핫스팟), ROS2 Humble FastDDS domain 59</text>
+  </svg>
+  </div>
+</section>
+
+<section class="sheet" id="detail" aria-live="polite"></section>
+
+<section class="sheet">
+  <h2>전체 흐름 한 단락</h2>
+  <p>Jetson의 OAK-D가 흑백 좌우 영상(10 Hz)과 IMU(200 Hz)를 100 Mbps 직결 유선으로 Pi5에 보낸다. Pi5에서는 Basalt VIO(odom 약 10 Hz)와 C++ GNSS(1 Hz)가 돌고, Ceres 융합기(발행 20 Hz, 최적화 2 Hz)가 GNSS를 <b>drift_correction</b> 방식으로 x·y·yaw에만 천천히 반영해 공용 위치를 낸다. Jetson에서는 ZED 영상 → SegFormer 야지 라벨(1 Hz), LiDAR(5 Hz), OAK 스테레오 점군(1~5 Hz)이 <b>개선 매퍼</b>로 모여 경사(중력 기준)와 의미 비용 지도를 만든다(지도 나이 약 0.9 s). 같은 Jetson의 <b>플래너</b>가 경유점 → Hybrid A* GPP(5 Hz) → RPP LPP로 경로를 짜 20 Hz DriveCommand를 무선으로 Pi4에 보내고, Pi4 제어기(50 Hz)가 ERPM(최소 1000)·서보(±35°)로 바꿔 VESC를 움직인다. 노트북 GUI는 SSH로 보드를 켜고 끄며, 받은 상태를 <code>.nomad</code>에 기록한다.</p>
+  <details><summary>이전 페이지와 무엇이 달라졌나</summary>
+    <ul>
+      <li>플래너 위치: Pi4 → <b>Jetson</b> (Pi4는 드라이버·제어기만 실행).</li>
+      <li>매퍼: 기존 4프로세스·JSON 전달 → <b>개선 매퍼 단일 프로세스</b>, 경사 기준 진행방향 → 중력.</li>
+      <li>위치: GNSS를 창 최적화에 넣던 방식 → <b>drift_correction</b>(1 m당 2 cm만 반영), VIO 감시기 자동 재시작.</li>
+      <li>제어: 0 A 관성 정지 → 브레이크 20 A + 핸드브레이크, 감속 정지 0.3 s, 서보 0.40 → 1.0/s.</li>
+      <li>이전 판: <a href="../experiments/20261111_board_code_review/index.html">데이터 흐름·예외 처리(11-13)</a>, <a href="mapper_20261113.html">새 매퍼 구조(11-13)</a>.</li>
+    </ul>
+  </details>
+</section>
+<footer>근거: 작업 기록 <code>log/NOMAD_모듈통합_리팩토링/로그기록.md</code>(11-11~16), 공유폴더 <code>NOMAD_모듈별_통합_20261104</code>(에이전트 인수인계, 제어_정리_20261115, 실물시험앱 remote 스크립트), 보드 코드 사본 <code>보드코드_20261114</code>, 플래너 분할 사본. 상세 조사 원문: <code>관련자료/시스템구조_20261116/조사_원문.md</code>. 공개본에는 IP·계정 정보 없음.</footer>
+</div>
+
+<script>
+const P = {
+sensor:{t:'센서', c:'var(--jet)', one:'모든 카메라·라이다는 Jetson에 USB로, GNSS만 Pi5에 붙는다.',
+ flow:[['OAK-D','흑백 좌우 640×480 10 Hz, IMU 200 Hz → 유선으로 Pi5 VIO'],['OAK 깊이','외부 SGBM 점군 1·2·3·5 Hz(GUI 기본 3) → 매퍼'],['ZED2','컬러 HD720 → 의미분할, IMU·지자계 → 융합'],['YDLIDAR G2','/scan·/point_cloud 5 Hz, 약 9° 숙임·높이 0.36 m'],['GNSS F9P','Pi5, NAV-PVT 1 Hz (/gps/fix·quality·signal_quality)']],
+ kv:[['OAK IMU','200 Hz (11-11에 100→200, 녹화 실측 197~201 Hz)'],['OAK 컬러','640×360 JPEG(칩 안 압축) → Pi5 전방 녹화 10 Hz'],['Jetson–Pi5','이더넷 직결, Pi5 쪽 100 Mbps (실측 평균 64 Mbps)'],['LiDAR 바닥','정지 상태에서 약 2.2 m 앞 바닥에 닿음']],
+ tl:[['11-11','OAK IMU 200 Hz, 전방 녹화 컬러 JPEG'],['11-14','Jetson SSD rosbag2 녹화(대기열 10→200)'],['11-15','점군 SGBM 3WAY 선택 추가']],
+ iss:[['todo','ZED IMU 타임스탬프가 약 +0.33 s 앞섬 — 원인 미확인'],['todo','LiDAR 스캔면이 OAK 바닥 대비 5~6° 기움(roll 약 +2.9°), 장착 밀림 가능성'],['bad','유선 여유가 적음(100 Mbps 링크에 평균 64 Mbps)'],['todo','SGBM 3WAY 패치 Jetson 적용 여부 미확인']]},
+loc:{t:'위치추정 — VIO + 융합기 (Pi5)', c:'var(--pi5)', one:'Basalt VIO가 상대 움직임을, Ceres 융합기가 GNSS·ZED IMU와 합쳐 공용 위치(20 Hz)를 낸다. GNSS는 천천히 끌어당기는 보정만 한다.',
+ flow:[['Basalt VIO','frontend + backend, odom 약 10 Hz, health 0.1 s'],['실패 감지','1 s에 수치 실패 3회·비정상값·health 1 s 끊김 → VIO_FAILED, 위치 WAITING(차 정지)'],['감시기','VIO_FAILED 2 s → 정지 확인 → Basalt만 재시작, 5분 3회 한도'],['Ceres 융합','창 10 s, 키프레임 5 Hz, 최적화 2 Hz, 발행 20 Hz'],['GNSS 드리프트 보정','최근 100 m 강건 맞춤, x·y·yaw만, 1 m당 2 cm + 1 cm/s, 정지 중 0']],
+ kv:[['설정','fusion_independent.yaml: publish 20, solve 2, window 10 s, vio_stale 0.5 s'],['GNSS','gnss_fusion_mode drift_correction, gnss_position_fallback false'],['안테나','antenna_in_imu [0.003, 0.11, 0.274] m (CAD+줄자, ±3 cm)'],['게이트','예측과 5 m 넘게 다른 fix 버림, σ>10 m·위성<5·HDOP>4 버림'],['출력','/nomad/localization/odometry·status, TF odom→base_link']],
+ extra:'<h3>노트북에서 검증한 VIO 로직</h3><p>Pi5와 같은 Basalt 소스·설정을 노트북에서 녹화 재생으로 검증. 진짜 오류는 자세가 아니라 <b>거리에 비례한 z 하강</b>(약 −1.8°)이었고, 카메라–IMU pitch를 <b>+2.49°</b> 고치면 z 기울기가 −2.8 → 약 0 cm/m로 사라진다(녹화 3개 확인, 수평 궤적 변화 없음). <span class="chip todo">Pi5 미반영</span></p><table><tr><th>녹화</th><th>보정 전</th><th>보정 후</th></tr><tr><td>1</td><td>−2.76 cm/m</td><td>+0.23</td></tr><tr><td>2</td><td>−3.35</td><td>−0.05</td></tr><tr><td>3</td><td>−2.85</td><td>−0.57</td></tr></table>',
+ tl:[['11-11','VIO 실패 감지 + 자동 재시작 감시기, VIO DDS 유선 전용'],['11-12','GNSS 노드 C++ 재작성'],['11-13','drift_correction 설치: 재생 오차 x4.0/y10.2/z16.1 m → 0.12/0.27/0.04 m'],['11-14','"자세 3.5~5° 틀림" 추정 정정 → 진짜 오류는 거리 비례 z 하강'],['11-15','pitch 스윕: +2.49°에서 z 기울기 0'],['11-16','보정 검증 3건, GNSS 단독 σ 10.7 m 튐을 융합이 거부(VIO와 0.64~0.74 m)']],
+ iss:[['bad','+2.49° 보정 Pi5 미반영, 경사·야지 미확인'],['bad','yaw 드리프트 6~9°(원점 복귀 오차 3.9 m/58 m)를 고칠 수단 없음 — 지자계가 정상의 약 1/100로 들어와 거부될 것'],['todo','11-11 Jetson 전원 꺼짐 때 VIO_FAILED가 안 남(감시기 미동작) — 원인 미확인'],['todo','실차에서 감시기가 실제로 재시작한 사례 기록 없음'],['keep','base_link 장착 변환은 아직 임시값(IMU = base)']]},
+perc:{t:'인지 — 의미분할·점군 (Jetson)', c:'var(--jet)', one:'ZED 영상을 팀이 학습한 SegFormer 야지 모델(field12)로 12클래스 라벨을 내고, 매퍼가 이 라벨을 3D 점에 투영해 쓴다.',
+ flow:[['ZED 컬러','HD720, frame_alias로 이름 맞춤'],['의미분할','semantic.sh → field12 엔진(best_fp16), 640×360 mono8, 1 Hz'],['어댑터','/nomad_preview/field12/class_ids → /perception/semantic/class_ids'],['점군','external_stereo_cloud: OpenCV SGBM(시차 192, 블록 7) → /oak/depth/points']],
+ kv:[['모델 b2(기본)','"SegFormer · 야지" = 팀 학습 field12 엔진 (정확도 실측 미확인)'],['indoor','ADE20K 실내 엔진 640×360 FP16'],['fcn','FCN-ResNet18(SUNRGB-D 21클래스), 시작 뒤 switch_model.sh로 전환(추정)'],['라벨 설정','semantic.real.json: ground [4,5,6,8], boundary_margin_px 6, occlusion 끔']],
+ tl:[['11-10','b2 이름으로 field12 모델 사용 시작(추정)'],['11-13','실내 시험에 indoor 모델'],['11-15 20:10','boundary_margin 2 → 6 px: 1 m당 새 막힘 24.6~28.6 → 22.6, 앞 1.4~2.3 m 약 −27%'],['11-15','녹화 속 /oak/depth/points는 장치 깊이가 아니라 OpenCV SGBM으로 정정']],
+ iss:[['bad','경로 양옆 막힘 띠: 실제 벽 46% / 재투영 바닥에 장애물 라벨 22% / OAK 바닥 점 11% (11-15 재생)'],['keep','원인 후보: VIO z 하강이 재투영을 약 2°(10 px) 위로 밀어 벽 라벨을 받음, 라벨이 깊이보다 0.3~1.2 s 늦음'],['todo','수정안 재투영 끔+칸 다수결(−24%) — 사용자 결정 대기, 미배포'],['bad','반짝이는 바닥을 인공물로 오분류, 야지 모델은 실내 물체를 못 잡음(추정)'],['keep','OAK 깊이는 1~1.3 m 너머 바닥에서 반사로 무너짐(물리 한계)']]},
+map:{t:'매퍼 — 개선 매퍼 (Jetson, 사용 중)', c:'var(--jet)', one:'기존 매퍼 로직을 단일 프로세스로 묶고 중력 기준 경사·고정·지도 범위 옵션을 더한 것. 경사(70%)와 의미(30%)를 합쳐 비용 지도를 낸다.',
+ flow:[['점 수신','LiDAR + OAK 점을 capture 시각의 Pi5 자세로 odom에 놓음, 높이 게이트 0.12 m'],['라벨','반경 3 m·3 s 점을 ZED 라벨에 투영, 경계 ±6 px 버림, 지면 4·5·6·8만 경사 입력'],['경사','칸 0.125 m, TLS 평면 반경 0.1875 m, 점 12개↑, 중력 기준, 첫 유효값 고정(점수 100이면 재계산)'],['비용','occ = 79×(0.7×경사 + 0.3×의미), 어느 쪽이든 100이면 막힘'],['출력','navigation_costmap · local_costmap · planning_cost_layers · perception/status']],
+ kv:[['경사 점수','오르막 4×tilt, 20° 이상 100, 내리막 −10° 미만 100'],['의미 비용','paved 0 · soil 20 · leaves 20 · gravel 35 · 장애물 클래스 100'],['보조 규칙','시작 2 m 원 평지 가정, 앞 0.5 m 반원 의미 0, 지나간 칸 0 기억(사람 제외)'],['terrain.json(11-15 18:57 사본)','map_length 10 m, gravity, freeze·retry 켬, 시작 평지 고정 끔, 라벨 누적 끔, cost_area known_cells'],['CPU','골든 bag 재생 0.30코어(기존 0.81), 실차 0.58~0.61']],
+ extra:'<h3>다른 매퍼와 비교</h3><table><tr><th>매퍼</th><th>구조</th><th>상태</th></tr><tr><td><b>개선 매퍼</b></td><td>단일 프로세스, 중력 경사, 지도 창·고정 옵션</td><td><span class="chip ok">사용 중</span></td></tr><tr><td>기존 매퍼</td><td>4프로세스 + JSON, 진행방향 경사</td><td>11-13 ㄹ자 성공 시험에 사용, 비교용</td></tr><tr><td>mapper2</td><td>높이 지도 grid_map, 턱 0.05 m 막힘, 빔 지우기</td><td>11-13 로직 폐기 결정</td></tr><tr><td>mapper3 final_v3</td><td>재생 정확도 최고(판 MAE 1.58°)</td><td>실차 3 Hz 점군에서 CPU 포화 → 보류</td></tr></table>',
+ tl:[['11-13','단일 프로세스·구조체 전달, 20 m 창, 중력각, Jetson 빌드·GUI 연결'],['11-14','keep_slope_on_failure, cost_area, max_map_cells 추가(기본 꺼짐), 골든 bag 16조합'],['11-15 15:36','"행렬 최고" 옵션: 시작 평지 고정 끔, 라벨 누적 끔'],['11-15 20:10','boundary_margin 6 px'],['11-15 실차','복도 30 m 시나리오, 20:07 시험은 마지막 막힌 경로 하나 빼고 도착']],
+ iss:[['bad','시작 평지 고정 끄기 옵션이 출력에 효과 없음(cost.cpp가 시작 영역을 0°로 덮음) — 수정 보류'],['bad','경사 각도 부족: 실측 12.2° 판을 7~9°로, 바닥을 4~7°로 읽음'],['keep','10 m 창에서 목표가 지도 밖 → 늦게 회전(근본은 플래너 경로 유지 방식으로 봄)'],['todo','지금 Jetson에 켜진 terrain.json 정확한 값 미확인'],['keep','기존 매퍼의 관리자(해시 검증·runtime.lock·시작 마감) 안전장치가 없음']]},
+plan:{t:'플래닝 — planner_node (Jetson으로 이전)', c:'var(--jet)', one:'코드는 그대로 3패키지로 나눠 Jetson에서 돌린다. 경유점을 고르고 Hybrid A*로 경로를 짠 뒤 RPP로 따라간다. Pi4는 출력만 한다.',
+ flow:[['입력 검사','전역 지도 3 s·지역 2 s 넘게 오래되면 STOP, 0.35 m 안이면 ARRIVED'],['비용 합성','장애물·여유·경사 5·지형 5·미관측 가산, min_clearance 0.15 m 하드 금지'],['경유점 선택','waypoint_radius 안의 관측된 빈 칸 후보 최대 16개, 기한 0.98 s'],['GPP','Hybrid A* 후보당 0.16 s, 차체 1.0×0.65 m 휩쓸림 검사'],['LPP (RPP)','관측된 앞부분 추종, lookahead 0.8 m, 명목 0.25 m/s, 미관측 칸 0.10 m/s'],['출력','DriveCommand 20 Hz, valid_for 0.15 s']],
+ kv:[['패키지','planning_core 239줄 · policy 592줄 · cpp 508줄, 테스트 11/11'],['실행','GUI가 SSH로 jetson_planner.sh --stdio, 목표·취소는 stdin JSON, 화면은 stdout JSON'],['corridor.min_clearance','0.15 고정(사용자 결정, 11-15 0.275 시험 뒤 되돌림)'],['waypoint_radius','마지막 기록 2.0 (11-15 20:36, "엄청 잘 돌았어")'],['terrain_weight','Jetson 5.0 (Pi4 원본 0.5)'],['설정 GUI','64개 7탭, Jetson ~/nomad_settings/planner에 저장·백업, 동시 수정 거부'],['주기','planning 5 Hz, command 20 Hz, GPP 예산 0.5 s/50000회']],
+ tl:[['11-12','Jetson 복사·빌드(4분 16초), 테스트 11/11, Pi4보다 17~26% 느림(단일 코어)'],['11-13','3패키지 분할(코드 무변경), 설정 64개 GUI, 프리셋, 소수 4자리 저장 버그 수정'],['11-15','min_clearance 0.15 고정, waypoint_radius 1.0 → 2.0, observation_turn_weight 30 → 20']],
+ iss:[['bad','GPP가 늦게 다시 짬: 기존 경로가 "아직 통과 가능"이면 유지 → 벽 1~1.5 m 앞에서야 새 경로(1~5.6 s). 실내 실패 주원인으로 봄(추정)'],['bad','Jetson → Pi4 명령이 무선에서 최대 1.2 s 늦어 만료 정지(학교 Wi-Fi). 핫스팟에서는 0.018 s로 해소 — 망에 따른 위험'],['keep','조향 지그재그(+35° ↔ −26~−32°) 원인 미확정'],['todo','terrain_weight 0.5 vs slope 5.0 "꼭 수정" 항목: Jetson은 5.0으로 맞췄으나 주행 효과 미확인'],['keep','후진 복구 없음("recovery disabled")'],['todo','관측 보호 상자 0.2×0.1 m와 실제 차체 차이 — 사용자 판단 남음']]},
+ctrl:{t:'제어 — Pi4 VESC', c:'var(--pi4)', one:'DriveCommand를 검사해 ERPM·서보로 바꾸고, 문제 때는 감속 → 브레이크 → 핸드브레이크로 세운다. 자율주행은 전진·정지만.',
+ flow:[['명령 검사','stamp 증가, 유효시간 안, 받은 뒤 0.35 s 안, 발행자 정확히 1개'],['속도','m/s × 3721.88 = ERPM, 양수 요청은 최소 1000 ERPM(약 0.27 m/s), VESC 내부 PID'],['조향','±35° → 서보 0~1, 변화율 1.0/s, 바퀴각 피드백 없음'],['감속 정지','0.3 s 동안 200 ERPM까지 → 핸드브레이크(12.5~30 A, 부하 비례)'],['안전 잠금','VESC 고장·과속 2500·바퀴 걸림 2 s·과전류 → RESET 필요']],
+ kv:[['ERPM','최소 1000 / 피드백 상한 1200 / 명령 상한 1850 / 과속 잠금 2500'],['정지','브레이크 20 A, 200 ERPM 이하 핸드브레이크, 유지 clamp(1.45·부하+8, 12.5, 30) A'],['온도','ESC 65 ℃ 경고, 80 ℃ 정지, 70 ℃ 미만 재출발'],['VESC','FW 5.03 HFI, 모터 ±50 A, 배터리 ±30 A, kp 0.010, ki 0.04'],['설치본','feat/control e076d48 (11-15 20:32 배포)'],['수동 조종','후진 최대 800 ERPM, 수동 때만']],
+ tl:[['11-12','0 A 관성 → 브레이크 20 A + 핸드브레이크(오르막 뒤로 굴러 과속 잠금 4회), ESC 온도 보호, HFI'],['11-13','PID·전류 한계 변경, 부하 비례 유지 전류(평지 22.8 → 18.1 A), 감속 정지, 플래너 Jetson 실행 시작'],['11-15','수동 후진, 서보 0.40 → 1.0/s(지연 약 1 s → 0.3 s), 수동 80 ℃ 정지, RESET 때 피크 기록 지움']],
+ iss:[['bad','핸드브레이크 중 ERPM을 0으로 보고 → 미끄러져도 정지로 보임. VIO로 미끄러짐 감지 기능 없음(11/12 야지에서 최대 3 m 밀림 확인)'],['bad','경사 정차 보장 안 됨: 짐 실으면 약 14°, 그 밖 17~20°'],['bad','제어기·드라이버 종료 시 VESC가 300 ms 뒤 0 A로 풀려 경사에서 굴러감'],['keep','플래너가 1000 ERPM 하한을 모름 → LPP 감속 지시가 무시됨'],['todo','Pi4 RTC 없음(11-15 약 5.7일 늦게 켜짐) → 명령이 미래 시각으로 보여 거부될 수 있음'],['keep','제어기를 Jetson으로 옮기는 계획: 순서만 정해짐, 구현 기록 없음']]},
+ops:{t:'운영 — 노트북 GUI·기록·예외 처리', c:'var(--lap)', one:'실물시험앱이 SSH로 보드를 순서대로 켜고, 출력 허용 순간부터 .nomad에 기록한다. 보드·링크가 끊기면 각 모듈의 만료 시간으로 차가 선다.',
+ flow:[['시작','시간 확인(Pi5 기준, 5 ms) → LAN → 센서(OAK·LiDAR 로그 대기 3~15 s) → 인지 → 매퍼(12 s 안) → VIO·융합'],['플래너','jetson_planner.sh --stdio + pi4_output_only.sh, 한쪽 끝나면 둘 다 종료'],['출력 허용','.nomad 기록 준비 성공해야 허용, 재계획·목표 변경에도 유지'],['종료','종료 먼저 시작 → 필수 메모(시험 이름) → 파일 이름 = 시험이름.nomad'],['재생','파일 입력만, SSH·명령 생성 없음']],
+ kv:[['기록','.nomad(SQLite, GUI가 받은 것만), Pi5 전방 MJPEG 1분 단위 10 Hz, Jetson SSD rosbag2 24토픽'],['설정 저장','Jetson ~/nomad_settings, 저장 전 백업, 다른 노트북이 바꿨으면 거부'],['주소 추적','MAC+호스트키 → mDNS → Pi5 유선 경유 순으로 다시 찾음'],['SSH','ControlMaster 재사용으로 호출당 1.81 → 0.10 s'],['GUI 기본값','mapper legacy·placement pi4 — 지금 쓰는 terrain·jetson은 저장된 선택값']],
+ extra:'<h3>끊길 때 차가 서는 시간</h3><table><tr><th>끊긴 곳</th><th>만료</th><th>결과</th></tr><tr><td>Jetson OAK</td><td>0.5 s 뒤 위치 무효</td><td>정지</td></tr><tr><td>융합기</td><td>0.3 s 뒤 위치 상태 만료</td><td>정지</td></tr><tr><td>매퍼</td><td>1.0 s 뒤 인지 상태 만료</td><td>정지</td></tr><tr><td>플래너 → Pi4</td><td>valid_for 0.15 s 또는 받은 뒤 0.35 s</td><td>0.3 s 감속 정지</td></tr><tr><td>노트북</td><td>SSH 종료(stdin EOF)</td><td>플래너 해제, 보드 쪽 감지 시간 미확인</td></tr></table>',
+ tl:[['11-11','전방 녹화 컬러, 녹화 목록·메모·삭제, 보드 주소 자동 추적, VIO 감시기'],['11-12','플래너 위치 Pi4/Jetson 선택, 공유폴더 자동 연결, 보드 시계 자동 보정'],['11-13','출력 허용 때 자동 기록, 종료 필수 메모, 설정 Jetson 저장·프리셋, 개선 매퍼 선택지'],['11-15','조종·녹화 창(키보드 조종, 후진, 센서 bag+GPS), stop_trial SSD 경로 수정, GUI 검사 505 OK']],
+ iss:[['bad','학교 Wi-Fi에서 명령 지연·끊김(평균 153 ms, 최대 1.2 s) — 핫스팟 권장'],['bad','녹화가 켠 ZED 컨테이너가 남으면 다음 시험 시작 거부'],['todo','chrony makestep 1 -1 보드 반영 미확인(설치 다시 눌러야 적용)'],['keep','F14 부분 해결: VIO만 자동 재시작, 융합·지도·OAK·GNSS는 자동 재시작 없음'],['keep','.nomad는 GUI가 받은 것만 저장(원본 점군·수치 비용 배열 없음)']]}
+};
+const ORDER = ['sensor','loc','perc','map','plan','ctrl','ops'];
+const NAME = {sensor:'센서',loc:'위치추정',perc:'인지',map:'매퍼',plan:'플래닝',ctrl:'제어',ops:'운영'};
+const LBL = {ok:'확인',todo:'미확인',keep:'추정·참고',bad:'문제'};
+const esc = s => s;
+function show(k, push){
+  const p = P[k]; document.querySelectorAll('#nav button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === k));
+  let h = `<h2 style="color:${p.c}">${p.t}</h2><p>${p.one}</p><h3>처리 순서</h3><div class="flow">` +
+    p.flow.map(([a,b]) => `<div class="step"><b>${a}</b><span>${b}</span></div>`).join('') + '</div>';
+  h += `<div class="grid2"><div><h3>설정·확정값</h3><dl class="kv">${p.kv.map(([a,b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl></div>` +
+       `<div><h3>최근 바뀐 점</h3><div class="tl">${p.tl.map(([a,b]) => `<div><b>${a}</b>${b}</div>`).join('')}</div></div></div>`;
+  if (p.extra) h += p.extra;
+  h += `<h3>알려진 문제·미확인</h3>` + p.iss.map(([t,s]) => `<div class="iss"><span class="chip ${t}">${LBL[t]}</span><span>${s}</span></div>`).join('');
+  const d = document.getElementById('detail'); d.innerHTML = h;
+  if (push !== false) { history.replaceState(null, '', '#' + k); d.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
+const nav = document.getElementById('nav');
+ORDER.forEach(k => { const b = document.createElement('button'); b.textContent = NAME[k]; b.dataset.k = k; b.onclick = () => show(k); nav.appendChild(b); });
+document.querySelectorAll('.blk').forEach(g => { g.addEventListener('click', () => show(g.dataset.part)); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(g.dataset.part); } }); });
+show(P[location.hash.slice(1)] ? location.hash.slice(1) : 'map', false);
+</script>
+</body>
+</html>
