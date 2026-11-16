@@ -63,10 +63,10 @@ async function open(m){
   g.computeBoundingBox();const bb=g.boundingBox,ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3()),r=Math.max(sz.x,sz.y);
   const gr=new THREE.GridHelper(Math.ceil(r*1.2),Math.min(200,Math.ceil(r*1.2)),0x56606c,0x2c333b);gr.rotation.x=Math.PI/2;gr.position.set(ce.x,ce.y,bb.min.z);gr.visible=document.getElementById('grid').checked;G.add(gr);G.userData.grid=gr;
   const rb=document.getElementById('runs');rb.innerHTML=m.runs.length?'<div class="grp">겹친 주행 궤적 (맵 좌표)</div>':'';
-  m.runs.forEach((ru,k)=>{const q=new Float32Array(ru.p.length*3);ru.p.forEach((x,j)=>q.set([x[0],x[1],x[2]+0.03],j*3));const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(q,3));
-    const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:COL[k%COL.length]}));G.add(ln);
-    const st=new THREE.Mesh(new THREE.SphereGeometry(r*0.006+0.03,12,8),new THREE.MeshBasicMaterial({color:COL[k%COL.length]}));st.position.set(q[0],q[1],q[2]);G.add(st);
-    const lb=document.createElement('label');lb.innerHTML=`<input type="checkbox" checked><i style="background:#${COL[k%COL.length].toString(16).padStart(6,'0')}"></i>${ru.label}`;lb.querySelector('input').onchange=e=>{ln.visible=st.visible=e.target.checked};rb.appendChild(lb)});
+  m.runs.forEach((ru,k)=>{const cc=ru.label.includes('성공')?0xffffff:COL[k%COL.length];const q=new Float32Array(ru.p.length*3);ru.p.forEach((x,j)=>q.set([x[0],x[1],x[2]+0.03],j*3));const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(q,3));
+    const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:cc}));G.add(ln);
+    const st=new THREE.Mesh(new THREE.SphereGeometry(r*0.006+0.03,12,8),new THREE.MeshBasicMaterial({color:cc}));st.position.set(q[0],q[1],q[2]);G.add(st);
+    const lb=document.createElement('label');lb.innerHTML=`<input type="checkbox" checked><i style="background:#${cc.toString(16).padStart(6,'0')}"></i>${ru.label}`;lb.querySelector('input').onchange=e=>{ln.visible=st.visible=e.target.checked};rb.appendChild(lb)});
   document.getElementById('info').innerHTML=`<b>${m.name}</b> · ${m.date}<br>${m.desc}<br>면 ${m.n_face.toLocaleString()}개`;
   home={t:ce.clone(),p:new THREE.Vector3(ce.x-r*0.55,ce.y-r*0.55,bb.max.z+r*0.5)};fit();cur=m;document.getElementById('load').style.display='none';
   if(innerWidth<=700)document.getElementById('side').classList.add('hide');
