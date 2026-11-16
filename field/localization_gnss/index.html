@@ -1,0 +1,105 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위치추정 GNSS·방향 정렬 · NOMAD</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"><style>:root{--bg:#f4f6f9;--card:#fff;--fg:#172131;--muted:#5d6878;--line:#dfe4ea;--accent:#1f5fd1;--accent-soft:#e6eefc;
+--ok:#18794e;--ok-soft:#e2f4ea;--warn:#a35c00;--warn-soft:#fcefdc;--bad:#b4232b;--bad-soft:#fbe6e7;--new:#6a3fd6;--new-soft:#efe9fd;--old:#7b8494;
+--s1:#2e9d4f;--s2:#f28e2b;--s3:#8e5bd1;--s4:#3b7ddd;--s5:#f2b705;--s6:#b0b0b0;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#11161e;--card:#19202b;--fg:#e7ebf1;--muted:#9aa4b2;--line:#2c3542;--accent:#7aa2ff;--accent-soft:#1d2a44;
+--ok:#5fd09a;--ok-soft:#163327;--warn:#f0ad55;--warn-soft:#3a2a14;--bad:#ff7b82;--bad-soft:#3a1a1d;--new:#b49bff;--new-soft:#271f45;--old:#8a93a3;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 "Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+header.top .brand{font-weight:900;letter-spacing:.02em;text-decoration:none;color:var(--fg)}
+header.top nav{display:flex;flex-wrap:wrap;gap:4px}
+header.top nav a{text-decoration:none;color:var(--muted);font-size:.9rem;padding:3px 10px;border-radius:999px}
+header.top nav a.on,header.top nav a:hover{background:var(--accent-soft);color:var(--accent)}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+.crumb{font-size:.84rem;color:var(--muted);margin:2px 0 10px}.crumb a{text-decoration:none}
+h1{font-size:1.6rem;margin:0 0 6px;letter-spacing:-.01em}h2{font-size:1.2rem;margin:28px 0 10px}h3{font-size:1rem;margin:18px 0 6px}
+p.lead{color:var(--muted);margin:0 0 14px;max-width:80ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--line);display:block}
+.card .im{position:relative}.card .dt{position:absolute;left:8px;top:8px;background:rgba(10,12,15,.78);color:#fff;font-weight:700;padding:3px 9px;border-radius:7px;font-size:.88rem;letter-spacing:.01em}
+.card .b{padding:10px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card b{font-size:1rem;line-height:1.35}.card .d{font-size:.86rem;color:var(--muted)}
+.big{grid-column:span 2}@media(max-width:640px){.big{grid-column:auto}}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:6px}
+.t{font-size:.72rem;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.t.ok{background:var(--ok-soft);color:var(--ok)}.t.warn{background:var(--warn-soft);color:var(--warn)}.t.bad{background:var(--bad-soft);color:var(--bad)}
+.t.new{background:var(--new-soft);color:var(--new);font-weight:700}.t.old{background:transparent;border:1px solid var(--line);color:var(--old)}
+.part{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:14px 0}
+.part.old{opacity:.86}.part h2{margin-top:0}
+.ptitle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ptitle .n{font:700 .8rem/1 ui-monospace,monospace;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 12px}
+.bar button{font:inherit;font-size:.85rem;padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.bar button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:700}
+.bar input{font:inherit;font-size:.88rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);min-width:180px;flex:1;max-width:280px}
+.count{font-size:.82rem;color:var(--muted)}
+.mini{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line);margin-top:4px}.mini i{display:block;height:100%}
+.sbar{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:6px 0}.sbar i{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-style:normal;white-space:nowrap;overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;background:var(--c);vertical-align:-1px}
+table{border-collapse:collapse;width:100%;font-size:.9rem;background:var(--card)}th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:500;font-size:.82rem}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}.kpi b{display:block;font-size:1.25rem}.kpi span{font-size:.78rem;color:var(--muted)}
+video{width:100%;background:#000;border-radius:10px;display:block}
+.vtabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.vtabs button,.jump{font:inherit;font-size:.85rem;padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.vtabs button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:700}
+.jump{border-color:var(--bad);color:var(--bad);padding:2px 10px}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:8px 0}details summary{cursor:pointer;font-weight:700}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:.92rem}
+.memo{border-left-color:var(--new)}
+img.full{width:100%;border-radius:10px;border:1px solid var(--line)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.two{grid-template-columns:1fr}}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:24px;font-size:.9rem}
+footer{max-width:1100px;margin:0 auto;padding:0 16px 40px;font-size:.8rem;color:var(--muted)}
+.hide{display:none!important}</style></head><body><header class="top"><div class="in"><a class="brand" href="../../index.html">NOMAD</a><nav><a href="../../field/index.html" class="on">실물 실험</a><a href="../../maps/index.html" class="">3D 맵</a><a href="../../system/index.html" class="">시스템 구조</a><a href="../../scenarios/index.html" class="">시뮬레이션</a><a href="../../archive/index.html" class="">보관</a></nav></div></header><main><div class=crumb><a href="../../index.html">홈</a> › <a href="../index.html">실물 실험</a> › 위치추정 GNSS</div><h1>위치추정 — GNSS 상태와 VIO·GNSS 방향 정렬</h1>
+<p class="lead">VIO는 주행할수록 위치 오차가 쌓여 GNSS 절대 위치로 보정하려 한다. 11/16 야지 녹화 4개와 11/17 건물 테라스 녹화 1개를 노트북에서 재생해(Pi5 VIO 구성: health + 자동 재시작, 장착각 +2.49° 보정) <b>GNSS가 장소마다 어떻게 다른지</b>, 그리고 <b>VIO와 GNSS의 방향을 맞추는 두 방식</b>을 비교했다. 보드 설정은 바꾸지 않았다(시험용 융합기는 노트북 사본).</p>
+<div class="kpi"><div><b>3~5 cm</b><span>야지 GNSS 정지 중 흔들림 (위성 31개, PDOP 0.9)</span></div><div><b>최대 62 cm</b><span>건물 테라스 정지 중 흔들림 (PDOP 4)</span></div><div><b>−170° ~ +82°</b><span>녹화마다 다른 VIO↔GNSS 방향 차이</span></div><div><b>2~3초</b><span>지자계 방식 정렬 시간 (야지 4개 중 3개)</span></div></div>
+<p class="memo"><b>결론 요약.</b> ① GNSS 품질은 위성 수보다 <b>하늘이 트인 정도(PDOP)</b>가 좌우했다. 야지는 단독 측위로도 움직임을 cm로 따라갔고, 건물 테라스는 RTK FLOAT 상태로 떠다녀 실험에 쓸 수 없었다. ② VIO 좌표는 출발 방향 기준이라 GNSS와 방향이 녹화마다 다르다 → <b>방향 정렬이 먼저</b>다. ③ 지자계 방식은 정지 2~3초면 정렬되지만 5~10° 오차가 있고, 직진 쌍 최적화 방식은 정답에 가까워지지만 10~20 m 주행으로는 기준(σ≤5°)을 못 넘었다.</p>
+<h2 id="gnss">1. GNSS 상태 — 건물 테라스 vs 야지</h2>
+<table><tr><th>녹화</th><th>해 종류 (개수)</th><th>위성</th><th>PDOP</th><th>hAcc 중앙</th><th>정지 중 1초 흔들림 (중앙/최대)</th><th>주행 중 GNSS−VIO 1초 이동 차 (중앙/90%)</th></tr><tr><td>11/17 01:37 건물 테라스 (199 s)</td><td>단독 32, DGNSS 16, RTK FLOAT 151</td><td>27</td><td><b>4.03</b></td><td>1.01 m</td><td><b>15 cm</b> / 62 cm</td><td>10 cm / 26 cm</td></tr><tr><td>11/16 14:07 야지 경사2 (111 s)</td><td>단독 109</td><td>31</td><td><b>0.95</b></td><td>2.53 m</td><td><b>5 cm</b> / 8 cm</td><td>4 cm / 11 cm</td></tr><tr><td>11/16 13:55 야지 직진 (50 s)</td><td>DGNSS 51</td><td>31</td><td><b>0.92</b></td><td>2.01 m</td><td><b>3 cm</b> / 6 cm</td><td>4 cm / 10 cm</td></tr><tr><td>11/16 13:30 야지 오르막 (83 s)</td><td>DGNSS 83</td><td>31</td><td><b>0.96</b></td><td>1.75 m</td><td><b>3 cm</b> / 16 cm</td><td>3 cm / 8 cm</td></tr></table>
+<p>PDOP는 위성이 하늘에 얼마나 고르게 퍼져 있는지(낮을수록 좋음). 위성 수는 비슷해도 건물 옆은 하늘 한쪽이 가려 PDOP가 4배 나빴다. 11/16 야지 양갈래 녹화는 GNSS 위치가 0개(녹화 당시 수신 없음)라 표에서 뺐다.</p>
+<h3>건물 테라스 (11/17 01:37) — RTK를 켰더니 오히려 떠다님</h3>
+<img class="full" src="gnss_terrace.png" alt="건물 테라스 GNSS 상태">
+<table><tr><th>시간</th><th>해 종류</th><th>hAcc</th><th>VIO 1초 이동</th><th>GNSS 1초 이동</th><th>해석</th></tr>
+<tr><td>0~30 s</td><td>단독</td><td>2.3~2.5 m</td><td>0 (정지)</td><td>0~0.1 m</td><td>정지, 조용함</td></tr>
+<tr><td>32 s 무렵</td><td>단독→DGNSS→RTK FLOAT</td><td>3.1 m</td><td>0</td><td><b>한 번에 약 3.6 m</b></td><td>보정 시작 순간 점프</td></tr>
+<tr><td>34~49 s</td><td>RTK FLOAT</td><td>2.1→1.0 m</td><td><b>0 (정지)</b></td><td><b>매초 0.5~0.6 m (약 7 m)</b></td><td>차는 서 있는데 GNSS만 이동</td></tr>
+<tr><td>50~199 s</td><td>RTK FLOAT (FIX 0회)</td><td>0.7~1.5 m</td><td>주행</td><td>대체로 따라감</td><td>VIO와 모양이 안 맞음 (회전 맞춰도 6.6 m)</td></tr></table>
+<ul><li><b>확인된 사실:</b> 보정(RTK)은 실제로 들어왔다(HDOP 빈칸 수정 효과). 그러나 끝까지 FLOAT였고 FIX는 0회. FLOAT 중 수신기가 보고한 hAcc(1.0 m)는 실제 흔들림보다 낙관적이었다. 보정 시작과 함께 PDOP가 1.0→4.4로 나빠졌다(위성 수 27~29 그대로).</li>
+<li><b>원인 후보 (모두 미확인, 확인 예정):</b> ① 건물 반사로 반송파 위상 오염·끊김 → 정수 모호수 미확정 ② 서울 VRS 보정에 없는 위성계를 RTK 계산에서 제외 ③ 휴대폰 테더링 보정 지연(보정 나이 값이 녹화에 비어 있음) ④ 수신기 RTK 모드가 FLOAT 전용으로 설정됐을 가능성.</li>
+<li><b>결정:</b> RTK는 운동장 같은 트인 곳에서 FIX가 되는지 확인할 때까지 보류하고 <b>단독 측위로 시험</b>한다(운영 GUI에서 '보정 시작'을 누르지 않으면 꺼져 있음).</li></ul>
+<h3>야지 (11/16) — 단독 측위인데도 cm 단위로 매끄러움</h3>
+<div class="two"><img class="full" src="gnss_y_slope2.png" alt="야지 경사2 GNSS"><img class="full" src="gnss_y_straight.png" alt="야지 직진 GNSS"></div>
+<img class="full" src="gnss_y_uphill.png" alt="야지 오르막 GNSS">
+<p>야지는 위성 31개·PDOP 0.9로 하늘이 트여 있었다. 절대 위치 정확도(hAcc)는 1.8~2.5 m지만 이 오차는 천천히 변하는 치우침이라 <b>움직임은 VIO와 수 cm 차이로 일치</b>했다. 매끄러움 ≠ 정확함: 지도상 위치는 m 단위로 치우쳐 있을 수 있다.</p>
+<h2 id="align">2. 왜 방향 정렬이 먼저인가</h2>
+<img class="full" src="align_need.png" alt="VIO와 GNSS 방향 차이">
+<table><tr><th>녹화</th><th>VIO↔GNSS 방향 차이 (전체 구간 최적)</th><th>VIO 그대로 겹쳤을 때 차이 (RMSE)</th><th>회전 하나 맞춘 뒤 차이</th></tr>
+<tr><td>야지 경사2</td><td>−170°</td><td>25.2 m</td><td>1.29 m</td></tr><tr><td>야지 직진</td><td>−130°</td><td>10.0 m</td><td>0.42 m</td></tr>
+<tr><td>야지 오르막</td><td>+82°</td><td>6.2 m</td><td>0.34 m</td></tr><tr><td>건물 테라스</td><td>+49°</td><td>10.1 m</td><td>6.63 m (GNSS가 떠다녀 안 맞음)</td></tr></table>
+<p>VIO는 동서남북을 모른다. 시작할 때 중력으로 위아래만 맞추고, 출발할 때 차가 향한 쪽을 늘 같은 축으로 둔다. 그래서 출발 방향에 따라 GNSS와 0~180° 어긋난다. 회전 하나만 맞추면 야지 세 녹화는 0.3~1.3 m로 겹친다 → <b>VIO 좌표와 GNSS 좌표의 방향(yaw) 관계를 먼저 찾아야 GNSS를 최적화에 넣을 수 있다.</b> 예전 11/15 복도 녹화가 잘 맞아 보였던 것은 차가 우연히 북쪽을 보고 출발했기 때문이다.</p>
+<h2 id="methods">3. 방향 정렬 두 방식</h2>
+<table><tr><th></th><th>방법 1 · ZED 지자계</th><th>방법 2 · 지자계 + 직진 쌍 최적화</th></tr>
+<tr><td>순서</td><td>출발 전 정지 중 ZED 지자계(가속도로 기울기 보정)로 북쪽 방향 → VIO 방향과 차이만큼 회전 → <b>바로 GNSS xy 융합</b></td><td>지자계로 대략 맞춤(화면만) → 주행 중 GNSS–VIO 위치 쌍을 모아 가중 최소제곱으로 yaw 최적화, 지자계 값(σ 8° 가정)과 합침 → σ≤5°면 그 yaw로 돌리고 <b>그때 융합 시작</b></td></tr>
+<tr><td>장점</td><td>정지 2~3초면 끝</td><td>주행이 길수록 정확</td></tr>
+<tr><td>약점</td><td>자기 교란이면 실패(오르막), 5~10° 오차</td><td>짧은 주행으로는 기준을 못 넘음. GNSS 해 종류가 바뀌면 점프 때문에 쌍을 다시 모음</td></tr>
+<tr><td>휴대폰에선</td><td>나침반(가속도+자이로+지자계)</td><td>GNSS 진행 방향(도플러 속도)과 IMU 진행 방향 비교 — 우리는 위치 점 차이를 쓰고 있어 더 느림(다음 녹화에 GNSS 속도 토픽 추가 예정)</td></tr></table>
+<table><tr><th>녹화</th><th>방법 1 결과</th><th>방법 2 결과</th><th>전체 구간 최적 방향(참고)</th></tr><tr><td>야지 경사2 (21 m)</td><td><b>2초에 정렬</b> (-160°), 융합–GNSS 0.31 m</td><td>대기로 끝남: GNSS만 -169°±12° → 지자계와 합쳐 <b>-163°±6.7°</b></td><td>−170°</td></tr><tr><td>야지 직진 (10 m)</td><td><b>3초에 정렬</b> (-131°), 융합–GNSS 0.39 m</td><td>대기로 끝남: GNSS만 -136°±33° → 지자계와 합쳐 <b>-131°±7.8°</b></td><td>−130°</td></tr><tr><td>야지 오르막 (10 m)</td><td>정렬 안 됨 (지자계 흔들림 6° > 기준 3°)</td><td>대기로 끝남: GNSS만 83°±42°</td><td>+82°</td></tr><tr><td>야지 양갈래 (21 m)</td><td><b>2초에 정렬</b> (-148°), GNSS 없음</td><td>GNSS 없음 → 대기</td><td>GNSS 없음</td></tr><tr><td>건물 테라스 (35 m)</td><td><b>2초에 정렬</b> (-15°), 융합–GNSS 1.01 m</td><td>대기로 끝남: GNSS만 17°±28° → 지자계와 합쳐 <b>-12°±7.7°</b>, 해 종류 바뀜으로 쌍 다시 모음 17회</td><td>+49° (GNSS 불량)</td></tr></table>
+<ul><li>방법 1은 4개 중 3개(야지)에서 2~3초 만에 정렬됐다. 정렬 각은 전체 구간 최적 방향과 경사2 10°, 직진 1° 차이였고, 이후 GNSS xy 융합이 차이를 메웠다.</li>
+<li>방법 2의 추정은 정답 쪽으로 갔지만(경사2 −163°, 직진 −131°) 10~21 m 주행으로는 σ가 6.7~7.8°에 머물러 기준 5°를 넘지 못해 융합을 시작하지 않았다. 더 긴 직진 구간(30 m 이상)이 필요하다.</li>
+<li>융합–GNSS 차이(0.3~0.4 m)는 GNSS를 넣어 최적화한 결과를 같은 GNSS와 비교한 값이라 <b>참값 오차가 아니다</b>(GNSS 추종 정도).</li></ul>
+<h3>녹화별 결과 (왼쪽 방법 1, 오른쪽 방법 2)</h3>
+<img class="full" src="res_y_slope2.png" alt="야지 경사2 결과"><img class="full" src="res_y_straight.png" alt="야지 직진 결과"><img class="full" src="res_y_uphill.png" alt="야지 오르막 결과"><img class="full" src="res_y_fork.png" alt="야지 양갈래 결과"><img class="full" src="res_terrace.png" alt="건물 테라스 결과">
+<h3>융합 영상 — 방법 1 (지자계 정렬 → GNSS xy 융합)</h3>
+<div class="vtabs"><button onclick="w.src='wxy_slope2_720p.mp4';w.play()">야지 경사2 (111 s)</button> <button onclick="w.src='wxy_straight_720p.mp4';w.play()">야지 직진 (50 s)</button></div>
+<video id="w" controls playsinline preload="metadata" src="wxy_slope2_720p.mp4" poster="wxy_slope2_poster.jpg"></video>
+<p>화면: 왼쪽 위 VIO 카메라 특징점, 오른쪽 위 동·북 궤적(초록 융합, 파랑 지자계 각만 쓴 VIO, 주황 GNSS), 아래 GNSS σ·지자계 나침반·VIO 높이.</p>
+<h2 id="next">4. 다음 시험</h2>
+<ul><li><b>장소 문제:</b> 건물 주변은 GNSS가 떠다녀 실험할 수 없고, 야지는 GNSS가 너무 좋아 VIO 오차가 쌓이기 전에 끝나 보정 효과를 비교하기 어렵다.</li>
+<li><b>제안 시나리오:</b> 운동장 → 건물 근처 → 운동장으로 길게(수백 m) 왕복. 출발 전 10초 정지(지자계), 곧은 길 30 m 이상 직진(쌍 최적화). RTK는 끄고 단독 측위.</li>
+<li>녹화에 GNSS 속도·진행 방향 토픽 추가 → 방법 2를 위치 쌍 대신 속도 방향으로 개선 검토.</li>
+<li>VIO가 정지라고 하면 GNSS 움직임을 무시하고, VIO와 GNSS 움직임이 안 맞으면 σ를 키우는 처리 검토(휴대폰이 흔들림을 숨기는 방식과 같은 원리). 아직 미구현.</li></ul>
+<p class="muted">자료: 노트북 재생 결과 `fusion_replay_*_pi5_mag`(방법 1), `*_pi5_maggnss`(방법 2, windowxy_max_yaw_sigma_deg 5). 지자계 편각 −8.5° 가정. 융합기 시험판은 노트북 사본이며 보드에는 아직 넣지 않았다.</p></main><footer>NOMAD 야지 자율주행 로봇 · LIG 프로젝트 · 정리 2026-11-17</footer></body></html>
