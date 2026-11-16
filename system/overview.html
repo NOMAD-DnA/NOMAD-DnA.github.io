@@ -152,10 +152,34 @@ footer{font-size:.8rem;color:var(--muted)}
       <li>플래너 위치: Pi4 → <b>Jetson</b> (Pi4는 드라이버·제어기만 실행).</li>
       <li>매퍼: 기존 4프로세스·JSON 전달 → <b>개선 매퍼 단일 프로세스</b>, 경사 기준 진행방향 → 중력.</li>
       <li>위치: GNSS를 창 최적화에 넣던 방식 → <b>drift_correction</b>(1 m당 2 cm만 반영), VIO 감시기 자동 재시작.</li>
+      <li>네트워크(11/16): 현장은 <b>노트북 핫스팟</b>에 세 보드가 붙고, 휴대폰 USB 테더링으로 인터넷도 같이 씀(확인).</li>
+      <li>GUI(11/16): 모듈 세부 설정(VIO·융합·GNSS·OAK·인지), 매퍼별 설정, 보드 전원 일괄 끄기 등 — 아래 "11/16 GUI·보드 개선".</li>
       <li>제어: 0 A 관성 정지 → 브레이크 20 A + 핸드브레이크, 감속 정지 0.3 s, 서보 0.40 → 1.0/s.</li>
       <li>이전 판: <a href="../experiments/20261111_board_code_review/index.html">데이터 흐름·예외 처리(11-13)</a>, <a href="mapper_20261113.html">새 매퍼 구조(11-13)</a>.</li>
     </ul>
   </details>
+</section>
+<section id="roadmap">
+  <h2>앞으로의 목표 (로드맵)</h2>
+  <table><tr><th>단계</th><th>내용</th><th>상태</th></tr>
+  <tr><td>1</td><td>시험 초기화 버튼</td><td><span class="chip ok">11-13</span></td></tr>
+  <tr><td>2</td><td>플래너 Jetson 이전 + GUI 파트별 설정</td><td><span class="chip ok">완료</span></td></tr>
+  <tr><td>3</td><td>VIO(Pi5) 설정·초기화 GUI</td><td><span class="chip ok">11-16 모듈 세부 설정으로 완료</span></td></tr>
+  <tr><td>다음</td><td>VIO + GNSS 융합기 재설계</td><td>진행 중 (시험판 빌드 중)</td></tr>
+  <tr><td><b>최종</b></td><td>로직 개발이 끝나면 <b>Pi4를 빼고 제어기를 Jetson으로</b> 옮겨 보드를 <b>Jetson + Pi5 두 대</b>로 줄이기</td><td>계획</td></tr></table>
+  <p style="color:var(--mut)">지금: Pi5 = VIO·융합·GNSS / Jetson = 센서·인지·매퍼·플래너 / Pi4 = 제어기(→ VESC) / 노트북 = GUI. 최종: Pi5 + Jetson(제어기 포함).</p>
+</section>
+<section id="gui1116">
+  <h2>11/16 GUI·보드 개선</h2>
+  <ul>
+    <li>매퍼별 설정 창: 클래스 경계 px, 초기 안전영역, 경사 계수 k(k=4가 기존 동작) — 실차 미확인</li>
+    <li>모듈 세부 설정 추가: VIO·융합·GNSS·OAK·인지 — 실차 미확인</li>
+    <li>보드 전원 일괄 끄기 — <b>실사용 성공</b></li>
+    <li>종료할 때 남는 모듈 정리, 목표 x·y 직접 입력, 시작할 때 보드 Wi-Fi 절전 끄기 — 실차 미확인</li>
+    <li>주행기록 올리기 오류 수정, 공유폴더에 남아 있던 .part 24개 복구</li>
+    <li>GNSS 비교 좌표 전달 상한 64 → 160 — 실차 미확인</li>
+    <li>Pi5 VIO 카메라–IMU pitch +2.49° 보정 → 높이 하강 없앰(실내 녹화 3개 재생, 야지 첫 실차 확인: 직진 4.9 m에서 z −1.4~+0.5 cm)</li>
+  </ul>
 </section>
 <footer>근거: 작업 기록 <code>log/NOMAD_모듈통합_리팩토링/로그기록.md</code>(11-11~16), 공유폴더 <code>NOMAD_모듈별_통합_20261104</code>(에이전트 인수인계, 제어_정리_20261115, 실물시험앱 remote 스크립트), 보드 코드 사본 <code>보드코드_20261114</code>, 플래너 분할 사본. 상세 조사 원문: <code>관련자료/시스템구조_20261116/조사_원문.md</code>. 공개본에는 IP·계정 정보 없음.</footer>
 </div>
@@ -181,7 +205,7 @@ perc:{t:'인지 — 의미분할·점군 (Jetson)', c:'var(--jet)', one:'ZED 영
 map:{t:'매퍼 — 개선 매퍼 (Jetson, 사용 중)', c:'var(--jet)', one:'기존 매퍼 로직을 단일 프로세스로 묶고 중력 기준 경사·고정·지도 범위 옵션을 더한 것. 경사(70%)와 의미(30%)를 합쳐 비용 지도를 낸다.',
  flow:[['점 수신','LiDAR + OAK 점을 capture 시각의 Pi5 자세로 odom에 놓음, 높이 게이트 0.12 m'],['라벨','반경 3 m·3 s 점을 ZED 라벨에 투영, 경계 ±6 px 버림, 지면 4·5·6·8만 경사 입력'],['경사','칸 0.125 m, TLS 평면 반경 0.1875 m, 점 12개↑, 중력 기준, 첫 유효값 고정(점수 100이면 재계산)'],['비용','occ = 79×(0.7×경사 + 0.3×의미), 어느 쪽이든 100이면 막힘'],['출력','navigation_costmap · local_costmap · planning_cost_layers · perception/status']],
  kv:[['경사 점수','오르막 4×tilt, 20° 이상 100, 내리막 −10° 미만 100'],['의미 비용','paved 0 · soil 20 · leaves 20 · gravel 35 · 장애물 클래스 100'],['보조 규칙','시작 2 m 원 평지 가정, 앞 0.5 m 반원 의미 0, 지나간 칸 0 기억(사람 제외)'],['terrain.json(11-15 18:57 사본)','map_length 10 m, gravity, freeze·retry 켬, 시작 평지 고정 끔, 라벨 누적 끔, cost_area known_cells'],['CPU','골든 bag 재생 0.30코어(기존 0.81), 실차 0.58~0.61']],
- extra:'<h3>다른 매퍼와 비교</h3><table><tr><th>매퍼</th><th>구조</th><th>상태</th></tr><tr><td><b>개선 매퍼</b></td><td>단일 프로세스, 중력 경사, 지도 창·고정 옵션</td><td><span class="chip ok">사용 중</span></td></tr><tr><td>기존 매퍼</td><td>4프로세스 + JSON, 진행방향 경사</td><td>11-13 ㄹ자 성공 시험에 사용, 비교용</td></tr><tr><td>mapper2</td><td>높이 지도 grid_map, 턱 0.05 m 막힘, 빔 지우기</td><td>11-13 로직 폐기 결정</td></tr><tr><td>mapper3 final_v3</td><td>재생 정확도 최고(판 MAE 1.58°)</td><td>실차 3 Hz 점군에서 CPU 포화 → 보류</td></tr></table>',
+ extra:'<h3>다른 매퍼와 비교</h3><table><tr><th>매퍼 (Jetson, 4종)</th><th>구조</th><th>상태</th></tr><tr><td><b>기존 매퍼 개선 (terrain)</b></td><td>단일 프로세스, 중력 경사, 지도 창·고정 옵션</td><td><span class="chip ok">사용 중</span> · 11/16 GUI에 클래스 경계 px·초기 안전영역·경사 계수 k(k=4가 기존 동작) 설정 추가 — 실차 미확인</td></tr><tr><td>기존 매퍼</td><td>4프로세스 + JSON, 진행방향 경사</td><td>비교용 (11-13 ㄹ자 성공 시험에 사용)</td></tr><tr><td>새 매퍼 (mapper2)</td><td>높이 지도 grid_map, 턱 0.05 m 막힘, 빔 지우기</td><td>시험용</td></tr><tr><td>새 매퍼3 v3 (final_v3)</td><td>재생 정확도 최고(판 MAE 1.58°)</td><td>실차 3 Hz 점군에서 CPU 포화로 보류 · 11/16 GUI 경계 px·초기 안전영역 설정 추가 — 실차 미확인</td></tr></table>',
  tl:[['11-13','단일 프로세스·구조체 전달, 20 m 창, 중력각, Jetson 빌드·GUI 연결'],['11-14','keep_slope_on_failure, cost_area, max_map_cells 추가(기본 꺼짐), 골든 bag 16조합'],['11-15 15:36','"행렬 최고" 옵션: 시작 평지 고정 끔, 라벨 누적 끔'],['11-15 20:10','boundary_margin 6 px'],['11-15 실차','복도 30 m 시나리오, 20:07 시험은 마지막 막힌 경로 하나 빼고 도착']],
  iss:[['bad','시작 평지 고정 끄기 옵션이 출력에 효과 없음(cost.cpp가 시작 영역을 0°로 덮음) — 수정 보류'],['bad','경사 각도 부족: 실측 12.2° 판을 7~9°로, 바닥을 4~7°로 읽음'],['keep','10 m 창에서 목표가 지도 밖 → 늦게 회전(근본은 플래너 경로 유지 방식으로 봄)'],['todo','지금 Jetson에 켜진 terrain.json 정확한 값 미확인'],['keep','기존 매퍼의 관리자(해시 검증·runtime.lock·시작 마감) 안전장치가 없음']]},
 plan:{t:'플래닝 — planner_node (Jetson으로 이전)', c:'var(--jet)', one:'코드는 그대로 3패키지로 나눠 Jetson에서 돌린다. 경유점을 고르고 Hybrid A*로 경로를 짠 뒤 RPP로 따라간다. Pi4는 출력만 한다.',
