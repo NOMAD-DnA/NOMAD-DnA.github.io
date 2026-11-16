@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOMAD 3D 맵 모음</title>
+<style>
+:root{--bg:#15181c;--panel:rgba(21,24,28,.9);--fg:#e9edf1;--mut:#9aa5b1;--acc:#3fb6ff;--line:#2c333b}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:14px/1.45 "Noto Sans KR",system-ui,sans-serif;overflow:hidden}
+#c{display:block;width:100%;height:100%;touch-action:none}
+#side{position:absolute;top:10px;left:10px;width:300px;max-height:calc(100% - 20px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;box-sizing:border-box}
+#side h1{font-size:17px;margin:0 0 2px}
+#side .crumb{font-size:12px;color:var(--mut);margin-bottom:8px}#side .crumb a{color:var(--acc);text-decoration:none}
+.grp{color:var(--mut);font-size:12px;margin:10px 0 4px;border-top:1px solid var(--line);padding-top:8px}
+.m{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;color:var(--fg);padding:6px 8px;border-radius:7px;cursor:pointer;font:inherit}
+.m:hover{background:#222830}.m.on{border-color:var(--acc);background:#1b2633}.m small{display:block;color:var(--mut);font-size:11.5px}
+#info{margin-top:10px;font-size:12.5px;color:var(--mut)}#info b{color:var(--fg)}
+#runs label{display:flex;gap:6px;align-items:center;font-size:12.5px;margin:2px 0}#runs i{display:inline-block;width:14px;height:4px;border-radius:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:12.5px}
+#tog{display:none;position:absolute;top:10px;left:10px;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit}
+#help{position:absolute;right:10px;bottom:10px;color:var(--mut);background:var(--panel);padding:6px 10px;border-radius:7px;font-size:12px}
+#load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--mut);background:var(--panel);padding:10px 16px;border-radius:8px;display:none}
+@media (max-width:700px){#side{width:calc(100% - 20px);max-height:46%}#side.hide{display:none}#tog{display:block}#help{display:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="tog">맵 목록</button>
+<div id="side">
+  <h1>3D 맵 모음</h1>
+  <div class="crumb"><a href="../index.html">홈</a> › <a href="../field/index.html">실물 실험</a> › 3D 맵</div>
+  <div style="font-size:12.5px;color:var(--mut)">휴대폰으로 장소를 찍어 만든 3D 맵(보기용으로 줄인 판). 맵을 누르면 열리고, 그 맵에 맞춘 로봇 주행 궤적을 겹쳐 볼 수 있다.</div>
+  <div id="list"></div>
+  <div id="info"></div>
+  <div class="row"><label><input type="checkbox" id="grid" checked> 격자</label><label><input type="checkbox" id="wire"> 면 대신 선</label><button id="fit" style="font:inherit;font-size:12px">처음 시점</button></div>
+  <div id="runs"></div>
+</div>
+<div id="load">불러오는 중…</div>
+<div id="help">한 손가락/왼쪽 드래그 회전 · 두 손가락/오른쪽 드래그 이동 · 휠/집기 확대</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(async function(){
+const R=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});R.setPixelRatio(Math.min(2,devicePixelRatio));
+const S=new THREE.Scene();S.background=new THREE.Color(0x15181c);
+const C=new THREE.PerspectiveCamera(50,1,0.02,1000);C.up.set(0,0,1);
+const O=new THREE.OrbitControls(C,R.domElement);O.enableDamping=true;O.screenSpacePanning=true;
+const size=()=>{R.setSize(innerWidth,innerHeight,false);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()};addEventListener('resize',size);size();
+const COL=[0xffb02e,0x3fb6ff,0x4cd37a,0xff5a8a,0xc58bff,0xffe14a,0x59e0d8,0xff7a3a];
+const L=await (await fetch('maps.json')).json();let cur=null,G=null;
+const list=document.getElementById('list');let lastGrp='';
+L.forEach(m=>{if(m.date!==lastGrp){lastGrp=m.date;list.insertAdjacentHTML('beforeend',`<div class="grp">${m.date}</div>`)}
+  const b=document.createElement('button');b.className='m';b.dataset.id=m.id;b.innerHTML=`${m.name}<small>${m.runs.length?('주행 '+m.runs.length+'회 겹침 · '):''}${m.mb} MB</small>`;b.onclick=()=>open(m);list.appendChild(b)});
+const bin=async(u,T)=>new T(await (await fetch(u)).arrayBuffer());
+let home=null;
+async function open(m){
+  document.querySelectorAll('.m').forEach(b=>b.classList.toggle('on',b.dataset.id===m.id));document.getElementById('load').style.display='block';
+  try{history.replaceState(null,'','#'+m.id)}catch(e){}
+  const d='data/'+m.id+'/';const [p,c,i]=await Promise.all([bin(d+'pos.bin',Float32Array),bin(d+'col.bin',Uint8Array),bin(d+'idx.bin',Uint32Array)]);
+  if(G)S.remove(G);G=new THREE.Group();S.add(G);
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(c,3,true));g.setIndex(new THREE.BufferAttribute(i,1));
+  const mat=new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide,wireframe:document.getElementById('wire').checked});G.add(new THREE.Mesh(g,mat));G.userData.mat=mat;
+  g.computeBoundingBox();const bb=g.boundingBox,ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3()),r=Math.max(sz.x,sz.y);
+  const gr=new THREE.GridHelper(Math.ceil(r*1.2),Math.min(200,Math.ceil(r*1.2)),0x56606c,0x2c333b);gr.rotation.x=Math.PI/2;gr.position.set(ce.x,ce.y,bb.min.z);gr.visible=document.getElementById('grid').checked;G.add(gr);G.userData.grid=gr;
+  const rb=document.getElementById('runs');rb.innerHTML=m.runs.length?'<div class="grp">겹친 주행 궤적 (맵 좌표)</div>':'';
+  m.runs.forEach((ru,k)=>{const q=new Float32Array(ru.p.length*3);ru.p.forEach((x,j)=>q.set([x[0],x[1],x[2]+0.03],j*3));const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(q,3));
+    const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:COL[k%COL.length]}));G.add(ln);
+    const st=new THREE.Mesh(new THREE.SphereGeometry(r*0.006+0.03,12,8),new THREE.MeshBasicMaterial({color:COL[k%COL.length]}));st.position.set(q[0],q[1],q[2]);G.add(st);
+    const lb=document.createElement('label');lb.innerHTML=`<input type="checkbox" checked><i style="background:#${COL[k%COL.length].toString(16).padStart(6,'0')}"></i>${ru.label}`;lb.querySelector('input').onchange=e=>{ln.visible=st.visible=e.target.checked};rb.appendChild(lb)});
+  document.getElementById('info').innerHTML=`<b>${m.name}</b> · ${m.date}<br>${m.desc}<br>면 ${m.n_face.toLocaleString()}개`;
+  home={t:ce.clone(),p:new THREE.Vector3(ce.x-r*0.55,ce.y-r*0.55,bb.max.z+r*0.5)};fit();cur=m;document.getElementById('load').style.display='none';
+  if(innerWidth<=700)document.getElementById('side').classList.add('hide');
+}
+function fit(){if(!home)return;O.target.copy(home.t);C.position.copy(home.p);O.update()}
+document.getElementById('fit').onclick=fit;
+document.getElementById('grid').onchange=e=>{if(G)G.userData.grid.visible=e.target.checked};
+document.getElementById('wire').onchange=e=>{if(G)G.userData.mat.wireframe=e.target.checked};
+document.getElementById('tog').onclick=()=>document.getElementById('side').classList.toggle('hide');
+open(L.find(m=>'#'+m.id===location.hash)||L[0]);
+(function loop(){requestAnimationFrame(loop);O.update();R.render(S,C)})();
+})();
+</script>
+</body>
+</html>
