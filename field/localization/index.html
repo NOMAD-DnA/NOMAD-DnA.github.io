@@ -20,6 +20,7 @@ p.lead{color:var(--muted);margin:0 0 14px;max-width:80ch}
 .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
 a.card:hover{border-color:var(--accent);transform:translateY(-1px)}
 .card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--line);display:block}
+.card .im{position:relative}.card .dt{position:absolute;left:8px;top:8px;background:rgba(10,12,15,.78);color:#fff;font-weight:700;padding:3px 9px;border-radius:7px;font-size:.88rem;letter-spacing:.01em}
 .card .b{padding:10px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
 .card b{font-size:1rem;line-height:1.35}.card .d{font-size:.86rem;color:var(--muted)}
 .big{grid-column:span 2}@media(max-width:640px){.big{grid-column:auto}}
@@ -53,10 +54,25 @@ img.full{width:100%;border-radius:10px;border:1px solid var(--line)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.two{grid-template-columns:1fr}}
 .pager{display:flex;justify-content:space-between;gap:10px;margin-top:24px;font-size:.9rem}
 footer{max-width:1100px;margin:0 auto;padding:0 16px 40px;font-size:.8rem;color:var(--muted)}
-.hide{display:none!important}</style></head><body><header class="top"><div class="in"><a class="brand" href="../../index.html">NOMAD</a><nav><a href="../../field/index.html" class="on">실물 실험</a><a href="../../system/index.html" class="">시스템 구조</a><a href="../../scenarios/index.html" class="">시뮬레이션</a><a href="../../archive/index.html" class="">보관</a></nav></div></header><main><div class=crumb><a href="../../index.html">홈</a> › <a href="../index.html">실물 실험</a> › 위치추정</div><h1>위치추정 시나리오 — VIO + GNSS 융합 (11/15 녹화, 11/16 분석)</h1>
+.hide{display:none!important}</style></head><body><header class="top"><div class="in"><a class="brand" href="../../index.html">NOMAD</a><nav><a href="../../field/index.html" class="on">실물 실험</a><a href="../../system/index.html" class="">시스템 구조</a><a href="../../scenarios/index.html" class="">시뮬레이션</a><a href="../../archive/index.html" class="">보관</a></nav></div></header><main><div class=crumb><a href="../../index.html">홈</a> › <a href="../index.html">실물 실험</a> › 위치추정</div><h1>위치추정 시나리오 — VIO + GNSS 융합</h1>
+<p class="lead">센서 녹화를 노트북에서 재생해 Basalt VIO(카메라–IMU 장착각 +2.49° 보정)와 VIO+GNSS 융합기(drift_correction), 지자계 방향을 함께 본다. 보드(Pi5/Jetson) 설정은 바꾸지 않았다. <a href="#s1116">11/16 시나리오</a> · <a href="#s1115">11/15 복도 왕복(분석 상세)</a></p>
+<h2 id="s1116">11/16 20:56 VIO 시나리오 <span class="t new">최신</span></h2>
+<div class="kpi"><div><b>67.3 m</b><span>VIO 경로 (최원점 29 m, 왕복)</span></div><div><b>4.15 m → 1.34 m</b><span>끝에서 출발점까지 · VIO → 융합</span></div><div><b>+0.11 cm/m</b><span>VIO 높이 변화 (하강 없음)</span></div><div><b>27쌍</b><span>융합에 쓴 GNSS 보정쌍</span></div></div>
+<div class="vtabs"><button onclick="w.src='loc1116_4x_720p.mp4';w.play()">4배속 (62 s)</button> <button onclick="w.src='loc1116_1x_720p.mp4';w.play()">1배속 (249 s)</button></div>
+<video id="w" controls playsinline preload="metadata" src="loc1116_4x_720p.mp4" poster="1116_f120.jpg"></video>
+<table><tr><th>GNSS 구간</th><th>상태</th></tr>
+<tr><td>0~108 s</td><td>위치 있음 109개, σ 중앙 2.9 m (60 s 이후 σ 커짐)</td></tr>
+<tr><td>109~182 s</td><td>위치 없음(NO FIX) 74개</td></tr>
+<tr><td>183~248 s</td><td>재획득 66개: 처음 약 25 s는 수십 m 튐(σ 44→10 m), 이후 출발점 근처로 수렴(끝 σ 3.3 m)</td></tr></table>
+<ul><li>융합기는 앞부분 GNSS 27쌍으로 xy 약 2.3 m를 보정했고(거부 80), 재획득 뒤 GNSS는 보정에 쓰지 않았다 → 끝 위치 개선은 앞부분 보정에서 나왔다.</li>
+<li>장착각 보정으로 높이 하강은 이 녹화에서도 없었다(끊김·점프 0).</li>
+<li>지자계는 값 단위 문제로 융합기가 전부 거부(9529개) — 방향은 VIO 자세 그대로.</li>
+<li>차의 실제 끝 위치(원위치 복귀 여부)는 확인하지 않아, '출발점까지 거리'를 오차로 단정하지 않는다.</li></ul>
+<div class="two"><img class="full" src="1116_f60.jpg" alt="11/16 60 s"><img class="full" src="1116_f230.jpg" alt="11/16 230 s"></div>
+<h2 id="s1115">11/15 실내 복도 왕복 — 원위치 복귀 (분석 상세)</h2>
 <p class="lead">실내 복도를 왕복해 <b>출발점으로 원위치 복귀</b>한 센서 녹화(58 m)를 노트북에서 재생해, Basalt VIO와 VIO+GNSS 융합기, 지자계 방향을 함께 확인했다. 보드(Pi5/Jetson) 설정은 바꾸지 않았다.</p>
 <div class="kpi"><div><b>2.85 m</b><span>끝 위치 오차 · VIO</span></div><div><b>2.69 m</b><span>끝 위치 오차 · 융합</span></div><div><b>−2.76 → +0.23</b><span>높이 변화 cm/m (장착각 보정)</span></div><div><b>약 4~6°</b><span>VIO 방향 드리프트</span></div></div>
-<h2>결과 영상</h2>
+<h3>결과 영상</h3>
 <div class="vtabs"><button onclick="v.src='loc_4x_720p.mp4';v.play()">4배속 (55 s)</button> <button onclick="v.src='loc_1x_720p.mp4';v.play()">1배속 (219 s)</button></div>
 <video id="v" controls playsinline preload="metadata" src="loc_4x_720p.mp4" poster="f120.jpg"></video>
 <table><tr><th>화면 위치</th><th>내용</th></tr>
