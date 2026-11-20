@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GPP 경로점의 yaw, 앞축 중점으로 +16.75cm 변환, 변환 경로를 따라 고르는 RPP 캐럿을 한눈에 확인하는 NOMAD 설명 도구.">
+<title>NOMAD · GPP yaw → 앞축 변환 → 캐럿</title>
+<style>
+  :root{color-scheme:light;--bg:#f4f6f9;--surface:#fff;--ink:#172532;--muted:#586779;--line:#dce3eb;--blue:#3265c6;--teal:#008578;--orange:#b6580a;--purple:#7851b9;--grid:#edf1f5;--soft:#f7f9fc;--yaw:#687584}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Noto Sans KR","Malgun Gothic",sans-serif}button,input,select{font:inherit}button,select,input{accent-color:var(--teal)}button,select{cursor:pointer}a{color:var(--blue)}:focus-visible{outline:3px solid #809ee9;outline-offset:4px}main{max-width:1440px;margin:auto;padding:28px 32px 36px}header{margin-bottom:22px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--muted)}h1{font-size:clamp(23px,3vw,34px);line-height:1.3;margin:9px 0}header p{margin:0;color:var(--muted)}.topline{display:flex;justify-content:space-between;gap:12px;align-items:center}.tag{font-size:12px;background:#e7eeeb;color:#245c49;border-radius:5px;padding:4px 9px;white-space:nowrap}.toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px 22px;border:1px solid var(--line);background:var(--surface);border-radius:12px 12px 0 0}.field{display:flex;align-items:center;gap:12px}.field label{font-weight:600;white-space:nowrap}select{border:1px solid #c8d2df;border-radius:6px;background:var(--surface);color:var(--ink);padding:7px 32px 7px 11px;min-height:42px}.lookahead{flex:1;min-width:280px}.lookahead input{flex:1;min-width:100px;max-width:340px}input[type=range]{width:100%;min-height:32px;margin:0}output,.number{font-variant-numeric:tabular-nums}.lookahead output{min-width:61px;font-weight:700}.switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}.switch input{width:17px;height:17px}.board{display:grid;grid-template-columns:minmax(0,1fr) 310px;background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;overflow:hidden}.diagram{padding:20px 20px 12px;min-width:0}.legend{display:flex;gap:10px 20px;flex-wrap:wrap;font-size:13px;color:var(--ink);margin:0 6px 4px}.legend span{display:inline-flex;align-items:center;gap:7px}.key{display:inline-block;width:22px;height:0;border-top:3px solid var(--blue)}.key.gpp{border-top-style:dashed}.key.axle{border-color:var(--teal)}.key.yaw{border-top:1px solid var(--yaw);position:relative}.key.yaw:after{content:"";position:absolute;right:-1px;top:-4px;border-left:6px solid var(--yaw);border-top:3px solid transparent;border-bottom:3px solid transparent}.key.carrot{border:0;width:9px;height:9px;transform:rotate(45deg);background:var(--orange);margin:0 6px}.key.arc{border-color:var(--purple);border-top-style:dotted}.drawing{display:block;width:100%;height:500px;touch-action:pan-y}.drawing text,.zoom text{font-family:inherit;font-size:12px;fill:var(--ink)}.drawing .label,.zoom .label{paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}.drawing .hint{fill:var(--muted)}.drawing .hit{cursor:pointer}.plot-caption{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding:0 8px}.panel{border-left:1px solid var(--line);padding:22px;background:var(--soft);min-width:0}.step-label{font-size:12px;letter-spacing:.03em;color:var(--muted);margin:0 0 4px}.panel h2{font-size:18px;line-height:1.4;margin:0 0 10px}.panel .explain{font-size:13px;color:var(--muted);margin:0 0 12px}.selection{display:flex;justify-content:space-between;font-size:13px;gap:8px}.selection output{font-weight:600}.zoom{display:block;width:100%;height:210px;margin-top:8px}.formula{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;background:#e9efef;padding:12px;border-radius:6px;line-height:1.9}.xy{font-size:12px;margin:8px 0 0;color:var(--muted);font-variant-numeric:tabular-nums}.divider{border:0;border-top:1px solid var(--line);margin:20px 0}.distance{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin:5px 0}.distance strong{font-size:17px}.distance.total{margin-bottom:9px}.small{font-size:12px;color:var(--muted)}.status{font-size:13px;line-height:1.65;margin:12px 0 0;color:var(--muted)}.arc-info{font-size:12px;color:var(--muted);margin-top:10px}[hidden]{display:none!important}.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:24px}.step{display:grid;grid-template-columns:26px 1fr;gap:10px}.step .n{width:24px;height:24px;background:#e6ebf1;border-radius:50%;text-align:center;font-size:12px;font-weight:700;line-height:24px}.step h3{font-size:15px;margin:0 0 4px}.step p{font-size:13px;color:var(--muted);margin:0}details{border-top:1px solid var(--line);margin-top:24px;padding-top:14px;font-size:13px}summary{font-weight:600;cursor:pointer;padding:6px 0}details p{color:var(--muted);max-width:1000px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}th{font-weight:600}footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:11px;margin-top:24px}.source{overflow-wrap:anywhere}noscript{display:block;padding:20px;background:#fff4da}
+  @media(max-width:1050px){main{padding:22px 20px}.toolbar{gap:14px 22px}.board{grid-template-columns:minmax(0,1fr) 280px}.panel{padding:18px}.drawing{height:480px}.field{gap:8px}.steps{gap:14px}}
+  @media(max-width:760px){main{padding:18px 12px}.topline{align-items:flex-start}.tag{font-size:11px}header{margin-bottom:16px}.toolbar{padding:14px;gap:12px}.field{width:100%}.field select{flex:1}.lookahead{min-width:0;flex-wrap:wrap}.lookahead label{flex:1}.lookahead input{max-width:none;order:3;flex-basis:100%}.board{grid-template-columns:1fr}.diagram{padding:14px 8px}.drawing{height:440px}.panel{border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;padding:20px}.panel .divider{display:none}.zoom{height:200px}.steps{grid-template-columns:1fr;gap:16px}.legend{gap:8px 13px}.plot-caption{font-size:11px}.source{max-width:100%}}
+  @media(max-width:480px){.panel{grid-template-columns:1fr;gap:20px}.panel .divider{display:block;margin:0}.zoom{height:205px}.drawing{height:400px}.tag{white-space:normal;text-align:right;max-width:125px}.legend{font-size:12px}header p{font-size:13px}th,td{padding:8px 5px;font-size:12px}.toolbar .switch{font-size:13px}}
+  .route-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);margin:14px 8px 0;padding-top:12px}.route-metrics>div{display:flex;flex-direction:column;gap:4px}.route-metrics span{font-size:12px;color:var(--muted)}.route-metrics strong{font-size:19px;font-variant-numeric:tabular-nums}#carrot-detail,#arc-info{margin:10px 8px 0}.panel{align-self:stretch}.panel .zoom{height:210px}
+  @media(max-width:760px){.panel{display:block}.route-metrics{gap:8px}.route-metrics strong{font-size:17px}}
+  @media(max-width:360px){.route-metrics span{font-size:11px}.route-metrics strong{font-size:15px}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <a href="index.html" style="display:inline-block;margin-bottom:12px;font-size:13px;text-decoration:none">← NOMAD 아카이브</a>
+    <div class="topline"><span class="eyebrow">NOMAD / PLANNING EXPLAINER</span><span class="tag">전륜구동 · 후륜조향</span></div>
+    <h1>GPP의 yaw에서 캐럿까지</h1>
+    <p>차량 기준점 P → yaw 방향으로 +16.75cm → 앞축 중점 A → 그 경로를 따라 캐럿 C</p>
+  </header>
+  <section aria-label="경로와 캐럿 탐색">
+    <div class="toolbar">
+      <div class="field"><label for="route">예시 경로</label><select id="route"><option value="left">좌회전</option><option value="s">S자 경로</option><option value="right">우회전</option><option value="straight">직선</option></select></div>
+      <div class="field lookahead"><label for="lookahead">캐럿 주시거리</label><input id="lookahead" type="range" min="0.30" max="1.50" step="0.05" value="0.80"><output id="lookahead-value" for="lookahead">0.80 m</output></div>
+      <label class="switch"><input id="show-arc" type="checkbox">LPP 추종 원호도 보기</label>
+    </div>
+    <div class="board">
+      <div class="diagram">
+        <div class="legend" aria-label="범례">
+          <span><i class="key gpp"></i>GPP 기준점 P</span><span><i class="key axle"></i>변환된 앞축 A</span><span><i class="key yaw"></i>yaw · P→A</span><span><i class="key carrot"></i>캐럿 C</span><span id="arc-key" hidden><i class="key arc"></i>LPP 앞축 원호</span>
+        </div>
+        <svg id="diagram" class="drawing" role="img" aria-labelledby="diagram-title diagram-desc"><title id="diagram-title">GPP 경로와 yaw, 앞축 변환점, 캐럿을 겹쳐 표시한 평면도</title><desc id="diagram-desc">파란 점선은 차량 기준점 경로입니다. 각 점에서 차체 yaw 방향으로 16.75cm 옮긴 초록 점을 이어 앞축 경로를 만듭니다. 현재 앞축 A0부터 초록 경로를 따라 주시거리만큼 간 주황 마름모가 캐럿입니다.</desc><g id="diagram-scene"></g></svg>
+        <div class="plot-caption"><span>경로점을 누르거나 ‘확인할 경로점’을 움직여 보세요.</span><span>합성 경로 예시 · X/Y 동일 축척 · 단위 m</span></div>
+        <div class="route-metrics">
+          <div><span>P → A 고정 변환</span><strong>16.75 cm</strong></div>
+          <div><span>A₀ → C 경로를 따라</span><strong id="walked">0.80 m</strong></div>
+          <div><span>A₀ → C 직선거리</span><strong id="chord" class="number"></strong></div>
+        </div>
+        <p id="carrot-detail" class="small"></p>
+        <p id="arc-info" class="arc-info" hidden></p>
+      </div>
+      <aside class="panel" aria-label="선택한 경로점과 거리 해설">
+        <div>
+          <p class="step-label">같은 차량 자세의 두 기준점</p><h2>yaw로 앞축 위치 구하기</h2>
+          <p class="explain">yaw는 <strong>계획대로 이 위치에 왔을 때의 차체 방향</strong>입니다.</p>
+          <div class="selection"><label for="point">확인할 경로점</label><output id="point-value" for="point">P₁₃ ↔ A₁₃</output></div>
+          <input id="point" type="range" min="0" max="80" step="1" value="25">
+          <svg id="zoom" class="zoom" role="img" aria-labelledby="zoom-title"><title id="zoom-title">선택한 GPP 경로점의 yaw와 16.75cm 앞축 변환 확대도</title><g id="zoom-scene"></g></svg>
+          <div class="formula">A.x = P.x + 0.1675 × cos(yaw)<br>A.y = P.y + 0.1675 × sin(yaw)</div>
+          <p id="coordinates" class="xy"></p>
+        </div>
+
+      </aside>
+    </div>
+  </section>
+  <section class="steps" aria-label="계산 순서">
+    <div class="step"><span class="n">1</span><div><h3>GPP가 위치와 방향을 함께 계획</h3><p>경로점마다 (x, y, yaw)가 있습니다. yaw는 현재 차에서 그 점을 바라보는 방위각이 아닙니다.</p></div></div>
+    <div class="step"><span class="n">2</span><div><h3>LPP가 같은 자세의 앞축 위치로 변환</h3><p>각 P의 yaw 방향으로 16.75cm 옮겨 A를 만듭니다. 같은 번호의 P와 A는 같은 순간의 차량 자세를 나타냅니다.</p></div></div>
+    <div class="step"><span class="n">3</span><div><h3>변환된 경로에서 캐럿 선택</h3><p>A들을 이은 선분을 따라 주시거리만큼 갑니다. 점 사이에 걸리면 보간하므로 캐럿이 꼭 A 점 하나와 일치하지는 않습니다.</p></div></div>
+  </section>
+  <details>
+    <summary>예전 전륜조향 때도 yaw가 필요했던 이유</summary>
+    <p>우리 Pure Pursuit 식은 조향하지 않는 축의 중점을 기준으로 계산합니다. 전륜조향 때는 뒤축, 후륜조향인 지금은 앞축입니다. 어느 경우든 GPP의 차체 yaw가 있어야 그 축의 위치를 구할 수 있습니다.</p>
+    <table><thead><tr><th>구성</th><th>Pure Pursuit 기준</th><th>차량 기준점에서 변환</th></tr></thead><tbody><tr><td>예전 전륜조향 · 후륜구동</td><td>뒤축 중점</td><td>yaw 방향으로 뒤로 이동</td></tr><tr><td>현재 후륜조향 · 전륜구동</td><td>앞축 중점</td><td>yaw 방향으로 앞으로 이동</td></tr></tbody></table>
+    <p>기록: 2026-10-12에는 경로 선분의 기울기 대신 GPP의 실제 차체 yaw를 쓰도록 수정했습니다(cfd9487). 10-29에는 조향 축을 바꾸면서 reference_offset의 부호를 바꿨습니다(0d87e0c). 그 당시 시뮬레이션의 변환 거리는 36cm였으며, 이 화면의 16.75cm는 현재 실차 플래너 모델 값입니다.</p>
+  </details>
+  <details>
+    <summary>현재 코드와 이 그림의 범위</summary>
+    <p>현재 모델의 축간거리 0.335m, reference_offset = −0.1675m를 사용합니다. 코드의 변환은 A = P − reference_offset × (cos(yaw), sin(yaw))입니다. 실제 차량에서 측정한 장착 오프셋을 보여 주는 화면은 아닙니다.</p>
+    <p>이 예시는 현재 차량이 경로의 첫 자세에 있다고 놓습니다. 실제 RPP는 전달받은 경로를 변환한 뒤, 현재 앞축에서 가장 가까운 변환 경로점부터 선분 길이를 누적하고 캐럿을 보간합니다. 그 앞 단계에서 현재 위치와 GPP 경로를 잇는 구간이 생길 수도 있습니다.</p>
+    <p>‘LPP 추종 원호’는 현재 앞축의 진행 방향에 접하고 캐럿을 지나는 한 원호입니다. κ = 2y / (x² + y²), 등가 조향각 = atan(0.335 × κ)를 사용합니다(x/y는 현재 앞축 좌표계). 이 원호가 캐럿에 도착할 때의 차체 방향을 GPP yaw와 같게 만드는 항은 없습니다.</p>
+    <p>개념 확인을 위한 합성 경로이며 실차 로그 재생이나 GPP 탐색 실행은 아닙니다. 한 주시거리 후보의 기하만 표시하며, 실제 RPP의 후보 순회·충돌 검사·속도 제한은 실행하지 않습니다. 조작은 이 그림에만 반영됩니다.</p>
+    <p class="source">확인한 구현: nomad_planning_policy/src/policy.cpp의 앞축 변환·주시거리 보간·RPP 곡률 계산, nomad_planning_core/src/core.cpp의 차량 운동학. 기준: 2026-11-13 소스 확인본.</p>
+  </details>
+  <footer><span>NOMAD · LPP 이해 도구 · 2026.11.13</span><span>합성 경로 예시 · 2026.11.13 기준 설명</span></footer>
+  <noscript>이 그림을 조작하려면 브라우저의 JavaScript가 필요합니다. P에서 yaw 방향으로 16.75cm 옮긴 A를 이어 만든 경로를 따라 주시거리만큼 간 점이 캐럿입니다.</noscript>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+  const OFFSET=0.1675, WHEELBASE=0.335, LENGTH=2.0, COUNT=80;
+  const route=$('route'), lookahead=$('lookahead'), point=$('point'), showArc=$('show-arc');
+  const diagram=$('diagram'), scene=$('diagram-scene'), zoom=$('zoom'), zoomScene=$('zoom-scene');
+  const C={gpp:'var(--blue)',axle:'var(--teal)',carrot:'var(--orange)',yaw:'var(--yaw)',arc:'var(--purple)',ink:'var(--ink)',line:'var(--line)',grid:'var(--grid)',surface:'var(--surface)'};
+  let poses=[], axles=[], toScreen=null;
+  const sub=n=>String(n).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
+  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const deg=r=>r*180/Math.PI;
+  function add(parent,tag,attrs={},text){const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,String(v));if(text!==undefined)e.textContent=text;parent.appendChild(e);return e;}
+  function label(parent,x,y,text,anchor='start',attrs={}){return add(parent,'text',{x,y,'text-anchor':anchor,class:'label',...attrs},text);}
+  function line(parent,a,b,attrs={}){return add(parent,'line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],...attrs});}
+  function arrow(parent,a,b,color,width=1.3,head=5){const len=Math.hypot(b[0]-a[0],b[1]-a[1]);if(len<1)return;const ux=(b[0]-a[0])/len,uy=(b[1]-a[1])/len;line(parent,a,b,{stroke:color,'stroke-width':width});add(parent,'path',{d:`M${b[0]},${b[1]} L${b[0]-head*ux+head*.5*uy},${b[1]-head*uy-head*.5*ux} L${b[0]-head*ux-head*.5*uy},${b[1]-head*uy+head*.5*ux} Z`,fill:color});}
+  function mark(parent,p,r,fill,stroke){return add(parent,'circle',{cx:p[0],cy:p[1],r,fill,stroke,'stroke-width':2});}
+  function advance(a,yaw,k,d){const end=yaw+k*d;return {x:a.x+(Math.abs(k)<1e-10?d*Math.cos(yaw):(Math.sin(end)-Math.sin(yaw))/k),y:a.y+(Math.abs(k)<1e-10?d*Math.sin(yaw):(Math.cos(yaw)-Math.cos(end))/k),yaw:end};}
+  function makeRoute(){
+    const type=route.value;let axle={x:OFFSET,y:0},yaw=0;poses=[];axles=[];
+    for(let i=0;i<=COUNT;i++){
+      const p={x:axle.x-OFFSET*Math.cos(yaw),y:axle.y-OFFSET*Math.sin(yaw),yaw};poses.push(p);
+      // Same expression as the current RPP: p - reference_offset * heading.
+      axles.push({x:p.x+OFFSET*Math.cos(p.yaw),y:p.y+OFFSET*Math.sin(p.yaw)});
+      const s=i*LENGTH/COUNT;let k=0;
+      if(type==='s')k=s<.15?0:s<.8?1.35:s<1.55?-1.35:0;
+      else if(type!=='straight')k=s>=.2&&s<1.4?(type==='left'?1.05:-1.05):0;
+      const next=advance(axle,yaw,k,LENGTH/COUNT);axle={x:next.x,y:next.y};yaw=next.yaw;
+    }
+  }
+  function carrotAt(L){let remaining=L;const walked=[axles[0]];for(let i=1;i<axles.length;i++){const a=axles[i-1],b=axles[i],len=distance(a,b);if(len>=remaining&&len>0){const t=remaining/len,target={x:a.x+t*(b.x-a.x),y:a.y+t*(b.y-a.y)};walked.push(target);return {target,walked,i,t};}walked.push(b);remaining-=len;}return {target:axles.at(-1),walked,i:axles.length-1,t:1};}
+  function pursuit(target){const x=target.x-axles[0].x,y=target.y-axles[0].y,k=2*y/(x*x+y*y);const angle=Math.abs(k)<1e-10?0:2*Math.atan2(y,x),length=Math.abs(k)<1e-10?Math.hypot(x,y):angle/k;return {k,angle,length,steer:Math.atan(WHEELBASE*k),points:Array.from({length:81},(_,i)=>advance(axles[0],0,k,length*i/80))};}
+  function drawZoom(index){
+    const p=poses[index],w=zoom.getBoundingClientRect().width||260,h=205,scale=Math.min(w-54,150)/.335;
+    zoom.setAttribute('viewBox',`0 0 ${w} ${h}`);zoomScene.replaceChildren();
+    const origin=[w/2-30,p.yaw<0?76:130],end=[origin[0]+OFFSET*scale*Math.cos(p.yaw),origin[1]-OFFSET*scale*Math.sin(p.yaw)];
+    arrow(zoomScene,[18,origin[1]],[w-12,origin[1]],C.line,1,4);label(zoomScene,w-10,origin[1]+17,'+X','end',{class:'hint'});
+    const tail=[origin[0]-27*Math.cos(p.yaw),origin[1]+27*Math.sin(p.yaw)];line(zoomScene,tail,[origin[0]+(OFFSET*scale+22)*Math.cos(p.yaw),origin[1]-(OFFSET*scale+22)*Math.sin(p.yaw)],{stroke:C.line,'stroke-width':9,'stroke-linecap':'round'});
+    arrow(zoomScene,origin,end,C.yaw,2.3,7);
+    mark(zoomScene,origin,5,C.gpp,C.surface);mark(zoomScene,end,5,C.surface,C.axle);
+    label(zoomScene,origin[0]-8,origin[1]+24,`P${sub(index)}`,'end');
+    const up=p.yaw>=0?-13:24;label(zoomScene,end[0]+9,end[1]+up,`A${sub(index)}`);
+    const r=28,arc=Array.from({length:25},(_,i)=>[origin[0]+r*Math.cos(p.yaw*i/24),origin[1]-r*Math.sin(p.yaw*i/24)]);add(zoomScene,'path',{d:arc.map((q,i)=>(i?'L':'M')+q.join(',')).join(' '),fill:'none',stroke:C.yaw,'stroke-width':1,'stroke-dasharray':'2 2'});
+    label(zoomScene,14,25,`이 점의 yaw  ${deg(p.yaw).toFixed(1)}°`);label(zoomScene,14,h-8,'P → A = 16.75cm  (고정)');
+    $('point-value').value=`P${sub(index)} ↔ A${sub(index)}`;
+    $('coordinates').textContent=`P (${p.x.toFixed(3)}, ${p.y.toFixed(3)}) m → A (${axles[index].x.toFixed(3)}, ${axles[index].y.toFixed(3)}) m`;
+    zoom.dataset.yaw=p.yaw;zoom.dataset.offset=distance(p,axles[index]);
+  }
+  function draw(){
+    const L=Number(lookahead.value),selected=Number(point.value),chosen=carrotAt(L),arc=pursuit(chosen.target);
+    const w=diagram.getBoundingClientRect().width||800,h=w<450?400:w<650?440:420;
+    diagram.setAttribute('viewBox',`0 0 ${w} ${h}`);diagram.style.height=h+'px';scene.replaceChildren();
+    const all=[...poses,...axles,...(showArc.checked?arc.points:[])];let xmin=Math.min(...all.map(p=>p.x)),xmax=Math.max(...all.map(p=>p.x)),ymin=Math.min(...all.map(p=>p.y)),ymax=Math.max(...all.map(p=>p.y));
+    xmin-=.12;xmax+=.17;ymin-=.20;ymax+=.20;if(ymax-ymin<.85){const mid=(ymax+ymin)/2;ymin=mid-.425;ymax=mid+.425;}
+    const margin={l:41,r:22,t:35,b:44},scale=Math.min((w-margin.l-margin.r)/(xmax-xmin),(h-margin.t-margin.b)/(ymax-ymin));
+    const ox=margin.l+((w-margin.l-margin.r)-(xmax-xmin)*scale)/2,oy=margin.t+((h-margin.t-margin.b)-(ymax-ymin)*scale)/2;
+    toScreen=p=>[ox+(p.x-xmin)*scale,oy+(ymax-p.y)*scale];
+    const d=points=>points.map((p,i)=>(i?'L':'M')+toScreen(p).map(v=>v.toFixed(3)).join(',')).join(' ');
+    const gridStep=w<450?.5:.25;
+    for(let x=Math.ceil(xmin/gridStep)*gridStep;x<=xmax;x+=gridStep){const a=toScreen({x,y:ymin}),b=toScreen({x,y:ymax});line(scene,a,b,{stroke:C.grid,'stroke-width':1});label(scene,a[0],h-16,x.toFixed(2),'middle',{class:'hint'});}
+    for(let y=Math.ceil(ymin/gridStep)*gridStep;y<=ymax;y+=gridStep){const a=toScreen({x:xmin,y}),b=toScreen({x:xmax,y});line(scene,a,b,{stroke:C.grid,'stroke-width':1});label(scene,30,a[1]+4,y.toFixed(2),'end',{class:'hint'});}
+    label(scene,10,16,'Y (m)', 'start',{class:'hint'});label(scene,w-5,h-2,'X (m)','end',{class:'hint'});
+    add(scene,'path',{d:d(poses),fill:'none',stroke:C.gpp,'stroke-width':2.5,'stroke-dasharray':'6 5'});
+    add(scene,'path',{d:d(axles),fill:'none',stroke:C.axle,'stroke-width':2,opacity:.5});
+    add(scene,'path',{d:d(chosen.walked),fill:'none',stroke:C.axle,'stroke-width':5,'stroke-linecap':'round','stroke-linejoin':'round'});
+    for(let i=0;i<=COUNT;i+=4){const p=toScreen(poses[i]),a=toScreen(axles[i]);arrow(scene,p,a,C.yaw,1,4);mark(scene,p,2.8,C.gpp,C.surface);mark(scene,a,2.8,C.surface,C.axle);const hit=add(scene,'circle',{cx:p[0],cy:p[1],r:13,fill:'transparent',class:'hit','data-index':i});hit.addEventListener('click',()=>{point.value=String(i);draw();});}
+    if(showArc.checked){add(scene,'path',{d:d(arc.points),fill:'none',stroke:C.arc,'stroke-width':2.5,'stroke-dasharray':'3 5','stroke-linecap':'round'});}
+    const p=toScreen(poses[selected]),a=toScreen(axles[selected]);mark(scene,p,10,'none',C.gpp);mark(scene,a,10,'none',C.axle);arrow(scene,p,a,C.yaw,2.4,6);mark(scene,p,4,C.gpp,C.surface);mark(scene,a,4,C.surface,C.axle);
+    const p0=toScreen(poses[0]),a0=toScreen(axles[0]);mark(scene,p0,5,C.gpp,C.surface);mark(scene,a0,5,C.surface,C.axle);
+    label(scene,p0[0]-2,p0[1]+25,'P₀','end');label(scene,a0[0]+5,a0[1]-18,'A₀');
+    if(selected>0){label(scene,p[0]-9,p[1]+24,`P${sub(selected)}`,'end');label(scene,a[0]+9,a[1]-16,`A${sub(selected)}`);}
+    const c=toScreen(chosen.target),r=9;add(scene,'path',{d:`M${c[0]},${c[1]-r} L${c[0]+r},${c[1]} L${c[0]},${c[1]+r} L${c[0]-r},${c[1]} Z`,fill:C.carrot,stroke:C.surface,'stroke-width':2});
+    const labelRight=c[0]+110<w,tx=c[0]+(labelRight?22:-22),ty=c[1]+(route.value==='right'?30:-30),anchor=labelRight?'start':'end';line(scene,[c[0],c[1]],[tx,ty+2],{stroke:C.carrot,'stroke-width':1});label(scene,tx,ty,'캐럿 C',anchor,{'font-weight':700});label(scene,tx,ty+18,`경로 따라 ${L.toFixed(2)}m`,anchor);
+    const end=toScreen(axles.at(-1));if(selected!==COUNT)label(scene,end[0],end[1]+(route.value==='right'?25:-16),'경로 계속','middle');
+    $('lookahead-value').value=L.toFixed(2)+' m';$('walked').textContent=L.toFixed(2)+' m';$('chord').textContent=distance(axles[0],chosen.target).toFixed(3)+' m';
+    const location=chosen.t<.01?`거의 A${sub(chosen.i-1)}`:chosen.t>.99?`거의 A${sub(chosen.i)}`:`A${sub(chosen.i-1)}–A${sub(chosen.i)} 선분 위 ${(chosen.t*100).toFixed(1)}% 지점`;
+    $('carrot-detail').textContent=`캐럿 C는 ${location}. 좌표 (${chosen.target.x.toFixed(3)}, ${chosen.target.y.toFixed(3)}) m.`;
+    $('arc-key').hidden=!showArc.checked;$('arc-info').hidden=!showArc.checked;
+    $('arc-info').textContent=`보라 원호는 앞축의 추종 원호입니다. 등가 조향각 ${deg(arc.steer).toFixed(1)}°. 캐럿에서 원호의 방향은 ${deg(arc.angle).toFixed(1)}°이며, GPP의 해당 방향과 일치하도록 강제하지 않습니다.`;
+    const walked=chosen.walked.slice(1).reduce((sum,p,i)=>sum+distance(p,chosen.walked[i]),0);
+    diagram.dataset.lookahead=L;diagram.dataset.walked=walked;diagram.dataset.chord=distance(axles[0],chosen.target);diagram.dataset.carrotX=chosen.target.x;diagram.dataset.carrotY=chosen.target.y;diagram.dataset.arcEndpointError=distance(arc.points.at(-1),chosen.target);diagram.dataset.maxOffsetError=Math.max(...poses.map((p,i)=>Math.abs(distance(p,axles[i])-OFFSET)));diagram.dataset.route=route.value;
+    drawZoom(selected);
+  }
+  route.addEventListener('change',()=>{makeRoute();draw();});lookahead.addEventListener('input',draw);point.addEventListener('input',draw);showArc.addEventListener('change',draw);
+  new ResizeObserver(draw).observe(document.querySelector('.diagram'));makeRoute();draw();
+})();
+</script>
+<script type="module" src="../assets/meeting-ping.js"></script>
+</body>
+</html>
