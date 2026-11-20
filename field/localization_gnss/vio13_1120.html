@@ -61,8 +61,15 @@ footer{max-width:1100px;margin:0 auto;padding:0 16px 40px;font-size:.8rem;color:
 <li>GNSS는 DGNSS 189 · RTK FLOAT 303 · <b>RTK FIX 0</b>. 해 종류가 54번 바뀌어 원래 규칙으로는 정렬이 안 됨 → 해 종류가 바뀌어도 정렬 쌍 유지로 44초에 정렬.</li>
 <li>거르기는 <b>10초 이동 비교 하나</b>가 중심(60초 비교 끔). 같은 구역을 두 번 지난 길이 서로 겹치도록 12가지 값을 비교해 고름.</li>
 <li>결과: 끝에서 GNSS와 <b>0.1 m</b>, 전체 중앙 <b>0.5 m</b>, 두 번 지난 길 차이 중앙 <b>0.8 m</b>.</li></ol></div>
-<h2>종합 영상</h2><p class="muted">왼쪽: 휴대폰 영상(작은 화면 = 로봇 OAK 카메라) · 오른쪽: 위에서 본 궤적, <b style="color:#e8453c">빨강 ▲ VIO</b> · <b style="color:#2e9d4f">초록 ▲ GNSS 융합</b> · 아래: 속도와 위치 보정 상태. 휴대폰·로봇 시간은 화면 움직임으로 맞춤(±2초 정도).</p>
+<h2>영상 1 — 두 번 지난 길 맞추기 설정</h2><p class="muted">왼쪽: 휴대폰 영상(작은 화면 = 로봇 OAK 카메라) · 오른쪽: 위에서 본 궤적, <b style="color:#e8453c">빨강 ▲ VIO</b> · <b style="color:#2e9d4f">초록 ▲ GNSS 융합</b> · 아래: 속도와 위치 보정 상태. 휴대폰·로봇 시간은 화면 움직임으로 맞춤(±2초 정도).</p>
 <video controls playsinline preload="metadata" src="vio13_1120_720p.mp4" poster="vio13_1120_poster.jpg"></video>
+<h2>영상 2 — 끝점 0.5 m 설정 (후보 규칙 + 최적화 창 20초)</h2><p class="muted">같은 녹화, 같은 화면 구성. 융합 설정만 다름: 후보 규칙에서 최적화 창 10초 → 20초. 출발점으로 돌아온 마지막 융합 위치가 VIO 시작 위치에서 <b>0.50 m</b> (위 영상 설정은 0.61 m, VIO만은 9.9 m).</p>
+<video controls playsinline preload="metadata" src="vio13_1120_win20_720p.mp4" poster="vio13_1120_win20_poster.jpg"></video>
+<table style="margin-top:10px"><tr><th>설정</th><th>융합 끝 ↔ VIO 시작</th><th>두 번 지난 길 차이 (중앙)</th><th>전체 GNSS와</th></tr>
+<tr><td>영상 1 (10초 2.5 m + 무게 상한 1 m + yaw 3°)</td><td>0.61 m</td><td><b>0.79 m</b></td><td><b>0.50 m</b></td></tr>
+<tr><td>영상 2 (후보 규칙 + 창 20초)</td><td><b>0.50 m</b></td><td>1.44 m</td><td>1.28 m</td></tr>
+<tr><td>VIO만 (출발 60초에 한 번 맞춤)</td><td>9.9 m</td><td>—</td><td>—</td></tr></table>
+<figure style="margin:12px 0 0;max-width:560px"><img class="full" src="vio13_win20_startend.png" alt="시작과 끝"><figcaption class="muted">VIO만(빨강) vs 영상 2 융합(초록) · ○ 시작, ✕ VIO 끝, ★ 융합 끝</figcaption></figure>
 <h2>설정 (11/20 후보 규칙 + 튜닝)</h2><table><tr><th>항목</th><th>값</th><th>뜻</th></tr>
 <tr><td>정렬</td><td>GNSS만, 15 m·3°, 해 종류 바뀌어도 쌍 유지</td><td>처음 방향을 GNSS 궤적과 VIO 궤적을 겹쳐 한 번 맞춤</td></tr>
 <tr><td>10초 이동 비교</td><td><b>2.5 m</b> (후보 2 m)</td><td>GNSS 10초 이동이 VIO와 이보다 다르면 안 씀</td></tr>
