@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d141b">
+  <meta name="description" content="NOMAD 자동차 3D 모델을 자유롭게 회전·확대하고, GLB 모델과 Blender 편집 원본을 다운로드하세요.">
+  <title>NOMAD · 3D 모델 스튜디오</title>
+  <link rel="stylesheet" href="studio.css">
+  <script type="module" src="vendor/model-viewer.min.js"></script>
+  <script type="module" src="studio.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="../../">NOMAD<span>ARCHIVE</span></a>
+    <a class="back" href="../index.html"><span aria-hidden="true">↖</span> 자료 목록으로</a>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow"><span></span> NOMAD / 3D MODEL STUDIO</p>
+      <h1 id="page-title">NOMAD, <span>모든 각도에서.</span></h1>
+      <p class="lead">영상 속 자동차를 직접 돌려보세요. 보고 싶은 각도로, 원하는 크기로.</p>
+    </section>
+    <div class="layout">
+      <section class="viewer-shell" id="viewer-shell" aria-label="3D 모델 뷰어">
+        <div class="stage" id="stage" data-background="dark">
+          <div class="stage-top"><span class="stage-label">INTERACTIVE 3D</span><span class="load-status" id="load-status" role="status">모델 불러오는 중</span></div>
+          <model-viewer id="vehicle" src="nomad.glb" poster="preview.jpg"
+            alt="쌍라이트, 라이다, 푸른 GNSS 수신기가 장착된 NOMAD 자동차 3D 모델. 드래그하거나 방향키를 눌러 회전하고, 휠 또는 두 손가락으로 확대·축소할 수 있습니다."
+            camera-controls touch-action="none" loading="eager" reveal="auto"
+            camera-orbit="-30deg 72deg 2.25m" camera-target="auto auto auto" field-of-view="32deg"
+            min-camera-orbit="auto 0deg 0.5m" max-camera-orbit="auto 180deg 5m"
+            min-field-of-view="20deg" max-field-of-view="50deg"
+            shadow-intensity="1" shadow-softness="0.8" exposure="1.15"
+            environment-image="neutral" interaction-prompt="none" interpolation-decay="100"
+            auto-rotate-delay="0" rotation-per-second="14deg">
+            <div slot="progress-bar" class="loading" id="loading"><div class="loading-card"><span class="spinner" aria-hidden="true"></span><p id="loading-text">3D 모델 준비 중…</p><div class="progress-track"><div id="progress-fill"></div></div></div></div>
+          </model-viewer>
+          <div class="error-panel" id="error-panel" hidden role="alert"><strong>3D 화면을 불러오지 못했어요.</strong><p>브라우저를 새로고침하거나 아래에서 모델 파일을 직접 받아보세요.</p><button id="retry" type="button">다시 불러오기</button></div>
+          <div class="stage-bottom"><span><i aria-hidden="true">↔</i> 드래그로 회전 <span class="divider">·</span> 휠로 확대</span><button class="icon-btn" id="fullscreen" type="button" aria-label="3D 뷰어 전체 화면" title="전체 화면">⛶</button></div>
+        </div>
+        <div class="viewer-controls">
+          <div class="preset-row" role="group" aria-label="모델 시점 선택">
+            <span class="control-label">시점</span>
+            <button class="preset selected" data-view="overview" type="button" aria-pressed="true">전체</button>
+            <button class="preset" data-view="front" type="button" aria-pressed="false">정면</button>
+            <button class="preset" data-view="back" type="button" aria-pressed="false">후면</button>
+            <button class="preset" data-view="left" type="button" aria-pressed="false">왼쪽</button>
+            <button class="preset" data-view="right" type="button" aria-pressed="false">오른쪽</button>
+            <button class="preset" data-view="top" type="button" aria-pressed="false">위</button>
+          </div>
+          <div class="utility-row">
+            <button id="rotate" type="button" aria-pressed="false"><span aria-hidden="true">↻</span> 자동 회전</button>
+            <button id="background" type="button" aria-pressed="false"><span aria-hidden="true">◐</span> 밝은 배경</button>
+            <button id="reset" type="button"><span aria-hidden="true">⤾</span> 처음으로</button>
+          </div>
+        </div>
+      </section>
+      <aside class="sidebar" aria-label="모델 정보와 다운로드">
+        <section class="model-info">
+          <p class="eyebrow">THE VEHICLE</p><h2>영상에서 보던<br>그 NOMAD.</h2>
+          <p class="description">차체의 분할 패널부터 바퀴, 카메라와 센서까지. 소개 영상에 사용한 자동차 모델을 그대로 담았습니다.</p>
+          <ul class="features"><li><span>01</span> 라이다 · 카메라</li><li><span>02</span> 푸른 GNSS 수신기</li><li><span>03</span> OAK-D Lite 아래 쌍라이트</li><li><span>04</span> 차체 패널 · 바퀴 · 서스펜션</li></ul>
+        </section>
+        <section class="downloads" aria-labelledby="download-title">
+          <h2 id="download-title">모델 가져가기</h2>
+          <a class="download primary" href="nomad.glb" download="NOMAD_자동차_3D모델.glb"><span><strong>GLB 모델 다운로드</strong><small>3D 뷰어·다른 프로그램에서 사용 · 8.3 MB</small></span><span aria-hidden="true">↓</span></a>
+          <a class="download secondary" href="nomad-blender-source.zip" download="NOMAD_Blender_편집원본.zip"><span><strong>Blender 편집 원본</strong><small>모델·조명·카메라·애니메이션 · ZIP 2.5 MB</small></span><span aria-hidden="true">↓</span></a>
+          <p class="download-note">ZIP 안에 .blend 파일과 제작 스크립트가 함께 들어 있어요.</p>
+        </section>
+        <details class="help"><summary>어떻게 조작하나요?</summary><dl><div><dt>회전</dt><dd>마우스로 드래그 / 한 손가락 드래그</dd></div><div><dt>확대·축소</dt><dd>마우스 휠 / 두 손가락 벌리기·오므리기</dd></div><div><dt>위치 이동</dt><dd>오른쪽 버튼 드래그 / 두 손가락 이동</dd></div><div><dt>키보드</dt><dd>3D 화면을 선택한 뒤 방향키</dd></div></dl></details>
+      </aside>
+    </div>
+    <footer><span>TEAM NOMAD <b>·</b> SEE. SENSE. MOVE.</span><span>실물 사진·영상을 바탕으로 제작한 시각화 모델</span></footer>
+  </main>
+  <noscript><div class="noscript">3D 회전 기능에는 JavaScript가 필요합니다. 모델 파일은 다운로드 버튼으로 받을 수 있어요.</div></noscript>
+  <script type="module" src="../../assets/meeting-ping.js"></script>
+</body>
+</html>
