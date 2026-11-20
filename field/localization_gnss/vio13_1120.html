@@ -1,0 +1,85 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>11/20 야지 · VIO와 GNSS 융합 · NOMAD</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"><style>:root{--bg:#f4f6f9;--card:#fff;--fg:#172131;--muted:#5d6878;--line:#dfe4ea;--accent:#1f5fd1;--accent-soft:#e6eefc;
+--ok:#18794e;--ok-soft:#e2f4ea;--warn:#a35c00;--warn-soft:#fcefdc;--bad:#b4232b;--bad-soft:#fbe6e7;--new:#6a3fd6;--new-soft:#efe9fd;--old:#7b8494;
+--s1:#2e9d4f;--s2:#f28e2b;--s3:#8e5bd1;--s4:#3b7ddd;--s5:#f2b705;--s6:#b0b0b0;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#11161e;--card:#19202b;--fg:#e7ebf1;--muted:#9aa4b2;--line:#2c3542;--accent:#7aa2ff;--accent-soft:#1d2a44;
+--ok:#5fd09a;--ok-soft:#163327;--warn:#f0ad55;--warn-soft:#3a2a14;--bad:#ff7b82;--bad-soft:#3a1a1d;--new:#b49bff;--new-soft:#271f45;--old:#8a93a3;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 "Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+header.top .brand{font-weight:900;letter-spacing:.02em;text-decoration:none;color:var(--fg)}
+header.top nav{display:flex;flex-wrap:wrap;gap:4px}
+header.top nav a{text-decoration:none;color:var(--muted);font-size:.9rem;padding:3px 10px;border-radius:999px}
+header.top nav a.on,header.top nav a:hover{background:var(--accent-soft);color:var(--accent)}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+.crumb{font-size:.84rem;color:var(--muted);margin:2px 0 10px}.crumb a{text-decoration:none}
+h1{font-size:1.6rem;margin:0 0 6px;letter-spacing:-.01em}h2{font-size:1.2rem;margin:28px 0 10px}h3{font-size:1rem;margin:18px 0 6px}
+p.lead{color:var(--muted);margin:0 0 14px;max-width:80ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--line);display:block}
+.card .im{position:relative}.card .dt{position:absolute;left:8px;top:8px;background:rgba(10,12,15,.78);color:#fff;font-weight:700;padding:3px 9px;border-radius:7px;font-size:.88rem;letter-spacing:.01em}
+.card .b{padding:10px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card b{font-size:1rem;line-height:1.35}.card .d{font-size:.86rem;color:var(--muted)}
+.big{grid-column:span 2}@media(max-width:640px){.big{grid-column:auto}}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:6px}
+.t{font-size:.72rem;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.t.ok{background:var(--ok-soft);color:var(--ok)}.t.warn{background:var(--warn-soft);color:var(--warn)}.t.bad{background:var(--bad-soft);color:var(--bad)}
+.t.new{background:var(--new-soft);color:var(--new);font-weight:700}.t.old{background:transparent;border:1px solid var(--line);color:var(--old)}
+.part{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:14px 0}
+.part.old{opacity:.86}.part h2{margin-top:0}
+.ptitle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ptitle .n{font:700 .8rem/1 ui-monospace,monospace;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 12px}
+.bar button{font:inherit;font-size:.85rem;padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.bar button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:700}
+.bar input{font:inherit;font-size:.88rem;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);min-width:180px;flex:1;max-width:280px}
+.count{font-size:.82rem;color:var(--muted)}
+.mini{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line);margin-top:4px}.mini i{display:block;height:100%}
+.sbar{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:6px 0}.sbar i{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-style:normal;white-space:nowrap;overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;background:var(--c);vertical-align:-1px}
+table{border-collapse:collapse;width:100%;font-size:.9rem;background:var(--card)}th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:500;font-size:.82rem}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}.kpi b{display:block;font-size:1.25rem}.kpi span{font-size:.78rem;color:var(--muted)}
+video{width:100%;background:#000;border-radius:10px;display:block}
+.vtabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.vtabs button,.jump{font:inherit;font-size:.85rem;padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.vtabs button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:700}
+.jump{border-color:var(--bad);color:var(--bad);padding:2px 10px}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:8px 0}details summary{cursor:pointer;font-weight:700}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:.92rem}
+.memo{border-left-color:var(--new)}
+img.full{width:100%;border-radius:10px;border:1px solid var(--line)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.two{grid-template-columns:1fr}}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:24px;font-size:.9rem}
+footer{max-width:1100px;margin:0 auto;padding:0 16px 40px;font-size:.8rem;color:var(--muted)}
+.hide{display:none!important}</style><style>.muted{color:var(--muted);font-size:.88rem}figure img{display:block}</style></head><body><header class="top"><div class="in"><a class="brand" href="../../index.html">NOMAD</a><nav><a href="../../field/index.html" class="on">실물 실험</a><a href="../../maps/index.html" class="">3D 맵</a><a href="../../system/index.html" class="">시스템 구조</a><a href="../../scenarios/index.html" class="">시뮬레이션</a><a href="../../archive/index.html" class="">보관</a></nav></div></header><main><div class=crumb><a href="../../index.html">홈</a> › <a href="../index.html">실물 실험</a> › <a href="index.html">위치추정 GNSS</a> › ⑦ 11/20 야지</div>
+<h1>⑦ 11/20 야지 — VIO와 GNSS 융합 (후보 규칙)</h1><p><a href="index.html">← 위치추정 GNSS 목차</a></p>
+<p class="lead">11/20 13:17 야지 녹화(vio13) · 약 8분 · 북쪽 약 80 m 길을 다녀오며 중간 구역을 두 번 지남. 노트북 재생 결과(Pi5 VIO 구성, 카메라–IMU +2.49° 보정). 보드 설정은 바꾸지 않음.</p>
+<div class="memo"><b>핵심</b><ol style="margin:.4em 0 0 1.2em;padding:0">
+<li>GNSS는 DGNSS 189 · RTK FLOAT 303 · <b>RTK FIX 0</b>. 해 종류가 54번 바뀌어 원래 규칙으로는 정렬이 안 됨 → 해 종류가 바뀌어도 정렬 쌍 유지로 44초에 정렬.</li>
+<li>거르기는 <b>10초 이동 비교 하나</b>가 중심(60초 비교 끔). 같은 구역을 두 번 지난 길이 서로 겹치도록 12가지 값을 비교해 고름.</li>
+<li>결과: 끝에서 GNSS와 <b>0.1 m</b>, 전체 중앙 <b>0.5 m</b>, 두 번 지난 길 차이 중앙 <b>0.8 m</b>.</li></ol></div>
+<h2>종합 영상</h2><p class="muted">왼쪽: 휴대폰 영상(작은 화면 = 로봇 OAK 카메라) · 오른쪽: 위에서 본 궤적, <b style="color:#e8453c">빨강 ▲ VIO</b> · <b style="color:#2e9d4f">초록 ▲ GNSS 융합</b> · 아래: 속도와 위치 보정 상태. 휴대폰·로봇 시간은 화면 움직임으로 맞춤(±2초 정도).</p>
+<video controls playsinline preload="metadata" src="vio13_1120_720p.mp4" poster="vio13_1120_poster.jpg"></video>
+<h2>설정 (11/20 후보 규칙 + 튜닝)</h2><table><tr><th>항목</th><th>값</th><th>뜻</th></tr>
+<tr><td>정렬</td><td>GNSS만, 15 m·3°, 해 종류 바뀌어도 쌍 유지</td><td>처음 방향을 GNSS 궤적과 VIO 궤적을 겹쳐 한 번 맞춤</td></tr>
+<tr><td>10초 이동 비교</td><td><b>2.5 m</b> (후보 2 m)</td><td>GNSS 10초 이동이 VIO와 이보다 다르면 안 씀</td></tr>
+<tr><td>60초 비교 · hAcc 제한</td><td>끔</td><td>조건을 줄임</td></tr>
+<tr><td>연속 통과 · 서서히 반영 · 정지 확인</td><td>2초 · 15초 · 4.7 m</td><td>거른 뒤 다시 쓸 때 들락날락·점프 방지</td></tr>
+<tr><td>GNSS 무게 상한</td><td><b>1 m</b> (후보 2 m)</td><td>GNSS를 0.5~1 m 정확도로 보고 당김</td></tr>
+<tr><td>yaw 고정</td><td><b>3°</b> (후보 1°), 120초에 걸쳐 따라감</td><td>방향이 크게 흔들리지 않게(끄면 59°까지 흔들림)</td></tr>
+<tr><td>높이</td><td>VIO 그대로</td><td>GNSS는 높이를 건드리지 않음</td></tr></table>
+<h2>값 고르기 — 같은 구역 두 번 지난 길 맞추기</h2><p class="lead">113~207초와 324~383초에 같은 구역을 지남. 두 번의 융합 궤적이 서로 얼마나 떨어지는지(작을수록 좋음)로 비교.</p>
+<table><tr><th>설정</th><th>두 번 지난 길 차이 (중앙 / 90%)</th><th>그 구간 GNSS와</th><th>전체</th><th>1초 최대 보정</th></tr>
+<tr><td>후보 규칙 그대로</td><td>1.47 / 2.48 m</td><td>0.66 m</td><td>1.01 m</td><td>0.23 m</td></tr>
+<tr><td>무게 상한 1 m + yaw 3°</td><td>1.08 / 2.55 m</td><td>0.41 m</td><td>0.63 m</td><td>0.29 m</td></tr>
+<tr><td><b>+ 10초 비교 2.5 m (위 영상)</b></td><td><b>0.79 / 3.24 m</b></td><td>0.42 m</td><td><b>0.50 m</b></td><td>0.31 m</td></tr>
+<tr><td>10초 비교 3 m만</td><td>0.70 / 3.35 m</td><td>0.47 m</td><td>0.57 m</td><td>0.44 m</td></tr>
+<tr><td>10초 비교 1.5 m</td><td>1.99 / 3.40 m</td><td>0.74 m</td><td>1.33 m</td><td>0.37 m</td></tr></table>
+<div class="grid" style="margin-top:12px"><figure style="margin:0"><img class="full" src="vio13_J.png" alt="튜닝 값"><figcaption class="muted">위 영상 설정 · 보라 = 쓴 GNSS, 회색 = 거른 GNSS</figcaption></figure><figure style="margin:0"><img class="full" src="vio13_base.png" alt="후보 규칙"><figcaption class="muted">후보 규칙 그대로</figcaption></figure></div>
+<h2>남은 문제</h2><ul><li>RTK FIX가 없는 녹화라 정답 위치가 없음 — "두 번 지난 길이 겹치는지"와 GNSS 차이로만 판단.</li>
+<li>녹화 1개 기준 튜닝. 같은 날 30분 전 vio12는 RTK FIX 49%였지만 OAK가 42초에 멈춰 VIO 비교 불가.</li>
+<li>노트북 재생 결과. 보드(Pi5)에는 아직 반영 안 함.</li></ul>
+</main><footer>NOMAD 야지 자율주행 로봇 · LIG 프로젝트 · 정리 2026-11-20</footer></body></html>
